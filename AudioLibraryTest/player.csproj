@@ -1,0 +1,627 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{96040217-FD3B-4ABB-A770-33EA5E484A0D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>player</RootNamespace>
+    <AssemblyName>player</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BASS BUILD_32BIT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;BASS BUILD_32BIT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;BASS BUILD_32BIT</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;BASS BUILD_32BIT</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>progico_lBx_icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Bass.Net, Version=2.4.8.4, Culture=neutral, PublicKeyToken=b7566c273e6ef480, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\Bass.Net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="FullSerializer - NoUnity">
+      <HintPath>libs\FullSerializer - NoUnity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Concurrent, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.Concurrent.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Enlightenment, Version=4.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>libs\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\Audio\IBassSoundProvider.cs" />
+    <Compile Include="Core\Audio\Playlist\PlaylistManager.cs" />
+    <Compile Include="Core\Audio\Playlist\PlayMode.cs" />
+    <Compile Include="Core\Audio\Playlist\Song.cs" />
+    <Compile Include="Core\Audio\WasapiSoundManager.cs" />
+    <Compile Include="Core\MainThreadDelegator.cs" />
+    <Compile Include="Core\Commands\WindowCommands.cs" />
+    <Compile Include="Core\FFmpeg\Exceptions.cs" />
+    <Compile Include="Core\FFmpeg\FFMpegDecoder.cs" />
+    <Compile Include="Core\FFmpeg\FFMpegFrameContainer.cs" />
+    <Compile Include="Core\FFmpeg\FFMpegManager.cs" />
+    <Compile Include="Core\FFmpeg\FFMpegUtils.cs" />
+    <Compile Include="Core\Input\ConsoleManager.cs" />
+    <Compile Include="Core\Input\ConsoleRenderer.cs" />
+    <Compile Include="Core\Input\FocusedInputGrabberForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Core\Input\InputHelper.cs" />
+    <Compile Include="Core\Input\InputManager.cs" />
+    <Compile Include="Core\Input\WindowsHotkeyUtil.cs" />
+    <Compile Include="Core\Logging\LoggingHelper.cs" />
+    <Compile Include="Core\Logging\MessageLoggedEventArgs.cs" />
+    <Compile Include="Core\Render\FpsLimitHelper.cs" />
+    <Compile Include="Core\Render\FramebufferManager.cs" />
+    <Compile Include="Core\Render\FramebufferRenderTexture.cs" />
+    <Compile Include="Core\Render\MessageRenderer.cs" />
+    <Compile Include="Core\Render\Primitives.cs" />
+    <Compile Include="Core\Render\ShaderManager.cs" />
+    <Compile Include="Core\Render\ThreadedLoaderContext.cs" />
+    <Compile Include="Core\Render\UI\Controls\ControlBase.cs" />
+    <Compile Include="Core\Render\UI\Controls\MessageCenterControl.cs" />
+    <Compile Include="Core\Render\UI\Controls\OLabel.cs" />
+    <Compile Include="Core\Render\MessageCenterService.cs" />
+    <Compile Include="Core\Render\UI\Controls\PieChartControl.cs" />
+    <Compile Include="Core\Render\UI\UIManager.cs" />
+    <Compile Include="Core\Service\IService.cs" />
+    <Compile Include="Core\Service\ServiceInitializationException.cs" />
+    <Compile Include="Core\Service\ServiceManager.cs" />
+    <Compile Include="Core\Settings\SettingsAccessor.cs" />
+    <Compile Include="Core\Settings\SettingsService.cs" />
+    <Compile Include="Core\TimeManager.cs" />
+    <Compile Include="External\ProcessCreator.cs" />
+    <Compile Include="External\QuickFont\Builder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\Configuration\QFontBuilderConfiguration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\Configuration\QFontConfiguration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\Configuration\QFontKerningConfiguration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\Configuration\QFontLoaderConfiguration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\Configuration\QFontShadowConfiguration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\FontLoadDescription.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\Helper.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\JBitmap.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\JMath.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\JTexture.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\JTextureManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\KerningCalculator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\ProjectionStack.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\QBitmap.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\QFont.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\QFontData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\QFontGlyph.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\QFontRenderOptions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\QVertexBuffer.cs" />
+    <Compile Include="External\QuickFont\TextNodeList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\QuickFont\TexturePage.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="External\TagLib\Aac\AudioHeader.cs" />
+    <Compile Include="External\TagLib\Aac\BitStream.cs" />
+    <Compile Include="External\TagLib\Aac\File.cs" />
+    <Compile Include="External\TagLib\Aiff\File.cs" />
+    <Compile Include="External\TagLib\Aiff\StreamHeader.cs" />
+    <Compile Include="External\TagLib\Ape\File.cs" />
+    <Compile Include="External\TagLib\Ape\Footer.cs" />
+    <Compile Include="External\TagLib\Ape\Item.cs" />
+    <Compile Include="External\TagLib\Ape\StreamHeader.cs" />
+    <Compile Include="External\TagLib\Ape\Tag.cs" />
+    <Compile Include="External\TagLib\Asf\ContentDescriptionObject.cs" />
+    <Compile Include="External\TagLib\Asf\ContentDescriptor.cs" />
+    <Compile Include="External\TagLib\Asf\DescriptionRecord.cs" />
+    <Compile Include="External\TagLib\Asf\ExtendedContentDescriptionObject.cs" />
+    <Compile Include="External\TagLib\Asf\File.cs" />
+    <Compile Include="External\TagLib\Asf\FilePropertiesObject.cs" />
+    <Compile Include="External\TagLib\Asf\Guid.cs" />
+    <Compile Include="External\TagLib\Asf\HeaderExtensionObject.cs" />
+    <Compile Include="External\TagLib\Asf\HeaderObject.cs" />
+    <Compile Include="External\TagLib\Asf\MetadataLibraryObject.cs" />
+    <Compile Include="External\TagLib\Asf\Object.cs" />
+    <Compile Include="External\TagLib\Asf\PaddingObject.cs" />
+    <Compile Include="External\TagLib\Asf\StreamPropertiesObject.cs" />
+    <Compile Include="External\TagLib\Asf\Tag.cs" />
+    <Compile Include="External\TagLib\Asf\UnknownObject.cs" />
+    <Compile Include="External\TagLib\Audible\File.cs" />
+    <Compile Include="External\TagLib\Audible\Tag.cs" />
+    <Compile Include="External\TagLib\ByteVector.cs" />
+    <Compile Include="External\TagLib\ByteVectorList.cs" />
+    <Compile Include="External\TagLib\CombinedTag.cs" />
+    <Compile Include="External\TagLib\CorruptFileException.cs" />
+    <Compile Include="External\TagLib\Debugger.cs" />
+    <Compile Include="External\TagLib\File.cs" />
+    <Compile Include="External\TagLib\FileTypes.cs" />
+    <Compile Include="External\TagLib\Flac\Block.cs" />
+    <Compile Include="External\TagLib\Flac\BlockHeader.cs" />
+    <Compile Include="External\TagLib\Flac\File.cs" />
+    <Compile Include="External\TagLib\Flac\Picture.cs" />
+    <Compile Include="External\TagLib\Flac\StreamHeader.cs" />
+    <Compile Include="External\TagLib\Genres.cs" />
+    <Compile Include="External\TagLib\Gif\Codec.cs" />
+    <Compile Include="External\TagLib\Gif\File.cs" />
+    <Compile Include="External\TagLib\Gif\GifCommentTag.cs" />
+    <Compile Include="External\TagLib\ICodec.cs" />
+    <Compile Include="External\TagLib\Id3v1\StringHandler.cs" />
+    <Compile Include="External\TagLib\Id3v1\Tag.cs" />
+    <Compile Include="External\TagLib\Id3v2\ExtendedHeader.cs" />
+    <Compile Include="External\TagLib\Id3v2\Footer.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frame.cs" />
+    <Compile Include="External\TagLib\Id3v2\FrameFactory.cs" />
+    <Compile Include="External\TagLib\Id3v2\FrameHeader.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\AttachedPictureFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\CommentsFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\GeneralEncapsulatedObjectFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\MusicCdIdentifierFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\PlayCountFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\PopularimeterFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\PrivateFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\RelativeVolumeFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\SynchronizedLyricsFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\TermsOfUseFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\TextIdentificationFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\UniqueFileIdentifierFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\UnknownFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\Frames\UnsynchronisedLyricsFrame.cs" />
+    <Compile Include="External\TagLib\Id3v2\FrameTypes.cs" />
+    <Compile Include="External\TagLib\Id3v2\Header.cs" />
+    <Compile Include="External\TagLib\Id3v2\SynchData.cs" />
+    <Compile Include="External\TagLib\Id3v2\Tag.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\ByteIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\ByteVectorIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\LongArrayIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\LongIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\MakernoteIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\Rational.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\RationalArrayIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\RationalIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SByteIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\ShortArrayIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\ShortIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SLongArrayIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SLongIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SRational.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SRationalArrayIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SRationalIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SShortArrayIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SShortIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\StringIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\StripOffsetsIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SubIFDArrayEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\SubIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\ThumbnailDataIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\UndefinedIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\Entries\UserCommentIFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\IFDDirectory.cs" />
+    <Compile Include="External\TagLib\IFD\IFDEntry.cs" />
+    <Compile Include="External\TagLib\IFD\IFDEntryType.cs" />
+    <Compile Include="External\TagLib\IFD\IFDReader.cs" />
+    <Compile Include="External\TagLib\IFD\IFDRenderer.cs" />
+    <Compile Include="External\TagLib\IFD\IFDStructure.cs" />
+    <Compile Include="External\TagLib\IFD\IFDTag.cs" />
+    <Compile Include="External\TagLib\IFD\Makernotes\Nikon3MakernoteReader.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\CanonFileInfoEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\CanonMakerNoteEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\CanonPictureInfoEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\ExifEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\GPSEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\IFDEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\IOPEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\Nikon3MakerNoteEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\NikonIsoInfoEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\NikonLensData3EntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\NikonPictureControlEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\NikonPreviewMakerNoteEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\NikonShotInfoEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\NikonVibrationReductionEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\NikonWorldTimeEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\OlympusMakerNoteEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\PanasonicMakerNoteEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\PentaxMakerNoteEntryTag.cs" />
+    <Compile Include="External\TagLib\IFD\Tags\SonyMakerNoteEntryTag.cs" />
+    <Compile Include="External\TagLib\IIM\IIMReader.cs" />
+    <Compile Include="External\TagLib\IIM\IIMTag.cs" />
+    <Compile Include="External\TagLib\Image\Codec.cs" />
+    <Compile Include="External\TagLib\Image\CombinedImageTag.cs" />
+    <Compile Include="External\TagLib\Image\File.cs" />
+    <Compile Include="External\TagLib\Image\ImageBlockFile.cs" />
+    <Compile Include="External\TagLib\Image\ImageOrientation.cs" />
+    <Compile Include="External\TagLib\Image\ImageTag.cs" />
+    <Compile Include="External\TagLib\Image\NoMetadata\File.cs" />
+    <Compile Include="External\TagLib\Jpeg\Codec.cs" />
+    <Compile Include="External\TagLib\Jpeg\File.cs" />
+    <Compile Include="External\TagLib\Jpeg\JpegCommentTag.cs" />
+    <Compile Include="External\TagLib\Jpeg\Marker.cs" />
+    <Compile Include="External\TagLib\Jpeg\Table.cs" />
+    <Compile Include="External\TagLib\ListBase.cs" />
+    <Compile Include="External\TagLib\Matroska\AudioTrack.cs" />
+    <Compile Include="External\TagLib\Matroska\EBMLElement.cs" />
+    <Compile Include="External\TagLib\Matroska\EBMLIDs.cs" />
+    <Compile Include="External\TagLib\Matroska\File.cs" />
+    <Compile Include="External\TagLib\Matroska\MatroskaIDs.cs" />
+    <Compile Include="External\TagLib\Matroska\SubtitleTrack.cs" />
+    <Compile Include="External\TagLib\Matroska\Tag.cs" />
+    <Compile Include="External\TagLib\Matroska\Track.cs" />
+    <Compile Include="External\TagLib\Matroska\VideoTrack.cs" />
+    <Compile Include="External\TagLib\Mpc\File.cs" />
+    <Compile Include="External\TagLib\Mpc\StreamHeader.cs" />
+    <Compile Include="External\TagLib\Mpeg4\AppleTag.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Box.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\AppleAdditionalInfoBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\AppleAnnotationBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\AppleDataBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\AppleElementaryStreamDescriptor.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\AppleItemListBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\FullBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoAudioSampleEntry.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoChunkLargeOffsetBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoChunkOffsetBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoFreeSpaceBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoHandlerBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoMetaBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoMovieHeaderBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoSampleDescriptionBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoSampleEntry.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoSampleTableBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoUserDataBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\IsoVisualSampleEntry.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\TextBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\UnknownBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\Boxes\UrlBox.cs" />
+    <Compile Include="External\TagLib\Mpeg4\BoxFactory.cs" />
+    <Compile Include="External\TagLib\Mpeg4\BoxHeader.cs" />
+    <Compile Include="External\TagLib\Mpeg4\BoxTypes.cs" />
+    <Compile Include="External\TagLib\Mpeg4\File.cs" />
+    <Compile Include="External\TagLib\Mpeg4\FileParser.cs" />
+    <Compile Include="External\TagLib\Mpeg\AudioFile.cs" />
+    <Compile Include="External\TagLib\Mpeg\AudioHeader.cs" />
+    <Compile Include="External\TagLib\Mpeg\File.cs" />
+    <Compile Include="External\TagLib\Mpeg\VBRIHeader.cs" />
+    <Compile Include="External\TagLib\Mpeg\VideoHeader.cs" />
+    <Compile Include="External\TagLib\Mpeg\XingHeader.cs" />
+    <Compile Include="External\TagLib\NonContainer\EndTag.cs" />
+    <Compile Include="External\TagLib\NonContainer\File.cs" />
+    <Compile Include="External\TagLib\NonContainer\StartTag.cs" />
+    <Compile Include="External\TagLib\NonContainer\Tag.cs" />
+    <Compile Include="External\TagLib\Ogg\Bitstream.cs" />
+    <Compile Include="External\TagLib\Ogg\Codec.cs" />
+    <Compile Include="External\TagLib\Ogg\Codecs\Theora.cs" />
+    <Compile Include="External\TagLib\Ogg\Codecs\Vorbis.cs" />
+    <Compile Include="External\TagLib\Ogg\File.cs" />
+    <Compile Include="External\TagLib\Ogg\GroupedComment.cs" />
+    <Compile Include="External\TagLib\Ogg\Page.cs" />
+    <Compile Include="External\TagLib\Ogg\PageHeader.cs" />
+    <Compile Include="External\TagLib\Ogg\Paginator.cs" />
+    <Compile Include="External\TagLib\Ogg\XiphComment.cs" />
+    <Compile Include="External\TagLib\Picture.cs" />
+    <Compile Include="External\TagLib\Png\Codec.cs" />
+    <Compile Include="External\TagLib\Png\File.cs" />
+    <Compile Include="External\TagLib\Png\PngTag.cs" />
+    <Compile Include="External\TagLib\Properties.cs" />
+    <Compile Include="External\TagLib\ReadOnlyByteVector.cs" />
+    <Compile Include="External\TagLib\Riff\AviHeaderList.cs" />
+    <Compile Include="External\TagLib\Riff\AviStream.cs" />
+    <Compile Include="External\TagLib\Riff\BitmapInfoHeader.cs" />
+    <Compile Include="External\TagLib\Riff\DivXTag.cs" />
+    <Compile Include="External\TagLib\Riff\File.cs" />
+    <Compile Include="External\TagLib\Riff\InfoTag.cs" />
+    <Compile Include="External\TagLib\Riff\List.cs" />
+    <Compile Include="External\TagLib\Riff\ListTag.cs" />
+    <Compile Include="External\TagLib\Riff\MovieIdTag.cs" />
+    <Compile Include="External\TagLib\Riff\WaveFormatEx.cs" />
+    <Compile Include="External\TagLib\StringList.cs" />
+    <Compile Include="External\TagLib\SupportedMimeType.cs" />
+    <Compile Include="External\TagLib\Tag.cs" />
+    <Compile Include="External\TagLib\Tiff\Arw\File.cs" />
+    <Compile Include="External\TagLib\Tiff\BaseTiffFile.cs" />
+    <Compile Include="External\TagLib\Tiff\Codec.cs" />
+    <Compile Include="External\TagLib\Tiff\Cr2\File.cs" />
+    <Compile Include="External\TagLib\Tiff\Dng\File.cs" />
+    <Compile Include="External\TagLib\Tiff\File.cs" />
+    <Compile Include="External\TagLib\Tiff\Nef\File.cs" />
+    <Compile Include="External\TagLib\Tiff\Pef\File.cs" />
+    <Compile Include="External\TagLib\Tiff\Rw2\File.cs" />
+    <Compile Include="External\TagLib\Tiff\Rw2\IFDReader.cs" />
+    <Compile Include="External\TagLib\Tiff\Rw2\IFDTag.cs" />
+    <Compile Include="External\TagLib\UnsupportedFormatException.cs" />
+    <Compile Include="External\TagLib\WavPack\File.cs" />
+    <Compile Include="External\TagLib\WavPack\StreamHeader.cs" />
+    <Compile Include="External\TagLib\Xmp\XmlNodeExtensions.cs" />
+    <Compile Include="External\TagLib\Xmp\XmpNode.cs" />
+    <Compile Include="External\TagLib\Xmp\XmpNodeType.cs" />
+    <Compile Include="External\TagLib\Xmp\XmpNodeVisitor.cs" />
+    <Compile Include="External\TagLib\Xmp\XmpTag.cs" />
+    <Compile Include="External\Win7FolderSelectDialog.cs" />
+    <Compile Include="Renderers\BarHelpers\AnimatedImageBackground.cs" />
+    <Compile Include="Renderers\BarHelpers\BackgroundBase.cs" />
+    <Compile Include="Renderers\BarHelpers\BackgroundController.cs" />
+    <Compile Include="Renderers\BarHelpers\BackgroundFactory.cs" />
+    <Compile Include="Renderers\BarHelpers\BackgroundScalingMode.cs" />
+    <Compile Include="Renderers\BarHelpers\IBackground.cs" />
+    <Compile Include="Renderers\BarHelpers\StaticImageBackground.cs" />
+    <Compile Include="Renderers\BarHelpers\VideoBackground.cs" />
+    <Compile Include="Renderers\BarHelpers\VideoRenderers\BaseVideoRenderer.cs" />
+    <Compile Include="Renderers\BarHelpers\VideoRenderers\GBRPlanarVideoRenderer.cs" />
+    <Compile Include="Renderers\BarHelpers\VideoRenderers\YUV420PlanarVideoRenderer.cs" />
+    <Compile Include="Shaders\BarShader.cs" />
+    <Compile Include="Shaders\CitySkylineShader.cs" />
+    <Compile Include="Shaders\FontShader.cs" />
+    <Compile Include="Shaders\GaussianBlurShader.cs" />
+    <Compile Include="Shaders\GBRPlanarShader.cs" />
+    <Compile Include="Shaders\GlslTunnelShader.cs" />
+    <Compile Include="Shaders\OscilloscopeShader.cs" />
+    <Compile Include="Shaders\PieChartShader.cs" />
+    <Compile Include="Shaders\TexturedQuadShader.cs" />
+    <Compile Include="Shaders\YUV420PlanarShader.cs" />
+    <Compile Include="Utility\CommandLineParser.cs" />
+    <Compile Include="Core\Render\TextRenderer.cs" />
+    <Compile Include="Core\Render\FpsTracker.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Core\Audio\BassSoundManager.cs" />
+    <Compile Include="Renderers\BarRenderer.cs" />
+    <Compile Include="Renderers\CitySkylineRenderer.cs" />
+    <Compile Include="Renderers\GlslTunnelRenderer.cs" />
+    <Compile Include="Renderers\OscilloscopeRenderer.cs" />
+    <Compile Include="Renderers\VisualizerRendererBase.cs" />
+    <Compile Include="Utility\DropTarget\DropTarget.cs" />
+    <Compile Include="Utility\DropTarget\DropTargetManager.cs" />
+    <Compile Include="Utility\EasingMethods.cs" />
+    <Compile Include="Core\Commands\PlayerCommands.cs" />
+    <Compile Include="Utility\External\CircularBuffer.cs" />
+    <Compile Include="Utility\MethodTimerHelper.cs" />
+    <Compile Include="Utility\ProfilingHelper.cs" />
+    <Compile Include="Utility\RotatingBuffer.cs" />
+    <Compile Include="Utility\SettingsKeys.cs" />
+    <Compile Include="Utility\Shader\CompiledShader.cs" />
+    <Compile Include="Utility\Shader\Shader.cs" />
+    <Compile Include="Utility\Shader\ShaderUtility.cs" />
+    <Compile Include="Core\Audio\SoundDataProcessor.cs" />
+    <Compile Include="Utility\ShadowplayUtil.cs" />
+    <Compile Include="Utility\TextureUtils.cs" />
+    <Compile Include="Utility\ThreadedConsoleReader.cs" />
+    <Compile Include="Utility\ExtensionMethods.cs" />
+    <Compile Include="Utility\Methods.cs" />
+    <Compile Include="Utility\TrayIconManager.cs" />
+    <Compile Include="Utility\UI\MessageCenterMessage.cs" />
+    <Compile Include="Utility\VertexFloatBuffer.cs" />
+    <Compile Include="Utility\VertexFormat.cs" />
+    <Compile Include="Utility\WallpaperMode.cs" />
+    <Compile Include="Utility\WallpaperUtils.cs" />
+    <Compile Include="Utility\Win32.cs" />
+    <Compile Include="Core\VisGameWindow.cs" />
+    <Compile Include="Core\Render\VisRenderer.cs" />
+    <Compile Include="Utility\Win32Wrapper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.manifest" />
+    <None Include="CUESDK_2013.dll" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="bassflac.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <EmbeddedResource Include="Shaders\BarShader.vert" />
+    <EmbeddedResource Include="Shaders\BarShader.frag" />
+    <EmbeddedResource Include="Shaders\OscilloscopeShader.frag" />
+    <EmbeddedResource Include="Shaders\OscilloscopeShader.vert" />
+    <EmbeddedResource Include="Shaders\TexturedQuadShader.frag" />
+    <EmbeddedResource Include="Shaders\TexturedQuadShader.vert" />
+    <EmbeddedResource Include="Shaders\GlslTunnel.frag" />
+    <EmbeddedResource Include="Shaders\GlslTunnel.vert" />
+    <EmbeddedResource Include="Shaders\CitySkylineShader.vert" />
+    <EmbeddedResource Include="Shaders\CitySkylineShader.frag" />
+    <None Include="bass.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Bass.Net.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <EmbeddedResource Include="Shaders\FontShader.frag" />
+    <EmbeddedResource Include="Shaders\FontShader.vert" />
+    <None Include="packages.config" />
+    <EmbeddedResource Include="Shaders\GBRPlanarShader.frag" />
+    <EmbeddedResource Include="Shaders\GBRPlanarShader.vert" />
+    <EmbeddedResource Include="Shaders\YUV420PlanarShader.frag" />
+    <EmbeddedResource Include="Shaders\YUV420PlanarShader.vert" />
+    <EmbeddedResource Include="Shaders\PieChartShader.frag" />
+    <EmbeddedResource Include="Shaders\PieChartShader.vert" />
+    <EmbeddedResource Include="Shaders\GaussianBlurShader.frag" />
+    <EmbeddedResource Include="Shaders\GaussianBlurShader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="basswasapi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ffbin_x64\avcodec-58.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ffbin_x64\avdevice-58.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ffbin_x64\avfilter-7.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ffbin_x64\avformat-58.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ffbin_x64\avutil-56.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ffbin_x64\postproc-55.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ffbin_x64\swresample-3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ffbin_x64\swscale-5.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FFmpeg.AutoGen\FFmpeg.AutoGen.csproj">
+      <Project>{3f5493cd-7593-4095-9597-e32ad0fd9742}</Project>
+      <Name>FFmpeg.AutoGen</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="progico_lBx_icon.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Release_REMOVEME (
+move /y "$(TargetDir)FFMpegInteropDecoder.dll" "$(TargetDir)x86\FFMpegInteropDecoder.dll" &gt; nul 2&gt;&amp;1
+
+move /y "$(TargetDir)FFMpegInteropDecoder.pdb" "$(TargetDir)x86\FFMpegInteropDecoder.pdb" &gt; nul 2&gt;&amp;1
+
+move /y "$(TargetDir)Bass.Net.dll" "$(TargetDir)x86\Bass.Net.dll" &gt; nul 2&gt;&amp;1
+
+move /y "$(TargetDir)OpenTK.dll" "$(TargetDir)x86\OpenTK.dll" &gt; nul 2&gt;&amp;1
+)</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
