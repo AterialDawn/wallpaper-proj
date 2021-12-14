@@ -50,6 +50,7 @@ namespace player.Core
         private FpsTracker fpsTracker;
         private InputManager inputManager;
         private UIManager uiManager;
+        private ImGuiManager imGuiManager;
         private OLabel clockLabel;
         private DropTargetManager dropTarget;
         private FramebufferManager fbManager;
@@ -121,6 +122,7 @@ namespace player.Core
                     }
                 }
 
+                imGuiManager.NewFrame();
                 inputManager.ProcessInputs();
 
                 ThreadedRendering(renderWatch.Elapsed.TotalSeconds);
@@ -149,7 +151,10 @@ namespace player.Core
             clockLabel.Text = $"{DateTime.Now.ToString("hh:mm:ss tt")}";
             visRenderer.Render(time);
             fpsTracker.Update();
+            
             uiManager.Render(time);
+            imGuiManager.Render();
+
 
             if (RTTEnabled)
             {
@@ -270,6 +275,7 @@ namespace player.Core
                 ServiceManager.RegisterService(new PlayerCommands());
                 inputManager = ServiceManager.RegisterService(new InputManager());
                 uiManager = ServiceManager.RegisterService(new UIManager());
+                imGuiManager = ServiceManager.RegisterService(new ImGuiManager());
                 fbManager = ServiceManager.RegisterService(new FramebufferManager());
 
                 ServiceManager.RegisterService(dropTarget);

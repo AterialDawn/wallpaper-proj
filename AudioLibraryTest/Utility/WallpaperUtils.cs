@@ -31,6 +31,16 @@ namespace player.Utility
             IsWallpaperEnabled = true;
         }
 
+        public static void DisableWallpaperMode()
+        {
+            if (IsWallpaperEnabled)
+            {
+                IsWallpaperEnabled = false;
+                IntPtr selfHandle = VisGameWindow.ThisForm.GetHandleOfGameWindow(true);
+                W32.SetParent(selfHandle, IntPtr.Zero);
+            }
+        }
+
         public static void SendToBottom()
         {
             VisGameWindow thisForm = VisGameWindow.ThisForm;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK.Input;
+using player.Core.Render.UI;
 using player.Core.Service;
 using Log = player.Core.Logging.Logger;
 
@@ -32,6 +33,8 @@ namespace player.Core.Input
         public string ServiceName { get { return "InputManager"; } }
         #endregion
 
+        ImGuiManager imGui;
+
         #region Public Methods
         /// <summary>
         /// Initialization method
@@ -39,6 +42,8 @@ namespace player.Core.Input
         public void Initialize()
         {
             InitKeyStatusDict();
+
+            imGui = ServiceManager.GetService<ImGuiManager>();
         }
 
         /// <summary>
@@ -95,6 +100,7 @@ namespace player.Core.Input
                 while (inputQueue.Count > 0)
                 {
                     InputEventContainer evt = inputQueue.Dequeue();
+                    if (imGui.ShouldSwallowInputEvent(evt)) continue;
                     if (evt.IsKeyEventArg)
                     {
                         ProcessKeyEvent(evt.KeyboardKeyEventArg, evt.KeyPressed);
@@ -217,21 +223,19 @@ namespace player.Core.Input
             }
         }
 
-        internal void MouseDown(MouseEventArgs args)
+        internal void MouseDown(MouseButtonEventArgs args)
         {
-            MouseEventArgs clonedEvents = new MouseEventArgs(args); //clone args as required by opentk
             lock (inputQueueLock)
             {
-                inputQueue.Enqueue(new InputEventContainer(clonedEvents));
+                inputQueue.Enqueue(new InputEventContainer(new MouseSnapshot(args)));
             }
         }
 
-        internal void MouseUp(MouseEventArgs args)
+        internal void MouseUp(MouseButtonEventArgs args)
         {
-            MouseEventArgs clonedEvents = new MouseEventArgs(args); //clone args as required by opentk
             lock (inputQueueLock)
             {
-                inputQueue.Enqueue(new InputEventContainer(clonedEvents));
+                inputQueue.Enqueue(new InputEventContainer(new MouseSnapshot(args)));
             }
         }
 
@@ -270,7 +274,19 @@ namespace player.Core.Input
             }
         }
 
-        private class InputEventContainer
+        internal class MouseSnapshot
+        {
+            public MouseButtonEventArgs Args { get; private set; }
+            public MouseState MouseState { get; private set; }
+
+            public MouseSnapshot(MouseButtonEventArgs args)
+            {
+                Args = new MouseButtonEventArgs(args);
+                MouseState = args.Mouse;
+            }
+        }
+
+        internal class InputEventContainer
         {
             public bool IsKeyEventArg { get { return KeyboardKeyEventArg != null; } }
             public bool KeyPressed { get; private set; } = false;
@@ -284,6 +300,8 @@ namespace player.Core.Input
 
             public bool IsMouseMoveEventArg { get { return MouseMoveEventArg != null; } }
             public MouseMoveEventArgs MouseMoveEventArg { get; private set; } = null;
+            public bool IsMouseSnapshot { get { return MouseSnapshot != null; } }
+            public MouseSnapshot MouseSnapshot { get; private set; } = null;
 
             public InputEventContainer(KeyStateChangedEventArgs args, bool keyPressed)
             {
@@ -294,6 +312,10 @@ namespace player.Core.Input
             public InputEventContainer(MouseEventArgs args)
             {
                 MouseEventArg = args;
+            }
+            public InputEventContainer(MouseSnapshot args)
+            {
+                MouseSnapshot = args;
             }
 
             public InputEventContainer(MouseWheelEventArgs args)

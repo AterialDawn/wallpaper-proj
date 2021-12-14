@@ -10,6 +10,7 @@ using System.Drawing.Text;
 using Log = player.Core.Logging.Logger;
 using player.Shaders;
 using player.Utility.Shader;
+using OpenTK.Graphics.OpenGL;
 
 namespace player.Core.Render
 {
@@ -156,6 +157,8 @@ namespace player.Core.Render
             _qFont.LoadVBOs();
             _qFont.DrawVBOs();
             QFont.End();
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
         
         private void InitFont()

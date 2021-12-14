@@ -18,6 +18,7 @@ using QuickFont;
 using player.Core.Render.UI.Controls;
 using player.Core.Render;
 using System.Drawing;
+using ImGuiNET;
 
 namespace player.Core.Input
 {
@@ -116,24 +117,14 @@ namespace player.Core.Input
                 caretState = !caretState;
             }
 
-            const float SeparatorOffset = 2f;
-
-            int consoleHeight = (int)(uiManager.UISize.Y * .2f);//console should take no more than 20%
-            int numberOfLines = Math.Min((int)((float)consoleHeight / (float)messageHeight), messageStack.Size); //Cast to floats to properly use floating point math here.
-            float linePosition = consoleHeight - (messageHeight + SeparatorOffset);
-            float inputBoxPos = (linePosition + SeparatorOffset);
+            float linePosition = 0;
+            float inputBoxPos = 0;
 
             shader.Activate();
 
             GL.PushMatrix(); //0
-            GL.Scale(uiManager.UISize.X, linePosition + messageHeight + SeparatorOffset * 2f, 1f); //add an extra line for text input
+            GL.Scale(uiManager.UISize.X, linePosition + messageHeight, 1f); //add an extra line for text input
             backgroundBuffer.Draw();
-            GL.PopMatrix(); //0
-
-            GL.PushMatrix(); //0
-            GL.Scale(uiManager.UISize.X, 1f, 1f);
-            GL.Translate(0f, linePosition, 0f);
-            lineBuffer.Draw();
             GL.PopMatrix(); //0
 
             uiManager.TextRenderer.RenderText(currentText, new Vector2(0, inputBoxPos), QFontAlignment.Left);
@@ -150,22 +141,15 @@ namespace player.Core.Input
                 GL.PopMatrix(); //0
             }
 
-
-            linePosition -= SeparatorOffset;
-            float heightAccum = 0;
-            for (int i = 0; i < numberOfLines; i++)
+            ImGui.BeginWindow("Console");
+            ImGui.BeginChild("scrolling");
+            for (int i = messageStack.Size - 1; i > -1 ; i--)
             {
-                if (messageStack[i].Item2 == null)
-                {
-                    messageStack[i].Item2 = new ProcessedTextInfo();
-                    messageStack[i].Item2.Text = uiManager.TextRenderer.PreprocessText(messageStack[i].Item1, VisGameWindow.ThisForm.Width, QFontAlignment.Left);
-                    messageStack[i].Item2.TextHeight = uiManager.TextRenderer.MeasureText(messageStack[i].Item2.Text);
-                }
-                var text = messageStack[i].Item2.Text;
-                var size = messageStack[i].Item2.TextHeight;
-                heightAccum += size.Height;       
-                uiManager.TextRenderer.RenderText(text, new Vector2(0, linePosition - heightAccum));
+                ImGui.TextWrapped(messageStack[i].Item1);
             }
+            ImGui.SetScrollHere(1.0f);
+            ImGui.EndChild();
+            ImGui.EndWindow();
         }
 
         public void ToggleDisplay()
