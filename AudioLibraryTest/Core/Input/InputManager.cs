@@ -117,9 +117,14 @@ namespace player.Core.Input
                     {
                         MouseMoveEvent?.Invoke(this, evt.MouseMoveEventArg);
                     }
+                    else if (evt.IsMouseSnapshot)
+                    {
+                        //unused for base system.
+                        //might be a bad idea?
+                    }
                     else
                     {
-                        Log.Log("Unknown input event!!!");
+                        Log.Log($"Unknown input event!!! {evt}");
                     }
                 }
             }
@@ -326,6 +331,11 @@ namespace player.Core.Input
             public InputEventContainer(MouseMoveEventArgs args)
             {
                 MouseMoveEventArg = args;
+            }
+
+            public override string ToString()
+            {
+                return base.ToString();
             }
         }
 

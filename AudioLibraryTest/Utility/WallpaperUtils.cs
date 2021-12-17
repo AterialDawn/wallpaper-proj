@@ -76,9 +76,9 @@ namespace player.Utility
             //W32.SetWindowLong(selfHandle, W32.WindowLongFlags.GWLP_HWNDPARENT, hprog);
         }
 
-        static Rectangle GetDesktopBounds()
+        internal static Rectangle GetDesktopBounds(bool correctBounds = true)
         {
-            int xOff = 0, yOff = 0, width = 0, height = 0;
+            int xOff = 0, yOff = 0, width = 1920, height = 1080;
             foreach (var screen in Screen.AllScreens)
             {
                 if (screen.Bounds.X < xOff) xOff = screen.Bounds.X;
@@ -99,18 +99,27 @@ namespace player.Utility
                 if (index < Screen.AllScreens.Length)
                 {
                     var screen = Screen.AllScreens[index];
-                    xOff -= screen.Bounds.Location.X;
-                    yOff -= screen.Bounds.Location.Y;
+                    //xOff -= screen.Bounds.Location.X;
+                    xOff += screen.Bounds.Location.X;
+                    yOff += screen.Bounds.Location.Y;
 
                     if (VisGameWindow.FormWallpaperMode == WallpaperMode.WorkingArea)
                     {
                         width = screen.WorkingArea.Width;
                         height = screen.WorkingArea.Height;
+                        if (!correctBounds)
+                        {
+                            return screen.Bounds;
+                        }
                     }
                     else if (VisGameWindow.FormWallpaperMode == WallpaperMode.FullArea)
                     {
                         width = screen.Bounds.Width;
                         height = screen.Bounds.Height;
+                        if (!correctBounds)
+                        {
+                            return screen.Bounds;
+                        }
                     }
 
                     Log.Log("Binding to monitor {0} @ Location {1},{2}", index, screen.Bounds.Location.X, screen.Bounds.Location.Y);
@@ -120,7 +129,7 @@ namespace player.Utility
                     Log.Log("WallpaperMonitorIndex is out of bounds!");
                 }
             }
-            return new Rectangle(-xOff, -yOff, width, height);
+            return new Rectangle(xOff, yOff, width, height);
         }
 
         public static void BeforeClose()
