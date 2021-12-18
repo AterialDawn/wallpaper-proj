@@ -63,7 +63,7 @@ namespace player
 
             //Initialize bass stuff
             BassNet.OmitCheckVersion = true;
-            BassNet.Registration("colgate@colgateisbestpony.com", "2X224232922422");
+            BassNet.Registration("trial@trial.com", "2X1837515183722");
 
             Log.Log("Creating rendering window...");
             try

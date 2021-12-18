@@ -124,6 +124,7 @@ namespace player.Core
 
                 imGuiManager.NewFrame();
                 inputManager.ProcessInputs();
+                imGuiManager.OnInputsProcessed();
 
                 ThreadedRendering(renderWatch.Elapsed.TotalSeconds);
                 
@@ -398,7 +399,13 @@ namespace player.Core
             //base.OnMouseMove(e);
             inputManager.MouseMove(e);
         }
-#endregion
+
+        protected override void OnKeyPress(OpenTK.KeyPressEventArgs e)
+        {
+            //base.OnKeyPress(e);
+            imGuiManager.CharPress(e.KeyChar);
+        }
+        #endregion
 
         protected override void OnResize(EventArgs e)
         {

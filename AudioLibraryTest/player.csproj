@@ -478,6 +478,7 @@
     <Compile Include="Renderers\BarHelpers\BackgroundController.cs" />
     <Compile Include="Renderers\BarHelpers\BackgroundFactory.cs" />
     <Compile Include="Renderers\BarHelpers\BackgroundScalingMode.cs" />
+    <Compile Include="Renderers\BarHelpers\BarRenderer.ImGui.cs" />
     <Compile Include="Renderers\BarHelpers\IBackground.cs" />
     <Compile Include="Renderers\BarHelpers\StaticImageBackground.cs" />
     <Compile Include="Renderers\BarHelpers\VideoBackground.cs" />

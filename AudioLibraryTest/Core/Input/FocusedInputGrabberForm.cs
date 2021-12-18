@@ -1,4 +1,5 @@
 ﻿using OpenTK.Input;
+using player.Core.Render.UI;
 using player.Core.Service;
 using player.Utility;
 using System;
@@ -26,6 +27,7 @@ namespace player.Core.Input
             }
         }
         InputManager input;
+        ImGuiManager imGui;
         public FocusedInputGrabberForm(Action<KeyEventArgs> onKeyDownHandler, Action<KeyEventArgs> onKeyUpHandler, Action onClosedHandler)
         {
             this.onKeyDownHandler = onKeyDownHandler;
@@ -33,6 +35,7 @@ namespace player.Core.Input
             this.onClosedHandler = onClosedHandler;
 
             input = ServiceManager.GetService<InputManager>();
+            imGui = ServiceManager.GetService<ImGuiManager>();
 
             if (VisGameWindow.FormWallpaperMode != WallpaperMode.None)
             {
@@ -105,6 +108,13 @@ namespace player.Core.Input
             base.OnKeyUp(e);
 
             if (e.KeyCode == Keys.Escape) Close();
+        }
+
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+            base.OnKeyPress(e);
+
+            imGui.CharPress(e.KeyChar);
         }
 
         protected override void OnLostFocus(EventArgs e)

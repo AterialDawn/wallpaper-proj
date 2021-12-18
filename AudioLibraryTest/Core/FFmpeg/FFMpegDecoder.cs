@@ -29,9 +29,7 @@ namespace player.Core.FFmpeg
 
         private BaseFFMpegFrameContainer currentFrame = null;
 
-        private bool _disposed = false;
-
-        private int width = 0, height = 0, convertedFrameBufferSize = 0;
+        private int width = 0, height = 0;
 
         private AVFormatContext* _pFormatContext;
         private AVCodecContext* _pCodecContext;

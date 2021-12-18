@@ -21,7 +21,7 @@ using Log = player.Core.Logging.Logger;
 
 namespace player.Renderers
 {
-    class BarRenderer : VisualizerRendererBase
+    partial class BarRenderer : VisualizerRendererBase
     {
         private const double LOWACTIVITYCUTOFF = 5.0; //After this many seconds, render background in full brightness
 
@@ -52,6 +52,8 @@ namespace player.Renderers
         private MenuItem nextWallpaper = new MenuItem("Next Wallpaper");
         private MenuItem toggleRotationMenuItem = new MenuItem("Toggle Rotation");
         private MenuItem loadWallpaper = new MenuItem("Load Wallpaper...");
+
+        private ImGuiHandler imGuiHandler;
 
         public override SoundDataTypes RequiredDataType { get { return SoundDataTypes.BarData; } }
 
@@ -104,6 +106,8 @@ namespace player.Renderers
             {
                 fpsOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("BarRenderer", FpsLimitOverride.Minimum);
             }
+
+            imGuiHandler = new ImGuiHandler(this);
         }
 
         private void Settings_OnSettingsReloaded(object sender, EventArgs e)

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using OpenTK.Input;
+using player.Core.Render;
 using player.Core.Render.UI.Controls;
 using player.Core.Service;
 using Log = player.Core.Logging.Logger;
@@ -30,18 +31,16 @@ namespace player.Core.Input
         public delegate void ConsoleLineHandler(object sender, ConsoleLineReadEventArgs args);
         private ConsoleLineHandler activeHandler = null;
         private string activeHandlerCommand = null;
-        private BlockingCollection<ConsoleMessage> messageList = new BlockingCollection<ConsoleMessage>(200); //No more than 200 backlogged messages
         InputManager inputManager;
         bool inputGrabberOpen = false;
         OLabel grabbingInputText;
+        FpsLimitOverrideContext fpsOverride = null;
 
         public string ServiceName { get { return "ConsoleManager"; } }
 
         public void Initialize()
         {
             RegisterCommandHandler("help", helpHandler);
-
-            consoleRenderer.Initialize();
 
             if (VisGameWindow.FormWallpaperMode != Utility.WallpaperMode.None)
             {
@@ -108,7 +107,7 @@ namespace player.Core.Input
             }
         }
 
-        private void f3KeyPress(object source, OpenTK.Input.Key key, bool keyDown)
+        private void f3KeyPress(object source, Key key, bool keyDown)
         {
             if (!keyDown) return; //Only worry about key presses
             consoleRenderer.ToggleDisplay();
@@ -118,6 +117,7 @@ namespace player.Core.Input
         {
             if (inputGrabberOpen) return;
             inputGrabberOpen = true;
+            fpsOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("ConsoleManager", FpsLimitOverride.Maximum);
             Thread thr = new Thread(() =>
             {
                 if (inputManager == null) inputManager = ServiceManager.GetService<InputManager>();
@@ -134,6 +134,12 @@ namespace player.Core.Input
                     Log.Log("FocusedInputGrabberForm disposed");
                     form.Dispose();
                     grabbingInputText.Enabled = false;
+
+                    if (fpsOverride != null)
+                    {
+                        fpsOverride.Dispose();
+                        fpsOverride = null;
+                    }
                 });
                 grabbingInputText.Enabled = true;
                 System.Windows.Forms.Application.Run(form);

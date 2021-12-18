@@ -20,8 +20,12 @@ namespace player.Core.Render.UI
 
         ImGuiController controller;
         VisGameWindow vgs;
+        List<char> pressedChars = new List<char>();
 
         public event EventHandler OnRenderingGui;
+        public event EventHandler OnDisplayingPopupMenu;
+
+        FpsLimitOverrideContext overrideContext = null;
 
         public void Initialize()
         {
@@ -58,6 +62,29 @@ namespace player.Core.Render.UI
 
         }
 
+        public void CharPress(char c)
+        {
+            lock (pressedChars)
+            {
+                pressedChars.Add(c);
+            }
+        }
+
+        public void OnInputsProcessed()
+        {
+            char[] charList;
+            lock (pressedChars)
+            {
+                charList = pressedChars.ToArray();
+                pressedChars.Clear();
+            }
+
+            foreach (var c in charList)
+            {
+                ImGui.AddInputCharacter(c);
+            }
+        }
+
         public void NewFrame()
         {
             controller.NewFrame(vgs.Width, vgs.Height);
@@ -73,11 +100,50 @@ namespace player.Core.Render.UI
             {
                 Log.Log($"ImGuiRender : {e}");
             }
+
+            if (!ImGui.IsAnyWindowHovered() && ImGui.IsMouseClicked(1))
+            {
+                ImGui.OpenPopup("mainPopup");
+            }
+
+            if (ImGui.BeginPopup("mainPopup"))
+            {
+                if (overrideContext == null)
+                {
+                    overrideContext = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("ImGuiPopup", FpsLimitOverride.Maximum);
+                }
+                ImGui.Text($"player v{Program.VersionNumber}");
+                ImGui.Separator();
+                if (OnDisplayingPopupMenu != null)
+                {
+                    var invoList = OnDisplayingPopupMenu.GetInvocationList();
+                    for (int i = 0; i < invoList.Length - 1; i++)
+                    {
+                        invoList[i].DynamicInvoke(this, EventArgs.Empty);
+                        ImGui.Separator();
+                    }
+
+                    if (invoList.Length > 0)
+                    {
+                        invoList[invoList.Length - 1].DynamicInvoke(this, EventArgs.Empty);
+                    }
+                }
+
+                ImGui.EndPopup();
+            }
+            else
+            {
+                if (overrideContext != null)
+                {
+                    overrideContext.Dispose();
+                    overrideContext = null;
+                }
+            }
             
             controller.Render();
         }
 
-        public bool ShouldSwallowInputEvent(Input.InputManager.InputEventContainer evc)
+        public bool ShouldSwallowInputEvent(InputManager.InputEventContainer evc)
         {
             var io = ImGui.GetIO();
 
@@ -210,6 +276,7 @@ namespace player.Core.Render.UI
                 //GL.Viewport(0, 0, displayW, displayH);
                 //GL.ClearColor(clear_color.X, clear_color.Y, clear_color.Z, clear_color.W);
                 //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                if (drawData->CmdListsCount == 0) return; //nothing to do :)
 
                 int last_texture;
                 GL.GetInteger(GetPName.TextureBinding2D, out last_texture);
