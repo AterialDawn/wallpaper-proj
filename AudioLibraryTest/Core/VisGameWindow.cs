@@ -60,16 +60,15 @@ namespace player.Core
         {
             ThisForm = this;
             Log.Log($"Player v{Program.VersionNumber} loading...");
-            this.Title = "Aterial's Visualizer";
-            
+            this.Title = "Aterial's Visualizer";            
+
+            dropTarget = new DropTargetManager(this.GetHandleOfGameWindow(true));
+
             if (FormWallpaperMode != WallpaperMode.None)
             {
                 WallpaperUtils.EnableWallpaperMode();
                 FpsLimiter.MaximumFps = 30; //win10 wallpaper reduces system responsiveness somewhat when set too high, cap it down to 30 fps
             }
-
-            dropTarget = new DropTargetManager(this.GetHandleOfGameWindow(true));
-
             WindowsHotkeyUtil.Init();
             RenderResolution = new Vector2(newWidth, newHeight);
         }
@@ -226,6 +225,10 @@ namespace player.Core
                 if (FormWallpaperMode == WallpaperMode.None)
                 {
                     BringToFront();
+                }
+                else
+                {
+                    Bounds = WallpaperUtils.WallpaperBounds;
                 }
 
                 //Everything is initialized, print registered commands via ConsoleManager

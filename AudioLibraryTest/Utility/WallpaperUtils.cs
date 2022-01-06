@@ -14,9 +14,19 @@ namespace player.Utility
         public static bool IsWallpaperEnabled { get; private set; }
         public static bool IsWin8Plus { get; private set; }
 
+        /// <summary>
+        /// Wallpaper bounds. Not corrected. 0,0,0,0 is far left of all monitors
+        /// </summary>
+        public static Rectangle WallpaperBounds { get; private set; } = Rectangle.Empty;
+        /// <summary>
+        /// Wallpaper bounds. Corrected. 0,0,0,0 is far left of PRIMARY monitor ONLY. Can be negative.
+        /// </summary>
+        public static Rectangle WallpaperBoundsCorrected { get; private set; } = Rectangle.Empty;
+
         public static void EnableWallpaperMode()
         {
             if (IsWallpaperEnabled) return;
+            GetDesktopBounds();
             if (Environment.OSVersion.Version.Major >= 6 && Environment.OSVersion.Version.Minor >= 2)
             {
                 IsWin8Plus = true;
@@ -54,7 +64,7 @@ namespace player.Utility
 
             thisForm.WindowBorder = OpenTK.WindowBorder.Hidden;
 
-            Rectangle bounds = GetDesktopBounds();
+            Rectangle bounds = WallpaperBounds;
             thisForm.X += bounds.X;
             thisForm.Y += bounds.Y;
             thisForm.Width = bounds.Width;
@@ -76,60 +86,38 @@ namespace player.Utility
             //W32.SetWindowLong(selfHandle, W32.WindowLongFlags.GWLP_HWNDPARENT, hprog);
         }
 
-        internal static Rectangle GetDesktopBounds(bool correctBounds = true)
+        internal static void GetDesktopBounds()
         {
-            int xOff = 0, yOff = 0, width = 1920, height = 1080;
+            int xOff = 0, yOff = 0;
             foreach (var screen in Screen.AllScreens)
             {
                 if (screen.Bounds.X < xOff) xOff = screen.Bounds.X;
                 if (screen.Bounds.Y < yOff) yOff = screen.Bounds.Y;
             }
 
-            int index = -1;
-            foreach (var option in Program.CLIParser.ActiveOptions)
+            Point wallpaperModePosition = Screen.PrimaryScreen.Bounds.Location;
+            Size wallpaperModeSize = Screen.PrimaryScreen.Bounds.Size;
+            var wallpaperPosOption = Program.CLIParser.ActiveOptions.Where(o => o.Item1.Equals("WallpaperPos")).FirstOrDefault();
+            var wallpaperSizeOption = Program.CLIParser.ActiveOptions.Where(o => o.Item1.Equals("WallpaperSize")).FirstOrDefault();
+            if (wallpaperPosOption != null)
             {
-                if (option.Item1.Equals("WallpaperMonitorIndex"))
+                string[] split = wallpaperPosOption.Item2.Split('x');
+                if (split.Length == 2)
                 {
-                    int.TryParse(option.Item2, out index);
+                    wallpaperModePosition = new Point(int.Parse(split[0]), int.Parse(split[1]));
                 }
             }
-
-            if (index != -1)
+            if (wallpaperSizeOption != null)
             {
-                if (index < Screen.AllScreens.Length)
+                string[] split = wallpaperSizeOption.Item2.Split('x');
+                if (split.Length == 2)
                 {
-                    var screen = Screen.AllScreens[index];
-                    //xOff -= screen.Bounds.Location.X;
-                    xOff += screen.Bounds.Location.X;
-                    yOff += screen.Bounds.Location.Y;
-
-                    if (VisGameWindow.FormWallpaperMode == WallpaperMode.WorkingArea)
-                    {
-                        width = screen.WorkingArea.Width;
-                        height = screen.WorkingArea.Height;
-                        if (!correctBounds)
-                        {
-                            return screen.Bounds;
-                        }
-                    }
-                    else if (VisGameWindow.FormWallpaperMode == WallpaperMode.FullArea)
-                    {
-                        width = screen.Bounds.Width;
-                        height = screen.Bounds.Height;
-                        if (!correctBounds)
-                        {
-                            return screen.Bounds;
-                        }
-                    }
-
-                    Log.Log("Binding to monitor {0} @ Location {1},{2}", index, screen.Bounds.Location.X, screen.Bounds.Location.Y);
-                }
-                else
-                {
-                    Log.Log("WallpaperMonitorIndex is out of bounds!");
+                    wallpaperModeSize = new Size(int.Parse(split[0]), int.Parse(split[1]));
                 }
             }
-            return new Rectangle(xOff, yOff, width, height);
+            WallpaperBounds = new Rectangle(wallpaperModePosition, wallpaperModeSize);
+            WallpaperBoundsCorrected = new Rectangle(xOff + WallpaperBounds.X, yOff + WallpaperBounds.Y, WallpaperBounds.Width, WallpaperBounds.Height);
+            Log.Log($"Wallpaper bounds : {WallpaperBounds}. Corrected : {WallpaperBoundsCorrected}");
         }
 
         public static void BeforeClose()
@@ -197,25 +185,15 @@ namespace player.Utility
 
                 return true;
             }), IntPtr.Zero);
-
-            IntPtr selfHandle = thisForm.GetHandleOfGameWindow(true);
-            var parentPtr = W32.SetParent(selfHandle, workerw);
-
             thisForm.WindowBorder = OpenTK.WindowBorder.Hidden;
-
-            Rectangle bounds = GetDesktopBounds();
-            thisForm.X += bounds.X;
-            thisForm.Y += bounds.Y;
+            Rectangle bounds = WallpaperBounds;
+            thisForm.X = bounds.X;
+            thisForm.Y = bounds.Y;
             thisForm.Width = bounds.Width;
             thisForm.Height = bounds.Height;
 
-            int exStyle = (int)Win32.GetWindowLong(selfHandle, (int)Win32.GetWindowLongFields.GWL_EXSTYLE);
-
-            Win32.ShowWindow(selfHandle, Win32.ShowWindowCommands.Hide);
-
-            exStyle |= (int)Win32.ExtendedWindowStyles.WS_EX_TOOLWINDOW;
-            exStyle &= ~(int)Win32.ExtendedWindowStyles.WS_EX_APPWINDOW;
-            Win32.SetWindowLong(selfHandle, (int)Win32.GetWindowLongFields.GWL_EXSTYLE, (IntPtr)exStyle);
+            IntPtr selfHandle = thisForm.GetHandleOfGameWindow(true);
+            var parentPtr = W32.SetParent(selfHandle, workerw);
         }
     }
 }

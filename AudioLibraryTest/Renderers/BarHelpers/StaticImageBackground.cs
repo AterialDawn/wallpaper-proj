@@ -59,8 +59,6 @@ namespace player.Renderers.BarHelpers
                         using (Bitmap resized = new Bitmap(targetWidth, (int)RenderResolution.Y))
                         using (Graphics g = Graphics.FromImage(resized))
                         {
-                            using (ProfilingHelper profiler = new ProfilingHelper("Image Resizing"))
-                            {
                                 g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
                                 g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
@@ -68,12 +66,9 @@ namespace player.Renderers.BarHelpers
                                 g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
 
                                 g.DrawImage(image, 0, 0, targetWidth, RenderResolution.Y);
-                            }
 
                             TextureUtils.LoadBitmapIntoTexture(resized, textureIndex);
                             Resolution = new SizeF(targetWidth, RenderResolution.Y);
-
-                            Log.Log($"Re-Rendering, Source image aspect is {Resolution.Width / Resolution.Height}");
                             RenderDifferentSizedImage();
                             alternativeRenderUsed = true;
                         }

@@ -41,6 +41,8 @@ namespace player
             CLIParser.AddOption("DisableRTT", "Disables Render to Texture", false, DisableRTTOption);
             CLIParser.AddOption("Resolution", "Changes the starting resolution (WxH)", true, ChangeResOption);
             CLIParser.AddOption("Wallpaper", "Enables wallpaper mode", false, WallpaperOptionCallback);
+            CLIParser.AddOption("WallpaperPos", "Wallpaper position, ex: -WallpaperPos 0x0", true);
+            CLIParser.AddOption("WallpaperSize", "Wallpaper mode size, ex -WallpaperSize 1920x1080", true);
             CLIParser.AddOption("PlayerMode", "Enables the visualizer's WASAPI mode (Vista+)", false, WasapiOptionCallback);
             CLIParser.AddOption("WasapiDevice", "Sets the default Wasapi device index to this", true, WasapiDeviceIndexCallback);
             CLIParser.AddOption("DisableFFmpeg", "Disables the loading of internal FFmpeg libraries. Video playback support disabled", false, DisableFFMmpegCallback);

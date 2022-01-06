@@ -39,7 +39,7 @@ namespace player.Core.Input
 
             if (VisGameWindow.FormWallpaperMode != WallpaperMode.None)
             {
-                currentBounds = WallpaperUtils.GetDesktopBounds(false);
+                currentBounds = WallpaperUtils.WallpaperBoundsCorrected;
             }
             else
             {
