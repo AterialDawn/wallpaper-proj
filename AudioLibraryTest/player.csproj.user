@@ -13,6 +13,6 @@
     <StartArguments>-Font "OCR A Std,10.0" -wallpaper full</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <StartArguments>-Font "OCR A Std,10.0" -wallpaper full -wallpaperpos 300x0</StartArguments>
+    <StartArguments>-Font "OCR A Std,10.0" -wallpaper full</StartArguments>
   </PropertyGroup>
 </Project>

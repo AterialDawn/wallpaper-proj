@@ -37,6 +37,7 @@ namespace player.Renderers.BarHelpers
         private double backgroundTimeTotal = 0;
         private double backgroundTimeLeft = 0;
         private SettingsAccessor<double> backgroundDurationAccessor;
+        bool skipBlending = false;
         
         private IBackground currentBackground = null;
         private IBackground nextBackground = null;
@@ -224,17 +225,18 @@ namespace player.Renderers.BarHelpers
             }
         }
 
-        public bool NewBackground()
+        public bool NewBackground(bool disableTransition = false)
         {
             if (!CanChangeBackground())
             {
                 return false;
             }
             backgroundTimeLeft = 0;
+            skipBlending = disableTransition;
             return true;
         }
 
-        public bool PreviousBackground()
+        public bool PreviousBackground(bool disableTransition = false)
         {
             if (!CanChangeBackground())
             {
@@ -242,6 +244,7 @@ namespace player.Renderers.BarHelpers
             }
             lastBackground = true;
             backgroundTimeLeft = 0;
+            skipBlending = disableTransition;
             return true;
         }
 
@@ -435,10 +438,11 @@ namespace player.Renderers.BarHelpers
                 fpsOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Background Transition", FpsLimitOverride.Maximum);
                 ScaleBackgroundMatrix(background, ref texMatrices[1]);
                 SecondaryTextureResolution = new Vector2(nextBackground.Resolution.Width, nextBackground.Resolution.Height);
-                currentBlendTime = BlendDuration;
+                currentBlendTime = skipBlending ? 0 : BlendDuration;
                 loadingBackground = false;
                 updateBackgroundMatrix = true;
                 swapBackgrounds = true;
+                skipBlending = false;
             }
         }
     }

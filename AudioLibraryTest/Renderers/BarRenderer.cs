@@ -249,7 +249,7 @@ namespace player.Renderers
             }
         }
 
-        void NewWallpaper(bool previous)
+        void NewWallpaper(bool previous, bool disableTransition = false)
         {
             if (backgroundController.IsTransitioning())
             {
@@ -259,12 +259,12 @@ namespace player.Renderers
             }
             if (previous)
             {
-                if (!backgroundController.PreviousBackground()) return;
+                if (!backgroundController.PreviousBackground(disableTransition)) return;
                 DisplayFadeoutMessage("Last Background");
             }
             else
             {
-                if (!backgroundController.NewBackground()) return;
+                if (!backgroundController.NewBackground(disableTransition)) return;
                 DisplayFadeoutMessage("Skipping Background");
             }
         }

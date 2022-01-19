@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using OpenTK;
 using OpenTK.Input;
 using player.Core.Render;
 using player.Core.Render.UI.Controls;
 using player.Core.Service;
+using player.Utility;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Input
@@ -36,19 +39,29 @@ namespace player.Core.Input
         OLabel grabbingInputText;
         FpsLimitOverrideContext fpsOverride = null;
 
+        //global mouse doubleclick stuff
+        bool mouseMovedSinceLastClick = false;
+        bool clickedAlready = false;
+        bool doubleClickedAlready = false;
+        bool doubleClickTriggered = false;
+        Stopwatch timeSinceLastClick = Stopwatch.StartNew();
+
         public string ServiceName { get { return "ConsoleManager"; } }
 
         public void Initialize()
         {
             RegisterCommandHandler("help", helpHandler);
 
-            if (VisGameWindow.FormWallpaperMode != Utility.WallpaperMode.None)
+            if (VisGameWindow.FormWallpaperMode != WallpaperMode.None)
             {
-                WindowsHotkeyUtil.RegisterHotkey(new WindowsHotkeyUtil.KeyContainer(System.Windows.Forms.Keys.Oemtilde, true, true, (_) =>
+                /*WindowsHotkeyUtil.RegisterHotkey(new WindowsHotkeyUtil.KeyContainer(System.Windows.Forms.Keys.Oemtilde, true, true, (_) =>
                 {
                     StartInputGrabberForm();
                 }));
-                Log.Log("Registered Global CTRL+SHIFT+TILDE hotkey");
+                Log.Log("Registered Global CTRL+SHIFT+TILDE hotkey");*/
+
+                WindowsHotkeyUtil.OnMouseRawInput += WindowsHotkeyUtil_OnMouseRawInput;
+                Log.Log("Enabled Global doubleclick hook");
             }
 
             //Register ` as our toggle console hotkey
@@ -58,6 +71,53 @@ namespace player.Core.Input
             grabbingInputText.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             grabbingInputText.Location = new System.Drawing.PointF(VisGameWindow.ThisForm.Width / 2f, 0);
             grabbingInputText.Enabled = false;
+        }
+
+        private void WindowsHotkeyUtil_OnMouseRawInput(object sender, RawInputEventArgs e)
+        {
+            var mouseData = e.Data as Linearstar.Windows.RawInput.RawInputMouseData;
+            if (mouseData != null)
+            {
+                if (mouseData.Mouse.LastX != 0 || mouseData.Mouse.LastY != 0)
+                {
+                    mouseMovedSinceLastClick = true;
+                    clickedAlready = false;
+                    doubleClickTriggered = false;
+                    doubleClickedAlready = false;
+                }
+
+                if (mouseData.Mouse.Buttons == Linearstar.Windows.RawInput.Native.RawMouseButtonFlags.LeftButtonDown)
+                {
+                    if (!clickedAlready)
+                    {
+                        clickedAlready = true;
+                        mouseMovedSinceLastClick = false;
+                        timeSinceLastClick = Stopwatch.StartNew();
+                    }
+                    else if (clickedAlready)
+                    {
+                        doubleClickedAlready = true;
+                    }
+                }
+                else if (mouseData.Mouse.Buttons == Linearstar.Windows.RawInput.Native.RawMouseButtonFlags.LeftButtonUp)
+                {
+                    if (!doubleClickTriggered && doubleClickedAlready && !mouseMovedSinceLastClick && timeSinceLastClick.ElapsedMilliseconds <= 250)
+                    {
+                        doubleClickTriggered = true;
+                        Win32.GetCursorPos(out System.Drawing.Point point);
+                        var windowHandle = Win32.WindowFromPoint(point);
+                        StringBuilder cName = new StringBuilder(256);
+                        Win32.GetClassName(windowHandle, cName, cName.Capacity);
+                        string className = cName.ToString();
+                        if (className == "SysListView32" && WallpaperUtils.WallpaperBoundsCorrected.Contains(point))
+                        {
+                            StartInputGrabberForm();
+                            Log.Log("Clicked on SysListView32 in wallpaper bounds.");
+                        }
+                    }
+                }
+            }
+
         }
 
         public void PostInit()

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Linearstar.Windows.RawInput;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Input
@@ -24,6 +25,8 @@ namespace player.Core.Input
         private static extern int UnregisterHotKey(IntPtr hWnd, int id);
 
         static HotkeyForm form;
+
+        public static event EventHandler<RawInputEventArgs> OnMouseRawInput { add { form.Input += value; } remove { form.Input -= value; } }
 
         public enum KeyModifiers
         {
@@ -43,7 +46,9 @@ namespace player.Core.Input
             {
                 form = new HotkeyForm();
                 _windowHandle = form.Handle;
+                RawInputDevice.RegisterDevice(HidUsageAndPage.Mouse, RawInputDeviceFlags.ExInputSink, _windowHandle);
                 Application.Run(form);
+                RawInputDevice.UnregisterDevice(HidUsageAndPage.Mouse);
             });
             thr.SetApartmentState(ApartmentState.STA);
             thr.IsBackground = true;
@@ -84,6 +89,7 @@ namespace player.Core.Input
 
         class HotkeyForm : Form
         {
+            public event EventHandler<RawInputEventArgs> Input;
             public HotkeyForm()
             {
             }
@@ -91,9 +97,16 @@ namespace player.Core.Input
             protected override void WndProc(ref Message msg)
             {
                 base.WndProc(ref msg);
-                if (msg.Msg != WM_HOTKEY) return;
-                int hotkeyId = msg.WParam.ToInt32();
-                InvokeHotkeyIfNeeded(hotkeyId);
+                if (msg.Msg == WM_HOTKEY)
+                {
+                    int hotkeyId = msg.WParam.ToInt32();
+                    InvokeHotkeyIfNeeded(hotkeyId);
+                }
+                else if (msg.Msg == 0x00FF)
+                {
+                    var data = RawInputData.FromHandle(msg.LParam);
+                    Input?.Invoke(this, new RawInputEventArgs(data));
+                }
                 
             }
 
@@ -146,5 +159,14 @@ namespace player.Core.Input
                 return ((OtherContainer.Key == this.Key) && (OtherContainer.Shift == this.Shift) && (OtherContainer.Ctrl == this.Ctrl));
             }
         }
+    }
+    class RawInputEventArgs : EventArgs
+    {
+        public RawInputEventArgs(RawInputData data)
+        {
+            Data = data;
+        }
+
+        public RawInputData Data { get; }
     }
 }
