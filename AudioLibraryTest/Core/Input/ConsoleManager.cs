@@ -106,13 +106,28 @@ namespace player.Core.Input
                         doubleClickTriggered = true;
                         Win32.GetCursorPos(out System.Drawing.Point point);
                         var windowHandle = Win32.WindowFromPoint(point);
-                        StringBuilder cName = new StringBuilder(256);
-                        Win32.GetClassName(windowHandle, cName, cName.Capacity);
-                        string className = cName.ToString();
-                        if (className == "SysListView32" && WallpaperUtils.WallpaperBoundsCorrected.Contains(point))
+                        if (windowHandle == IntPtr.Zero) return;
+                        Win32.GetWindowThreadProcessId(windowHandle, out uint procId);
+                        try
                         {
-                            StartInputGrabberForm();
-                            Log.Log("Clicked on SysListView32 in wallpaper bounds.");
+                            using (var process = Process.GetProcessById((int)procId))
+                            {
+                                if (process.ProcessName == "explorer" && WallpaperUtils.WallpaperBoundsCorrected.Contains(point))
+                                {
+                                    StringBuilder cName = new StringBuilder(256);
+                                    Win32.GetClassName(windowHandle, cName, cName.Capacity);
+                                    string className = cName.ToString();
+                                    if (className == "SysListView32") //best check i have...
+                                    {
+                                        StartInputGrabberForm();
+                                        Log.Log("Clicked on desktop in wallpaper bounds.");
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception exc)
+                        {
+                            Log.Log($"GetProcById err : {exc}");
                         }
                     }
                 }
