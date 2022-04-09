@@ -101,7 +101,7 @@ namespace player.Core.Input
                 }
                 else if (mouseData.Mouse.Buttons == Linearstar.Windows.RawInput.Native.RawMouseButtonFlags.LeftButtonUp)
                 {
-                    if (!doubleClickTriggered && doubleClickedAlready && !mouseMovedSinceLastClick && timeSinceLastClick.ElapsedMilliseconds <= 250)
+                    if (!doubleClickTriggered && doubleClickedAlready && !mouseMovedSinceLastClick && timeSinceLastClick.ElapsedMilliseconds <= 575)
                     {
                         doubleClickTriggered = true;
                         Win32.GetCursorPos(out System.Drawing.Point point);

@@ -59,6 +59,7 @@ namespace player
             if (EnableKillingShadowplay)
             {
                 //https://www.reddit.com/r/nvidia/comments/89mtzr/nvidia_freestyleoverlay_any_way_to_disable_for/
+				//set 0x809D5F60 to 0x10000000 on profile for this app
                 //figured out how to disable shadowplay per program
                 ShadowplayUtil.KillIfNeeded();
             }
