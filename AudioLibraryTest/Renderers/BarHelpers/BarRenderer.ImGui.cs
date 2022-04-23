@@ -20,6 +20,7 @@ namespace player.Renderers
             BarRenderer parent;
             SettingsService settings;
             bool imageInfoWindowVisible = false;
+            Vector2 buttonSize = new Vector2(135, 19);
 
             public ImGuiHandler(BarRenderer parent)
             {
@@ -28,90 +29,6 @@ namespace player.Renderers
                 ServiceManager.GetService<ImGuiManager>().OnDisplayingPopupMenu += ImGuiHandler_OnDisplayingPopupMenu;
                 settings = ServiceManager.GetService<SettingsService>();
                 settings.SetSettingDefault("Wallpaper.MoveToPaths", new string[0]);
-
-                ServiceManager.GetService<ImGuiManager>().OnRenderingGui += ImGuiHandler_OnRenderingGui;
-            }
-
-            private void ImGuiHandler_OnRenderingGui(object sender, EventArgs e)
-            {
-                if (imageInfoWindowVisible)
-                {
-                    var buttonSize = new Vector2(135, 19);
-                    if (ImGui.BeginWindow("Image Options"))
-                    {
-                        string curWallpaperPath = parent.backgroundController.GetCurrentWallpaperPath();
-                        string curWallpaperName = Path.GetFileName(curWallpaperPath);
-
-                        ImGui.Text("Image Name : ");
-
-                        ImGui.SameLine();
-
-                        ImGui.Text(curWallpaperName);
-
-                        ImGui.Separator();
-
-                        if (ImGui.Button("Next Wallpaper", buttonSize))
-                        {
-                            parent.NewWallpaper(false, true);
-                        }
-
-                        if (ImGui.Button("Previous Wallpaper", buttonSize))
-                        {
-                            parent.NewWallpaper(true, true);
-                        }
-
-                        if (ImGui.Button("Open in Explorer", buttonSize))
-                        {
-                            parent.backgroundController.OpenCurrentWallpaper();
-                        }
-
-                        var paths = settings.GetSettingAs<string[]>("Wallpaper.MoveToPaths", null);
-                        if (paths != null && paths.Length > 0)
-                        {
-                            ImGui.Separator();
-                            if (ImGui.BeginMenu("Move To Paths"))
-                            {
-                                foreach (var path in paths)
-                                {
-                                    try
-                                    {
-                                        FileAttributes fa = File.GetAttributes(path);
-
-                                        if ((fa & FileAttributes.Directory) == FileAttributes.Directory)
-                                        {
-                                            if (ImGui.Button(Path.GetFileName(path)))
-                                            {
-                                                ImGui.CloseCurrentPopup();
-                                                try
-                                                {
-                                                    string destination = Path.Combine(path, curWallpaperName);
-                                                    Log.Log($"Moving {curWallpaperPath} to {destination}");
-
-                                                    File.Move(curWallpaperPath, destination);
-
-                                                    parent.NewWallpaper(false, true);
-                                                }
-                                                catch (Exception exc)
-                                                {
-                                                    Log.Log($"Error moving wallpaper : {exc}");
-                                                    parent.DisplayFadeoutMessage($"Could not move wallpaper : {exc.Message}");
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ImGui.Text($"Invalid Path : {Path.GetFileName(path)}");
-                                        }
-
-                                    }
-                                    catch { }
-                                }
-                                ImGui.EndMenu();
-                            }
-                        }
-                        ImGui.EndWindow();
-                    }
-                }
             }
 
             private void ImGuiHandler_OnDisplayingPopupMenu(object sender, EventArgs e)
@@ -122,9 +39,70 @@ namespace player.Renderers
                 ImGui.Text($"Wallpaper {curWallpaperName}");
                 ImGui.Separator();
 
-                if (ImGui.Checkbox("Show Image Options Window", ref imageInfoWindowVisible))
+                if (ImGui.Button("Next Wallpaper", buttonSize))
                 {
-                    ImGui.CloseCurrentPopup();
+                    parent.NewWallpaper(false, true);
+                }
+
+                if (ImGui.Button("Previous Wallpaper", buttonSize))
+                {
+                    parent.NewWallpaper(true, true);
+                }
+
+                if (ImGui.Button("Open in Explorer", buttonSize))
+                {
+                    parent.backgroundController.OpenCurrentWallpaper();
+                }
+
+                bool keep = parent.backgroundController.KeepCurrentBackground;
+                if (ImGui.Checkbox("Keep Current Wallpaper", ref keep))
+                {
+                    parent.ToggleKeepRotation();
+                }
+
+                var paths = settings.GetSettingAs<string[]>("Wallpaper.MoveToPaths", null);
+                if (paths != null && paths.Length > 0)
+                {
+                    ImGui.Separator();
+                    if (ImGui.BeginMenu("Move To Paths"))
+                    {
+                        foreach (var path in paths)
+                        {
+                            try
+                            {
+                                FileAttributes fa = File.GetAttributes(path);
+
+                                if ((fa & FileAttributes.Directory) == FileAttributes.Directory)
+                                {
+                                    if (ImGui.Button(Path.GetFileName(path)))
+                                    {
+                                        ImGui.CloseCurrentPopup();
+                                        try
+                                        {
+                                            string destination = Path.Combine(path, curWallpaperName);
+                                            Log.Log($"Moving {curWallpaperPath} to {destination}");
+
+                                            File.Move(curWallpaperPath, destination);
+
+                                            parent.NewWallpaper(false, true);
+                                        }
+                                        catch (Exception exc)
+                                        {
+                                            Log.Log($"Error moving wallpaper : {exc}");
+                                            parent.DisplayFadeoutMessage($"Could not move wallpaper : {exc.Message}");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    ImGui.Text($"Invalid Path : {Path.GetFileName(path)}");
+                                }
+
+                            }
+                            catch { }
+                        }
+                        ImGui.EndMenu();
+                    }
                 }
             }
         }
