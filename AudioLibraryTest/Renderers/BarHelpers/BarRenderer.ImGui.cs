@@ -52,6 +52,7 @@ namespace player.Renderers
                 if (ImGui.Button("Open in Explorer", buttonSize))
                 {
                     parent.backgroundController.OpenCurrentWallpaper();
+                    ImGui.CloseCurrentPopup();
                 }
 
                 bool keep = parent.backgroundController.KeepCurrentBackground;
