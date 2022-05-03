@@ -147,14 +147,14 @@ namespace player.Core.Settings
 
     enum BackgroundMode
     {
-        BorderedDefault,
-        SolidBackground
+        BorderedDefault = 0,
+        SolidBackground = 1
     }
 
     enum BackgroundAnchorPosition
     {
-        Center,
-        Left,
-        Right
+        Center = 0,
+        Left = 1,
+        Right = 2
     }
 }

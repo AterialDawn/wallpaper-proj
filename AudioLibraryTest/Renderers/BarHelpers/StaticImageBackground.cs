@@ -133,6 +133,7 @@ namespace player.Renderers.BarHelpers
             var settingsForImage = ServiceManager.GetService<WallpaperImageSettingsService>().GetImageSettingsForPath(SourcePath);
             var currentMode = BackgroundMode.BorderedDefault;
             var backgroundColor = System.Numerics.Vector4.One;
+            var align = BackgroundAnchorPosition.Center;
             gaussianBlur = new GaussianBlurShader();
             gaussianBlur.SetResolution(RenderResolution);
 
@@ -140,6 +141,7 @@ namespace player.Renderers.BarHelpers
             {
                 currentMode = settingsForImage.Mode;
                 backgroundColor = settingsForImage.BackgroundColor;
+                align = settingsForImage.AnchorPosition;
             }
 
             renderTargetHelper = new FramebufferRenderTexture((int)RenderResolution.X, (int)RenderResolution.Y, framebufferHooks);
@@ -239,25 +241,39 @@ namespace player.Renderers.BarHelpers
                     }
                 case BackgroundMode.SolidBackground:
                     {
-                        GL.Scale(2, 2, 1);
+                        float sideAnchorScalar = ((RenderResolution.X / RenderResolution.Y) / (Resolution.Width / Resolution.Height) * 0.125f);
 
                         renderTargetHelper.BindAndRenderTo();
 
                         gaussianBlur.SetColorOverride(true, new Vector4(backgroundColor.X, backgroundColor.Y, backgroundColor.Z, backgroundColor.W));
-
+                        GL.PushMatrix();
+                        GL.Scale(2, 2, 1);
                         primitives.CenteredQuad.Draw();
+                        GL.PopMatrix();
 
                         gaussianBlur.SetColorOverride(false, Vector4.Zero);
+
+                        GL.Ortho(0, RenderResolution.X, 0, RenderResolution.Y, -1, 1);
 
                         GL.BindTexture(TextureTarget.Texture2D, textureIndex);
 
                         {
-                            GL.PushMatrix();
-                            GL.Scale(aspect, 1, 1);
 
-                            primitives.CenteredQuad.Draw();
+                            switch (align)
+                            {
+                                case BackgroundAnchorPosition.Center:
+                                    GL.Translate((RenderResolution.X * 0.5f) - (Resolution.Width * 0.5f), 0, 0);
+                                    Log.Log($"SideAnchorScalar : {sideAnchorScalar}");
+                                    break;
 
-                            GL.PopMatrix();
+                                case BackgroundAnchorPosition.Right:
+                                    GL.Translate(RenderResolution.X - Resolution.Width, 0, 0);
+                                    break;
+                            }
+
+                            GL.Scale(Resolution.Width, Resolution.Height, 1);
+
+                            primitives.QuadBuffer.Draw();
                         }
 
                         renderTargetHelper.FinishRendering();

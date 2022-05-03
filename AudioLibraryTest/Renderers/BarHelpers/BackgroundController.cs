@@ -198,6 +198,7 @@ namespace player.Renderers.BarHelpers
             {
                 overrideBackground = possibleBg;
                 backgroundTimeLeft = 0;
+                skipBlending = true;
                 return true;
             }
             return false;

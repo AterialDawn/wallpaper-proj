@@ -27,6 +27,9 @@ namespace player.Renderers
             WallpaperImageSettingsService wpSettings;
             FpsLimitOverrideContext fpsOverride = null;
 
+            string[] renderModeItems = new string[] { "Default", "Solid Background" };
+            string[] anchorPosItems = new string[] { "Centered", "Left", "Right" };
+
             public ImGuiHandler(BarRenderer parent)
             {
                 this.parent = parent;
@@ -54,12 +57,14 @@ namespace player.Renderers
                         if (parent.backgroundController.CurrentBackground is StaticImageBackground)
                         {
                             var curSettings = wpSettings.GetImageSettingsForPath(curPath);
-                            int selectedItem = 0;
+                            int renderModeIdx = 0;
+                            int anchorPosIdx = 0;
                             Vector4 color = Vector4.One;
                             int left = 0, right = 0, top = 0, bot = 0;
                             if (curSettings != null)
                             {
-                                if (curSettings.Mode == BackgroundMode.SolidBackground) selectedItem = 1;
+                                renderModeIdx = (int)curSettings.Mode;
+                                anchorPosIdx = (int)curSettings.AnchorPosition;
                                 color = curSettings.BackgroundColor;
 
                                 left = curSettings.TrimPixelsLeft;
@@ -67,9 +72,14 @@ namespace player.Renderers
                                 top = curSettings.TrimPixelsTop;
                                 bot = curSettings.TrimPixelsBottom;
                             }
-                            if (ImGui.Combo("Render Mode", ref selectedItem, new string[] { "Default", "Solid Background" }))
+                            if (ImGui.Combo("Render Mode", ref renderModeIdx, renderModeItems))
                             {
-                                wpSettings.GetImageSettingsForPath(curPath, true).Mode = selectedItem == 0 ? BackgroundMode.BorderedDefault : BackgroundMode.SolidBackground;
+                                wpSettings.GetImageSettingsForPath(curPath, true).Mode = (BackgroundMode)renderModeIdx;
+                            }
+
+                            if (ImGui.Combo("Anchor Position", ref anchorPosIdx, anchorPosItems))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).AnchorPosition = (BackgroundAnchorPosition)anchorPosIdx;
                             }
 
                             if (ImGui.ColorPicker4("Background Color", ref color, ColorEditFlags.RGB | ColorEditFlags.NoOptions | ColorEditFlags.NoPicker | ColorEditFlags.NoSmallPreview | ColorEditFlags.NoTooltip))
