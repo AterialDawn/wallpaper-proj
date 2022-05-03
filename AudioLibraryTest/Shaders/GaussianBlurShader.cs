@@ -15,12 +15,14 @@ namespace player.Shaders
         int resolutionLocation;
         int strengthLocation;
         int blurLocation;
-        int blackLocation;
+        int colorOverrideLocation;
+        int colorLocation;
 
         Vector2 resolution = Vector2.Zero;
         float strength = 0;
         bool blur = true;
-        bool black = false;
+        bool colorOverride = false;
+        Vector4 color = new Vector4();
 
         public override void Initialize()
         {
@@ -28,7 +30,8 @@ namespace player.Shaders
             resolutionLocation = GetUniformLocation("resolution");
             strengthLocation = GetUniformLocation("strength");
             blurLocation = GetUniformLocation("blur");
-            blackLocation = GetUniformLocation("black");
+            colorOverrideLocation = GetUniformLocation("colorOverride");
+            colorLocation = GetUniformLocation("color");
         }
 
         protected override void OnActivate()
@@ -36,7 +39,8 @@ namespace player.Shaders
             SetUniform(resolutionLocation, resolution);
             SetUniform(strengthLocation, strength);
             SetUniform(blurLocation, blur);
-            SetUniform(blackLocation, black);
+            SetUniform(colorOverrideLocation, colorOverride);
+            SetUniform(colorLocation, color);
         }
 
         public void SetResolution(Vector2 resolution)
@@ -57,10 +61,12 @@ namespace player.Shaders
             SetUniform(blurLocation, state);
         }
 
-        public void SetBlackState(bool state)
+        public void SetColorOverride(bool state, Vector4 color)
         {
-            this.black = state;
-            SetUniform(blackLocation, state);
+            this.colorOverride = state;
+            this.color = color;
+            SetUniform(colorOverrideLocation, state);
+            SetUniform(colorLocation, color);
         }
     }
 }

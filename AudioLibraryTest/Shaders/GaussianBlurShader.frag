@@ -6,7 +6,8 @@ uniform sampler2D image;
 uniform vec2 resolution;
 uniform float strength;
 uniform bool blur;
-uniform bool black;
+uniform bool colorOverride;
+uniform vec4 color;
 
 
 const int samples = 30,
@@ -37,9 +38,9 @@ vec3 adjustExposure(vec3 color, float value) {
 
 void main(void)
 {
-    if(black)
+    if(colorOverride)
     {
-        gl_FragColor = vec4(0,0,0,1);
+        gl_FragColor = color;
         return;
     }
 	vec2 sampleLoc = gl_TexCoord[0].st;

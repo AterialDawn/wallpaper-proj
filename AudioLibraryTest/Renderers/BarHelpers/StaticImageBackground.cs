@@ -11,6 +11,8 @@ using player.Core.Render;
 using player.Core.Service;
 using player.Shaders;
 using OpenTK;
+using player.Core.Settings;
+using OpenTK.Graphics;
 
 namespace player.Renderers.BarHelpers
 {
@@ -54,18 +56,34 @@ namespace player.Renderers.BarHelpers
 
                     if (Math.Abs((Resolution.Width / Resolution.Height) - (RenderResolution.X / RenderResolution.Y)) > 0.05f)
                     {
-                        int targetWidth = (int)(((float)image.Width / (float)image.Height) * (float)RenderResolution.Y);
+                        var settingsForImage = ServiceManager.GetService<WallpaperImageSettingsService>().GetImageSettingsForPath(SourcePath);
+                        int resizedWidth = image.Width, resizedHeight = image.Height;
+
+                        if (settingsForImage != null)
+                        {
+                            resizedWidth = image.Width - (settingsForImage.TrimPixelsLeft + settingsForImage.TrimPixelsRight);
+                            resizedHeight = image.Height - (settingsForImage.TrimPixelsTop + settingsForImage.TrimPixelsBottom);
+                        }
+
+                        int targetWidth = (int)(((float)resizedWidth / (float)resizedHeight) * (float)RenderResolution.Y);
 
                         using (Bitmap resized = new Bitmap(targetWidth, (int)RenderResolution.Y))
                         using (Graphics g = Graphics.FromImage(resized))
                         {
-                                g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-                                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                            g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
 
+                            if (settingsForImage != null)
+                            {
+                                g.DrawImage(image, new RectangleF(0, 0, targetWidth, RenderResolution.Y), new RectangleF(settingsForImage.TrimPixelsLeft, settingsForImage.TrimPixelsTop, resizedWidth, resizedHeight), GraphicsUnit.Pixel);
+                            }
+                            else
+                            {
                                 g.DrawImage(image, 0, 0, targetWidth, RenderResolution.Y);
+                            }
 
                             TextureUtils.LoadBitmapIntoTexture(resized, textureIndex);
                             Resolution = new SizeF(targetWidth, RenderResolution.Y);
@@ -112,99 +130,142 @@ namespace player.Renderers.BarHelpers
         //runs in Preload, in a loadercontext thread
         void RenderDifferentSizedImage()
         {
-            GL.PushMatrix();
-            GL.LoadIdentity();
-
+            var settingsForImage = ServiceManager.GetService<WallpaperImageSettingsService>().GetImageSettingsForPath(SourcePath);
+            var currentMode = BackgroundMode.BorderedDefault;
+            var backgroundColor = System.Numerics.Vector4.One;
             gaussianBlur = new GaussianBlurShader();
-            gaussianBlur.SetBlurState(true);
             gaussianBlur.SetResolution(RenderResolution);
-            gaussianBlur.SetStrength(3f);
 
-            float scalar = RenderResolution.Y / Resolution.Height;
-            float aspect = ((Resolution.Width / Resolution.Height) / (RenderResolution.X / RenderResolution.Y));
-
-            float bgImageScalar = Math.Max(1f, 1f / aspect * 0.75f);
-
-            float horizontalMove = aspect;
+            if (settingsForImage != null)
+            {
+                currentMode = settingsForImage.Mode;
+                backgroundColor = settingsForImage.BackgroundColor;
+            }
 
             renderTargetHelper = new FramebufferRenderTexture((int)RenderResolution.X, (int)RenderResolution.Y, framebufferHooks);
-            var bgTargetHelper = new FramebufferRenderTexture((int)RenderResolution.X, (int)RenderResolution.Y, framebufferHooks);
-            bgTargetHelper.BindAndRenderTo();
 
-            GL.BindTexture(TextureTarget.Texture2D, textureIndex);
+            float aspect = ((Resolution.Width / Resolution.Height) / (RenderResolution.X / RenderResolution.Y));
 
-            GL.Scale(2, 2, 1);
-
-            gaussianBlur.Activate();
-
+            GL.PushMatrix();
+            GL.LoadIdentity();
+            switch (currentMode)
             {
-                GL.PushMatrix();
-                GL.Translate(-horizontalMove, 0, 0);
-                GL.Scale(aspect, 1, 1);
-                GL.Scale(bgImageScalar, bgImageScalar, 1);
-                primitives.CenteredQuad.Draw();
-                GL.PopMatrix();
+                case BackgroundMode.BorderedDefault:
+                    {
+                        gaussianBlur.SetBlurState(true);
+                        gaussianBlur.SetStrength(3f);
+
+                        float scalar = RenderResolution.Y / Resolution.Height;
+
+                        float bgImageScalar = Math.Max(1f, 1f / aspect * 0.75f);
+
+                        float horizontalMove = aspect;
+                        var bgTargetHelper = new FramebufferRenderTexture((int)RenderResolution.X, (int)RenderResolution.Y, framebufferHooks);
+                        bgTargetHelper.BindAndRenderTo();
+
+                        GL.BindTexture(TextureTarget.Texture2D, textureIndex);
+
+                        GL.Scale(2, 2, 1);
+
+                        gaussianBlur.Activate();
+
+                        {
+                            GL.PushMatrix();
+                            GL.Translate(-horizontalMove, 0, 0);
+                            GL.Scale(aspect, 1, 1);
+                            GL.Scale(bgImageScalar, bgImageScalar, 1);
+                            primitives.CenteredQuad.Draw();
+                            GL.PopMatrix();
+                        }
+                        {
+                            GL.PushMatrix();
+                            GL.Translate(horizontalMove, 0, 0);
+                            GL.Scale(aspect, 1, 1);
+                            GL.Scale(bgImageScalar, bgImageScalar, 1);
+                            primitives.CenteredQuad.Draw();
+                            GL.PopMatrix();
+                        }
+
+
+
+                        bgTargetHelper.FinishRendering();
+
+                        renderTargetHelper.BindAndRenderTo();
+
+                        GL.BindTexture(TextureTarget.Texture2D, bgTargetHelper.RenderTexture);
+
+                        primitives.CenteredQuad.Draw();
+
+                        GL.BindTexture(TextureTarget.Texture2D, textureIndex);
+
+                        gaussianBlur.SetBlurState(false);
+
+                        {
+                            GL.PushMatrix();
+                            GL.Scale(aspect, 1, 1);
+
+                            primitives.CenteredQuad.Draw();
+
+                            GL.PopMatrix();
+                        }
+
+                        gaussianBlur.SetColorOverride(true, new Vector4(0,0,0,1));
+                        {
+                            float targetSizeInPixels = 9f * (RenderResolution.X / 1920f);
+
+                            GL.PushMatrix();
+                            GL.Translate(horizontalMove * 0.5f, -0.5f, 0);
+                            GL.Scale((1f / RenderResolution.X) * targetSizeInPixels, 1, 1);
+
+                            primitives.QuadBuffer.Draw();
+
+                            GL.PopMatrix();
+
+                            GL.PushMatrix();
+                            GL.Translate(-horizontalMove * 0.5f, -0.5f, 0);
+                            GL.Scale((1f / RenderResolution.X) * targetSizeInPixels, 1, 1);
+
+                            primitives.QuadBuffer.Draw();
+
+                            GL.PopMatrix();
+                        }
+
+                        renderTargetHelper.FinishRendering();
+
+                        GL.PopMatrix();
+
+                        bgTargetHelper.Cleanup();
+                        break;
+                    }
+                case BackgroundMode.SolidBackground:
+                    {
+                        GL.Scale(2, 2, 1);
+
+                        renderTargetHelper.BindAndRenderTo();
+
+                        gaussianBlur.SetColorOverride(true, new Vector4(backgroundColor.X, backgroundColor.Y, backgroundColor.Z, backgroundColor.W));
+
+                        primitives.CenteredQuad.Draw();
+
+                        gaussianBlur.SetColorOverride(false, Vector4.Zero);
+
+                        GL.BindTexture(TextureTarget.Texture2D, textureIndex);
+
+                        {
+                            GL.PushMatrix();
+                            GL.Scale(aspect, 1, 1);
+
+                            primitives.CenteredQuad.Draw();
+
+                            GL.PopMatrix();
+                        }
+
+                        renderTargetHelper.FinishRendering();
+                        break;
+                    }
             }
-            {
-                GL.PushMatrix();
-                GL.Translate(horizontalMove, 0, 0);
-                GL.Scale(aspect, 1, 1);
-                GL.Scale(bgImageScalar, bgImageScalar, 1);
-                primitives.CenteredQuad.Draw();
-                GL.PopMatrix();
-            }
-
-            
-
-            bgTargetHelper.FinishRendering();
-
-            renderTargetHelper.BindAndRenderTo();
-
-            GL.BindTexture(TextureTarget.Texture2D, bgTargetHelper.RenderTexture);
-
-            primitives.CenteredQuad.Draw();
-
-            GL.BindTexture(TextureTarget.Texture2D, textureIndex);
-
-            gaussianBlur.SetBlurState(false);
-
-            {
-                GL.PushMatrix();
-                GL.Scale(aspect, 1, 1);
-
-                primitives.CenteredQuad.Draw();
-
-                GL.PopMatrix();
-            }
-
-            gaussianBlur.SetBlackState(true);
-            {
-                float targetSizeInPixels = 9f * (RenderResolution.X / 1920f);
-
-                GL.PushMatrix();
-                GL.Translate(horizontalMove * 0.5f, -0.5f, 0);
-                GL.Scale((1f / RenderResolution.X) * targetSizeInPixels, 1, 1);
-
-                primitives.QuadBuffer.Draw();
-
-                GL.PopMatrix();
-
-                GL.PushMatrix();
-                GL.Translate(-horizontalMove * 0.5f, -0.5f, 0);
-                GL.Scale((1f / RenderResolution.X) * targetSizeInPixels, 1, 1);
-
-                primitives.QuadBuffer.Draw();
-
-                GL.PopMatrix();
-            }
-
-            renderTargetHelper.FinishRendering();
-
-            GL.PopMatrix();
 
             Resolution = new SizeF(RenderResolution.X, RenderResolution.Y);
-
-            bgTargetHelper.Cleanup();
         }
     }
 }

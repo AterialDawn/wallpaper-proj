@@ -25,6 +25,8 @@ namespace player.Renderers.BarHelpers
         public Vector2 SecondaryTextureResolution { get; private set; } = new Vector2();
         public bool ReadyToRender { get { return initialLoadDone; } }
 
+        public IBackground CurrentBackground { get { return currentBackground; } }
+
         private BarShader shader;
         private Vector2 windowRes = Vector2.Zero;
         private Matrix4[] texMatrices = new Matrix4[2];

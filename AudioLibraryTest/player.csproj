@@ -176,6 +176,7 @@
     <Compile Include="Core\Service\ServiceManager.cs" />
     <Compile Include="Core\Settings\SettingsAccessor.cs" />
     <Compile Include="Core\Settings\SettingsService.cs" />
+    <Compile Include="Core\Settings\WallpaperImageSettingsService.cs" />
     <Compile Include="Core\TimeManager.cs" />
     <Compile Include="External\ProcessCreator.cs" />
     <Compile Include="External\QuickFont\Builder.cs">

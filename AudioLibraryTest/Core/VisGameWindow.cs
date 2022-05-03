@@ -281,6 +281,7 @@ namespace player.Core
                 uiManager = ServiceManager.RegisterService(new UIManager());
                 imGuiManager = ServiceManager.RegisterService(new ImGuiManager());
                 fbManager = ServiceManager.RegisterService(new FramebufferManager());
+                ServiceManager.RegisterService(new WallpaperImageSettingsService());
 
                 ServiceManager.RegisterService(dropTarget);
             }
