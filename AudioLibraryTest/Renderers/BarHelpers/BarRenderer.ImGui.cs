@@ -24,6 +24,7 @@ namespace player.Renderers
             SettingsService settings;
             bool imageInfoWindowVisible = false;
             Vector2 buttonSize = new Vector2(135, 19);
+            Vector2 pmButtonSize = new Vector2(33.5f, 20);
             WallpaperImageSettingsService wpSettings;
             FpsLimitOverrideContext fpsOverride = null;
 
@@ -111,10 +112,57 @@ namespace player.Renderers
 
                             ImGui.PopItemWidth();
 
+                            if (ImGui.Button("+", pmButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("-", pmButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft--;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+", pmButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("-", pmButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight--;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+", pmButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("-", pmButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop--;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+", pmButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("-", pmButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom--;
+                            }
                             if (ImGui.Button("Redraw Image"))
                             {
                                 parent.backgroundController.ImmediatelyLoadNewWallpaper(curPath);
                             }
+                            ImGui.SameLine();
+                            if (ImGui.Button("Clear Settings"))
+                            {
+                                wpSettings.ClearSettingsForPath(curPath);
+                            }
+                            ImGui.SameLine();
+                            bool hasCustomSettings = curSettings != null;
+                            ImGui.Checkbox("Has Custom Settings", ref hasCustomSettings);
                         }
                         else
                         {

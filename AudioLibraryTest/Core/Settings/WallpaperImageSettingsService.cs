@@ -55,6 +55,22 @@ namespace player.Core.Settings
             return currentFile?.Settings;
         }
 
+        public void ClearSettingsForPath(string path)
+        {
+            var pathComponents = new Uri(path).Segments.Where(s => s != "/").Select(s => s.Replace("/", "")).ToArray();
+            var fileName = pathComponents[pathComponents.Length - 1];
+
+            var parentComponentOfFile = traversePathComponents(pathComponents.Take(pathComponents.Length - 1), false);
+            if (parentComponentOfFile == null) return;
+
+            var currentFile = parentComponentOfFile.SubComponents.Where(p => p.Name == pathComponents[pathComponents.Length - 1]).Cast<ImageFileComponent>().FirstOrDefault();
+            if (currentFile != null)
+            {
+                parentComponentOfFile.SubComponents.Remove(currentFile);
+                Logging.Logger.Log($"Settings for image {fileName} removed");
+            }
+        }
+
         PathComponent traversePathComponents(IEnumerable<string> pathComponents, bool createIfNotExists)
         {
             PathComponent parentComponent = null;

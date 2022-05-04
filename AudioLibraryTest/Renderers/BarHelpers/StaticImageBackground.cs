@@ -263,7 +263,6 @@ namespace player.Renderers.BarHelpers
                             {
                                 case BackgroundAnchorPosition.Center:
                                     GL.Translate((RenderResolution.X * 0.5f) - (Resolution.Width * 0.5f), 0, 0);
-                                    Log.Log($"SideAnchorScalar : {sideAnchorScalar}");
                                     break;
 
                                 case BackgroundAnchorPosition.Right:
