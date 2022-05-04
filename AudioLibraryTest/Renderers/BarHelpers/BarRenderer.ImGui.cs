@@ -112,42 +112,42 @@ namespace player.Renderers
 
                             ImGui.PopItemWidth();
 
-                            if (ImGui.Button("+", pmButtonSize))
+                            if (ImGui.Button("+##Left", pmButtonSize))
                             {
                                 wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("-", pmButtonSize))
+                            if (ImGui.Button("-##Left", pmButtonSize))
                             {
                                 wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft--;
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("+", pmButtonSize))
+                            if (ImGui.Button("+##Right", pmButtonSize))
                             {
                                 wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("-", pmButtonSize))
+                            if (ImGui.Button("-##Right", pmButtonSize))
                             {
                                 wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight--;
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("+", pmButtonSize))
+                            if (ImGui.Button("+##Top", pmButtonSize))
                             {
                                 wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("-", pmButtonSize))
+                            if (ImGui.Button("-##Top", pmButtonSize))
                             {
                                 wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop--;
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("+", pmButtonSize))
+                            if (ImGui.Button("+##Bot", pmButtonSize))
                             {
                                 wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
                             }
                             ImGui.SameLine();
-                            if (ImGui.Button("-", pmButtonSize))
+                            if (ImGui.Button("-##Bot", pmButtonSize))
                             {
                                 wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom--;
                             }
