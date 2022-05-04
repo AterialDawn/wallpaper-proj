@@ -65,7 +65,7 @@ namespace player.Renderers.BarHelpers
                             resizedHeight = image.Height - (settingsForImage.TrimPixelsTop + settingsForImage.TrimPixelsBottom);
                         }
 
-                        int targetWidth = (int)(((float)resizedWidth / (float)resizedHeight) * (float)RenderResolution.Y);
+                        int targetWidth = (int)Math.Ceiling(((float)resizedWidth / (float)resizedHeight) * (float)RenderResolution.Y);
 
                         using (Bitmap resized = new Bitmap(targetWidth, (int)RenderResolution.Y))
                         using (Graphics g = Graphics.FromImage(resized))
@@ -74,11 +74,11 @@ namespace player.Renderers.BarHelpers
                             g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
                             if (settingsForImage != null)
                             {
-                                g.DrawImage(image, new RectangleF(0, 0, targetWidth, RenderResolution.Y), new RectangleF(settingsForImage.TrimPixelsLeft, settingsForImage.TrimPixelsTop, resizedWidth, resizedHeight), GraphicsUnit.Pixel);
+                                g.DrawImage(image, new Rectangle(0, 0, targetWidth, (int)RenderResolution.Y), new Rectangle(settingsForImage.TrimPixelsLeft, settingsForImage.TrimPixelsTop, resizedWidth, resizedHeight), GraphicsUnit.Pixel);
                             }
                             else
                             {
