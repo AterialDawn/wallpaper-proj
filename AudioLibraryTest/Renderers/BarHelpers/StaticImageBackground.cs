@@ -23,6 +23,7 @@ namespace player.Renderers.BarHelpers
         private int textureIndex;
         private FramebufferRenderTexture renderTargetHelper;
         private Primitives primitives;
+        private VertexFloatBuffer renderBuffer = new VertexFloatBuffer(VertexFormat.XY_UV_COLOR, bufferHint: BufferUsageHint.StaticDraw);
 
         bool alternativeRenderUsed = false;
         private GaussianBlurShader gaussianBlur;
@@ -148,6 +149,8 @@ namespace player.Renderers.BarHelpers
 
             float aspect = ((Resolution.Width / Resolution.Height) / (RenderResolution.X / RenderResolution.Y));
 
+            renderBuffer.Clear();
+
             GL.PushMatrix();
             GL.LoadIdentity();
             switch (currentMode)
@@ -241,7 +244,16 @@ namespace player.Renderers.BarHelpers
                     }
                 case BackgroundMode.SolidBackground:
                     {
-                        float sideAnchorScalar = ((RenderResolution.X / RenderResolution.Y) / (Resolution.Width / Resolution.Height) * 0.125f);
+                        float pixelOffsetX = (1f / Resolution.Width);
+                        float pixelOffsetY = (1f / Resolution.Height);
+                        renderBuffer.AddVertex(0f, 0f, 0f + pixelOffsetX, 0f + pixelOffsetY, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(0f, Resolution.Height, 0f + pixelOffsetX, 1f - pixelOffsetY, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f - pixelOffsetX, 1f - pixelOffsetY, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(0f, 0f, 0f + pixelOffsetX, 0f + pixelOffsetY, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f - pixelOffsetX, 1f - pixelOffsetY, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(Resolution.Width, 0f, 1f - pixelOffsetX, 0f + pixelOffsetY, 1f, 1f, 1f, 1f);
+                        renderBuffer.UsageHint = BufferUsageHint.StaticDraw;
+                        renderBuffer.Load();
 
                         renderTargetHelper.BindAndRenderTo();
 
@@ -270,9 +282,7 @@ namespace player.Renderers.BarHelpers
                                     break;
                             }
 
-                            GL.Scale(Resolution.Width, Resolution.Height, 1);
-
-                            primitives.QuadBuffer.Draw();
+                            renderBuffer.Draw();
                         }
 
                         renderTargetHelper.FinishRendering();
