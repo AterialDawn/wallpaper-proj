@@ -21,6 +21,7 @@ namespace player.Core.Render.UI
         ImGuiController controller;
         VisGameWindow vgs;
         List<char> pressedChars = new List<char>();
+        bool anyItemInMenuOpened = false;
 
         public event EventHandler OnRenderingGui;
         public event EventHandler OnDisplayingPopupMenu;
@@ -89,7 +90,6 @@ namespace player.Core.Render.UI
         {
             controller.NewFrame(vgs.Width, vgs.Height);
         }
-
         public void Render()
         {
             /*
@@ -98,20 +98,20 @@ namespace player.Core.Render.UI
             ImGui.SetNextWindowPos(Vector2.Zero, Condition.Always, Vector2.Zero);
             if (ImGui.BeginWindow("Background", ref cmon, 0f, WindowFlags.NoTitleBar | WindowFlags.NoMove | WindowFlags.NoInputs))
             {
-                if (ImGui.GetMousePos().Y <= 15 || ImGui.IsAnyItemHovered())
+                if (ImGui.GetMousePos().Y <= 15 || anyItemInMenuOpened)
                 {
+                    anyItemInMenuOpened = false;
                     if (ImGui.BeginMainMenuBar())
                     {
                         if (ImGui.BeginMenu("wot"))
                         {
+                            anyItemInMenuOpened = true;
                             ImGui.MenuItem("wot item");
                             ImGui.EndMenu();
                         }
                         ImGui.EndMainMenuBar();
                     }
                 }
-                ImGui.Text("sick");
-                ImGui.Text("a bunch of text but it probably wont work");
                 ImGui.EndWindow();
             }
             */
