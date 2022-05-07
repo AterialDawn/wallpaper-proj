@@ -92,6 +92,30 @@ namespace player.Core.Render.UI
 
         public void Render()
         {
+            /*
+            ImGui.SetNextWindowSize(new Vector2(VisGameWindow.ThisForm.ClientSize.Width, VisGameWindow.ThisForm.ClientSize.Height), Condition.Always);
+            bool cmon = true;
+            ImGui.SetNextWindowPos(Vector2.Zero, Condition.Always, Vector2.Zero);
+            if (ImGui.BeginWindow("Background", ref cmon, 0f, WindowFlags.NoTitleBar | WindowFlags.NoMove | WindowFlags.NoInputs))
+            {
+                if (ImGui.GetMousePos().Y <= 15 || ImGui.IsAnyItemHovered())
+                {
+                    if (ImGui.BeginMainMenuBar())
+                    {
+                        if (ImGui.BeginMenu("wot"))
+                        {
+                            ImGui.MenuItem("wot item");
+                            ImGui.EndMenu();
+                        }
+                        ImGui.EndMainMenuBar();
+                    }
+                }
+                ImGui.Text("sick");
+                ImGui.Text("a bunch of text but it probably wont work");
+                ImGui.EndWindow();
+            }
+            */
+
             try
             {
                 OnRenderingGui?.Invoke(this, EventArgs.Empty);
@@ -100,6 +124,8 @@ namespace player.Core.Render.UI
             {
                 Log.Log($"ImGuiRender : {e}");
             }
+            
+            
 
             if (!ImGui.IsAnyWindowHovered() && ImGui.IsMouseClicked(1))
             {

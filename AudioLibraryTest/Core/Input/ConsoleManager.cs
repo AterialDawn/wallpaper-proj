@@ -38,6 +38,7 @@ namespace player.Core.Input
         bool inputGrabberOpen = false;
         OLabel grabbingInputText;
         FpsLimitOverrideContext fpsOverride = null;
+        Vector2 mouseDownPosition = Vector2.Zero;
 
         //global mouse doubleclick stuff
         bool mouseMovedSinceLastClick = false;
@@ -80,10 +81,16 @@ namespace player.Core.Input
             {
                 if (mouseData.Mouse.LastX != 0 || mouseData.Mouse.LastY != 0)
                 {
-                    mouseMovedSinceLastClick = true;
-                    clickedAlready = false;
-                    doubleClickTriggered = false;
-                    doubleClickedAlready = false;
+                    mouseDownPosition.X += mouseData.Mouse.LastX;
+                    mouseDownPosition.Y += mouseData.Mouse.LastY;
+
+                    if (mouseDownPosition.Length > 8)
+                    {
+                        mouseMovedSinceLastClick = true;
+                        clickedAlready = false;
+                        doubleClickTriggered = false;
+                        doubleClickedAlready = false;
+                    }
                 }
 
                 if (mouseData.Mouse.Buttons == Linearstar.Windows.RawInput.Native.RawMouseButtonFlags.LeftButtonDown)
@@ -92,6 +99,7 @@ namespace player.Core.Input
                     {
                         clickedAlready = true;
                         mouseMovedSinceLastClick = false;
+                        mouseDownPosition = Vector2.Zero;
                         timeSinceLastClick = Stopwatch.StartNew();
                     }
                     else if (clickedAlready)

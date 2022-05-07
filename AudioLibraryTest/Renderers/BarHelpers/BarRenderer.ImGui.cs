@@ -27,6 +27,7 @@ namespace player.Renderers
             Vector2 pmButtonSize = new Vector2(33.5f, 20);
             WallpaperImageSettingsService wpSettings;
             FpsLimitOverrideContext fpsOverride = null;
+            bool forcedKeepWallpaper = false;
 
             string[] renderModeItems = new string[] { "Default", "Solid Background" };
             string[] anchorPosItems = new string[] { "Centered", "Left", "Right" };
@@ -53,123 +54,128 @@ namespace player.Renderers
                         {
                             fpsOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Image Settings", FpsLimitOverride.Maximum);
                         }
-                        var curPath = parent.backgroundController.GetCurrentWallpaperPath();
-
-                        if (parent.backgroundController.CurrentBackground is StaticImageBackground)
+                        if (parent.backgroundController.LoadingNextWallpaper)
                         {
-                            var curSettings = wpSettings.GetImageSettingsForPath(curPath);
-                            int renderModeIdx = 0;
-                            int anchorPosIdx = 0;
-                            Vector4 color = Vector4.One;
-                            int left = 0, right = 0, top = 0, bot = 0;
-                            if (curSettings != null)
-                            {
-                                renderModeIdx = (int)curSettings.Mode;
-                                anchorPosIdx = (int)curSettings.AnchorPosition;
-                                color = curSettings.BackgroundColor;
-
-                                left = curSettings.TrimPixelsLeft;
-                                right = curSettings.TrimPixelsRight;
-                                top = curSettings.TrimPixelsTop;
-                                bot = curSettings.TrimPixelsBottom;
-                            }
-                            if (ImGui.Combo("Render Mode", ref renderModeIdx, renderModeItems))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).Mode = (BackgroundMode)renderModeIdx;
-                            }
-
-                            if (ImGui.Combo("Anchor Position", ref anchorPosIdx, anchorPosItems))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).AnchorPosition = (BackgroundAnchorPosition)anchorPosIdx;
-                            }
-
-                            if (ImGui.ColorPicker4("Background Color", ref color, ColorEditFlags.RGB | ColorEditFlags.NoOptions | ColorEditFlags.NoPicker | ColorEditFlags.NoSmallPreview | ColorEditFlags.NoTooltip))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = color;
-                            }
-
-                            ImGui.Text("Pixel Crop Offsets");
-                            ImGui.PushItemWidth(75);
-                            if (ImGui.SliderInt("##Left", ref left, 0, 30, $"{left}"))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft = left;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.SliderInt("##Right", ref right, 0, 30, $"{right}"))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight = right;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.SliderInt("##Top", ref top, 0, 30, $"{top}"))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop = top;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.SliderInt("##Bottom", ref bot, 0, 30, $"{bot}"))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom = bot;
-                            }
-
-                            ImGui.PopItemWidth();
-
-                            if (ImGui.Button("+##Left", pmButtonSize))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.Button("-##Left", pmButtonSize))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft--;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.Button("+##Right", pmButtonSize))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.Button("-##Right", pmButtonSize))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight--;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.Button("+##Top", pmButtonSize))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.Button("-##Top", pmButtonSize))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop--;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.Button("+##Bot", pmButtonSize))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.Button("-##Bot", pmButtonSize))
-                            {
-                                wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom--;
-                            }
-                            if (ImGui.Button("Redraw Image"))
-                            {
-                                parent.backgroundController.ImmediatelyLoadNewWallpaper(curPath);
-                            }
-                            ImGui.SameLine();
-                            if (ImGui.Button("Clear Settings"))
-                            {
-                                wpSettings.ClearSettingsForPath(curPath);
-                            }
-                            ImGui.SameLine();
-                            bool hasCustomSettings = curSettings != null;
-                            ImGui.Checkbox("Has Custom Settings", ref hasCustomSettings);
+                            ImGui.Text("Busy loading a wallpaper...");
                         }
                         else
                         {
-                            ImGui.Text("Settings not yet supported for this background type");
+                            var curPath = parent.backgroundController.GetCurrentWallpaperPath();
+
+                            if (parent.backgroundController.CurrentBackground is StaticImageBackground)
+                            {
+                                var curSettings = wpSettings.GetImageSettingsForPath(curPath);
+                                int renderModeIdx = 0;
+                                int anchorPosIdx = 0;
+                                Vector4 color = Vector4.One;
+                                int left = 0, right = 0, top = 0, bot = 0;
+                                if (curSettings != null)
+                                {
+                                    renderModeIdx = (int)curSettings.Mode;
+                                    anchorPosIdx = (int)curSettings.AnchorPosition;
+                                    color = curSettings.BackgroundColor;
+
+                                    left = curSettings.TrimPixelsLeft;
+                                    right = curSettings.TrimPixelsRight;
+                                    top = curSettings.TrimPixelsTop;
+                                    bot = curSettings.TrimPixelsBottom;
+                                }
+                                if (ImGui.Combo("Render Mode", ref renderModeIdx, renderModeItems))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).Mode = (BackgroundMode)renderModeIdx;
+                                }
+
+                                if (ImGui.Combo("Anchor Position", ref anchorPosIdx, anchorPosItems))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).AnchorPosition = (BackgroundAnchorPosition)anchorPosIdx;
+                                }
+
+                                if (ImGui.ColorPicker4("Background Color", ref color, ColorEditFlags.RGB | ColorEditFlags.NoOptions | ColorEditFlags.NoPicker | ColorEditFlags.NoSmallPreview | ColorEditFlags.NoTooltip))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = color;
+                                }
+
+                                ImGui.Text("Pixel Crop Offsets");
+                                ImGui.PushItemWidth(75);
+                                if (ImGui.SliderInt("##Left", ref left, 0, 30, $"{left}"))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft = left;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.SliderInt("##Right", ref right, 0, 30, $"{right}"))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight = right;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.SliderInt("##Top", ref top, 0, 30, $"{top}"))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop = top;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.SliderInt("##Bottom", ref bot, 0, 30, $"{bot}"))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom = bot;
+                                }
+
+                                ImGui.PopItemWidth();
+
+                                if (ImGui.Button("+##Left", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("-##Left", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft--;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("+##Right", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("-##Right", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight--;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("+##Top", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("-##Top", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop--;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("+##Bot", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("-##Bot", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom--;
+                                }
+                                if (ImGui.Button("Redraw Image"))
+                                {
+                                    parent.backgroundController.ImmediatelyLoadNewWallpaper(curPath);
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("Clear Settings"))
+                                {
+                                    wpSettings.ClearSettingsForPath(curPath);
+                                }
+                                ImGui.SameLine();
+                                bool hasCustomSettings = curSettings != null;
+                                ImGui.Checkbox("Has Custom Settings", ref hasCustomSettings);
+                            }
+                            else
+                            {
+                                ImGui.Text("Settings not yet supported for this background type");
+                            }
                         }
-
-
                         ImGui.EndWindow();
                     }
                 }
@@ -211,9 +217,25 @@ namespace player.Renderers
                 if (ImGui.Checkbox("Keep Current Wallpaper", ref keep))
                 {
                     parent.ToggleKeepRotation();
+                    forcedKeepWallpaper = false;
                 }
 
-                ImGui.Checkbox("Image Settings", ref imageInfoWindowVisible);
+                if (ImGui.Checkbox("Image Settings", ref imageInfoWindowVisible))
+                {
+                    if (!imageInfoWindowVisible && forcedKeepWallpaper)
+                    {
+                        parent.backgroundController.KeepCurrentBackground = false;
+                    }
+                    else if (imageInfoWindowVisible)
+                    {
+                        if (!parent.backgroundController.KeepCurrentBackground)
+                        {
+                            parent.backgroundController.KeepCurrentBackground = true;
+                            forcedKeepWallpaper = true;
+                            Log.Log("Keeping current background");
+                        }
+                    }
+                }
 
                 var paths = settings.GetSettingAs<string[]>("Wallpaper.MoveToPaths", null);
                 if (paths != null && paths.Length > 0)

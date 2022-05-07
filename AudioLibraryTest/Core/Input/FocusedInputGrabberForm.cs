@@ -58,28 +58,11 @@ namespace player.Core.Input
         int lastX = -1;
         int lastY = -1;
 
-        Timer tmr = null;
-        bool lostFocus = false;
         Rectangle currentBounds;
+
         protected override void OnShown(EventArgs e)
         {
-            tmr = new Timer();
-            tmr.Tick += (s, args) =>
-            {
-                if (lostFocus) return;
-                if (Form.ActiveForm != this)
-                {
-                    Activate();
-                }
-                else
-                {
-                    tmr?.Stop();
-                    tmr?.Dispose();
-                    tmr = null;
-                }
-            };
-            tmr.Interval = 30;
-            tmr.Start();
+
 
             //Location = new System.Drawing.Point(-9000, -9000);
             FormBorderStyle = FormBorderStyle.None;
@@ -87,12 +70,15 @@ namespace player.Core.Input
             Size = currentBounds.Size;
             this.Opacity = 0.01;
 
+            //what the fuck.
+            Win32.keybd_event((byte)0xA4, 0x45, 0x1 | 0, 0);
+            Win32.keybd_event((byte)0xA4, 0x45, 0x1 | 0x2, 0);
+            Win32.SetForegroundWindow(this.Handle);
+
             base.OnShown(e);
         }
         protected override void OnClosed(EventArgs e)
         {
-            tmr?.Stop();
-            tmr?.Dispose();
             onClosedHandler();
             base.OnClosed(e);
         }
@@ -119,7 +105,6 @@ namespace player.Core.Input
 
         protected override void OnLostFocus(EventArgs e)
         {
-            lostFocus = true;
             this.Close();
         }
 

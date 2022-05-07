@@ -75,6 +75,11 @@ namespace player.Utility
 
         [DllImport("ole32.dll", ExactSpelling = true, SetLastError = true)]
         internal static extern int OleInitialize(int val);
+        [DllImport("user32.dll")]
+        public static extern bool SetForegroundWindow(IntPtr hwnd);
+
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]

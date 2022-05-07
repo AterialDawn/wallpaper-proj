@@ -24,6 +24,7 @@ namespace player.Renderers.BarHelpers
         public Vector2 PrimaryTextureResolution { get; private set; } = new Vector2();
         public Vector2 SecondaryTextureResolution { get; private set; } = new Vector2();
         public bool ReadyToRender { get { return initialLoadDone; } }
+        public bool LoadingNextWallpaper { get { return loadingBackground; } }
 
         public IBackground CurrentBackground { get { return currentBackground; } }
 
