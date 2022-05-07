@@ -48,7 +48,7 @@ namespace player.Renderers
             {
                 if (imageInfoWindowVisible)
                 {
-                    if (ImGui.BeginWindow("Image Settings"))
+                    if (ImGui.BeginWindow("Image Settings", ref imageInfoWindowVisible, WindowFlags.Default))
                     {
                         if (fpsOverride == null)
                         {
@@ -186,6 +186,11 @@ namespace player.Renderers
                         fpsOverride.Dispose();
                         fpsOverride = null;
                     }
+                    if (forcedKeepWallpaper)
+                    {
+                        forcedKeepWallpaper = false;
+                        parent.backgroundController.KeepCurrentBackground = false;
+                    }
                 }
             }
 
@@ -222,11 +227,7 @@ namespace player.Renderers
 
                 if (ImGui.Checkbox("Image Settings", ref imageInfoWindowVisible))
                 {
-                    if (!imageInfoWindowVisible && forcedKeepWallpaper)
-                    {
-                        parent.backgroundController.KeepCurrentBackground = false;
-                    }
-                    else if (imageInfoWindowVisible)
+                    if (imageInfoWindowVisible)
                     {
                         if (!parent.backgroundController.KeepCurrentBackground)
                         {
