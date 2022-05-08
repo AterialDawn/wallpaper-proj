@@ -15,7 +15,7 @@ namespace player.Utility
             BitmapData TextureData = sourceBitmap.LockBits(
                 new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height),
                     ImageLockMode.ReadOnly,
-                    System.Drawing.Imaging.PixelFormat.Format32bppPArgb
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb
                 );
 
             LoadPtrIntoTexture(sourceBitmap.Width, sourceBitmap.Height, oglTexture, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, TextureData.Scan0);

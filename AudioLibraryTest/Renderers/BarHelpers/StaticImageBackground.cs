@@ -87,6 +87,8 @@ namespace player.Renderers.BarHelpers
                             }
 
                             TextureUtils.LoadBitmapIntoTexture(resized, textureIndex);
+                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
                             Resolution = new SizeF(targetWidth, RenderResolution.Y);
                             RenderDifferentSizedImage();
                             alternativeRenderUsed = true;
@@ -244,14 +246,12 @@ namespace player.Renderers.BarHelpers
                     }
                 case BackgroundMode.SolidBackground:
                     {
-                        float pixelOffsetX = (1f / Resolution.Width);
-                        float pixelOffsetY = (1f / Resolution.Height);
-                        renderBuffer.AddVertex(0f, 0f, 0f + pixelOffsetX, 0f + pixelOffsetY, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(0f, Resolution.Height, 0f + pixelOffsetX, 1f - pixelOffsetY, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f - pixelOffsetX, 1f - pixelOffsetY, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(0f, 0f, 0f + pixelOffsetX, 0f + pixelOffsetY, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f - pixelOffsetX, 1f - pixelOffsetY, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(Resolution.Width, 0f, 1f - pixelOffsetX, 0f + pixelOffsetY, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(0f, 0f, 0f, 0f, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(0f, Resolution.Height, 0f, 1f, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(0f, 0f, 0f, 0f, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f, 1f, 1f, 1f, 1f);
+                        renderBuffer.AddVertex(Resolution.Width, 0f, 1f, 0f, 1f, 1f, 1f, 1f);
                         renderBuffer.UsageHint = BufferUsageHint.StaticDraw;
                         renderBuffer.Load();
 
@@ -274,11 +274,11 @@ namespace player.Renderers.BarHelpers
                             switch (align)
                             {
                                 case BackgroundAnchorPosition.Center:
-                                    GL.Translate((RenderResolution.X * 0.5f) - (Resolution.Width * 0.5f), 0, 0);
+                                    GL.Translate((int)((RenderResolution.X * 0.5f) - (Resolution.Width * 0.5f)), 0, 0);
                                     break;
 
                                 case BackgroundAnchorPosition.Right:
-                                    GL.Translate(RenderResolution.X - Resolution.Width, 0, 0);
+                                    GL.Translate((int)(RenderResolution.X - Resolution.Width), 0, 0);
                                     break;
                             }
 
