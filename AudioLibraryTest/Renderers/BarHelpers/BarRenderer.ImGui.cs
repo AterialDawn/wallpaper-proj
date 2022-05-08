@@ -176,8 +176,8 @@ namespace player.Renderers
                                 ImGui.Text("Settings not yet supported for this background type");
                             }
                         }
-                        ImGui.EndWindow();
                     }
+                    ImGui.EndWindow();
                 }
                 else
                 {
