@@ -82,6 +82,10 @@ namespace player.Core.Render
                 context.MakeCurrent(window.WindowInfo);
                 ContextReadyEvent.Set();
                 Log.Log($"{contextName} context ready");
+
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+
                 ProcessCallbacks();
             }
 
