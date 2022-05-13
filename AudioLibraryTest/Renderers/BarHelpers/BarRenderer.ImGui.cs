@@ -1,18 +1,24 @@
 ﻿using ImGuiNET;
+using OpenTK.Graphics.OpenGL;
 using player.Core;
+using player.Core.Input;
 using player.Core.Render;
 using player.Core.Render.UI;
 using player.Core.Service;
 using player.Core.Settings;
 using player.Renderers.BarHelpers;
+using player.Utility;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Log = player.Core.Logging.Logger;
+using Point = System.Drawing.Point;
 
 namespace player.Renderers
 {
@@ -28,6 +34,11 @@ namespace player.Renderers
             WallpaperImageSettingsService wpSettings;
             FpsLimitOverrideContext fpsOverride = null;
             bool forcedKeepWallpaper = false;
+            Point lastMousePos = Point.Empty;
+            Bitmap desktopBmp = new Bitmap(1, 1);
+            Graphics desktopDC;
+            IntPtr colorPickerTexture;
+            Vector2 pickerSize = new Vector2(16, 16);
 
             string[] renderModeItems = new string[] { "Default", "Solid Background" };
             string[] anchorPosItems = new string[] { "Centered", "Left", "Right" };
@@ -38,10 +49,21 @@ namespace player.Renderers
 
                 ServiceManager.GetService<ImGuiManager>().OnDisplayingPopupMenu += ImGuiHandler_OnDisplayingPopupMenu;
                 ServiceManager.GetService<ImGuiManager>().OnRenderingGui += ImGuiHandler_OnRenderingGui;
+                ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiHandler_MouseMoveEventRaw;
                 settings = ServiceManager.GetService<SettingsService>();
                 settings.SetSettingDefault("Wallpaper.MoveToPaths", new string[0]);
 
                 wpSettings = ServiceManager.GetService<WallpaperImageSettingsService>();
+                desktopDC = Graphics.FromImage(desktopBmp);
+
+                colorPickerTexture = new IntPtr(GL.GenTexture());
+
+                TextureUtils.LoadBitmapIntoTexture(new Bitmap(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets/colPick.png")), (int)colorPickerTexture);
+            }
+
+            private void ImGuiHandler_MouseMoveEventRaw(object sender, OpenTK.Input.MouseMoveEventArgs e)
+            {
+                lastMousePos = new Point(e.X + WallpaperUtils.WallpaperBoundsCorrected.Left, e.Y + WallpaperUtils.WallpaperBoundsCorrected.Top);
             }
 
             private void ImGuiHandler_OnRenderingGui(object sender, EventArgs e)
@@ -95,6 +117,16 @@ namespace player.Renderers
                                     wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = color;
                                 }
 
+                                ImGui.ImageButton(colorPickerTexture, pickerSize, Vector2.Zero, Vector2.One, 0, Vector4.Zero, Vector4.One);
+                                if (ImGui.IsLastItemActive())
+                                {
+                                    desktopDC.CopyFromScreen(lastMousePos.X, lastMousePos.Y, 0, 0, new Size(1, 1), CopyPixelOperation.SourceCopy);
+
+                                    var sampled = desktopBmp.GetPixel(0, 0);
+                                    wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = new Vector4(sampled.R / 255f, sampled.G / 255f, sampled.B / 255f, 1);
+                                }
+
+                                ImGui.SameLine();
                                 ImGui.Text("Pixel Crop Offsets");
                                 ImGui.PushItemWidth(75);
                                 if (ImGui.SliderInt("##Left", ref left, 0, 30, $"{left}"))
@@ -119,19 +151,14 @@ namespace player.Renderers
 
                                 ImGui.PopItemWidth();
 
-                                if (ImGui.Button("+##Left", pmButtonSize))
-                                {
-                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
-                                }
-                                ImGui.SameLine();
                                 if (ImGui.Button("-##Left", pmButtonSize))
                                 {
                                     wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft--;
                                 }
                                 ImGui.SameLine();
-                                if (ImGui.Button("+##Right", pmButtonSize))
+                                if (ImGui.Button("+##Left", pmButtonSize))
                                 {
-                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
                                 }
                                 ImGui.SameLine();
                                 if (ImGui.Button("-##Right", pmButtonSize))
@@ -139,9 +166,9 @@ namespace player.Renderers
                                     wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight--;
                                 }
                                 ImGui.SameLine();
-                                if (ImGui.Button("+##Top", pmButtonSize))
+                                if (ImGui.Button("+##Right", pmButtonSize))
                                 {
-                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
                                 }
                                 ImGui.SameLine();
                                 if (ImGui.Button("-##Top", pmButtonSize))
@@ -149,14 +176,19 @@ namespace player.Renderers
                                     wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop--;
                                 }
                                 ImGui.SameLine();
-                                if (ImGui.Button("+##Bot", pmButtonSize))
+                                if (ImGui.Button("+##Top", pmButtonSize))
                                 {
-                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
                                 }
                                 ImGui.SameLine();
                                 if (ImGui.Button("-##Bot", pmButtonSize))
                                 {
                                     wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom--;
+                                }
+                                ImGui.SameLine();
+                                if (ImGui.Button("+##Bot", pmButtonSize))
+                                {
+                                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
                                 }
                                 if (ImGui.Button("Redraw Image"))
                                 {

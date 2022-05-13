@@ -10,7 +10,7 @@
     <StartArguments>-Font "OCR A Std,10.0"</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <StartArguments>-Font "OCR A Std,10.0"</StartArguments>
+    <StartArguments>-Font "OCR A Std,10.0" -wallpaper</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <StartArguments>-Font "OCR A Std,10.0" -wallpaper full</StartArguments>

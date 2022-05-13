@@ -21,6 +21,11 @@ namespace player.Core.Input
         public event EventHandler<MouseEventArgs> MouseEvent;
         public event EventHandler<MouseMoveEventArgs> MouseMoveEvent;
         public event EventHandler<MouseWheelEventArgs> MouseWheelEvent;
+
+        public event EventHandler<KeyStateChangedEventArgs> KeyStateEventRaw;
+        public event EventHandler<MouseEventArgs> MouseEventRaw;
+        public event EventHandler<MouseMoveEventArgs> MouseMoveEventRaw;
+        public event EventHandler<MouseWheelEventArgs> MouseWheelEventRaw;
         #endregion
 
         #region Private Fields and Properties
@@ -100,6 +105,33 @@ namespace player.Core.Input
                 while (inputQueue.Count > 0)
                 {
                     InputEventContainer evt = inputQueue.Dequeue();
+
+                    if (evt.IsKeyEventArg)
+                    {
+                        KeyStateEventRaw?.Invoke(this, evt.KeyboardKeyEventArg);
+                    }
+                    else if (evt.IsMouseEventArg)
+                    {
+                        MouseEventRaw?.Invoke(this, evt.MouseEventArg);
+                    }
+                    else if (evt.IsMouseWheelEventArg)
+                    {
+                        MouseWheelEventRaw?.Invoke(this, evt.MouseWheelEventArg);
+                    }
+                    else if (evt.IsMouseMoveEventArg)
+                    {
+                        MouseMoveEventRaw?.Invoke(this, evt.MouseMoveEventArg);
+                    }
+                    else if (evt.IsMouseSnapshot)
+                    {
+                        //unused for base system.
+                        //might be a bad idea?
+                    }
+                    else
+                    {
+                        Log.Log($"Unknown input event!!! {evt}");
+                    }
+
                     if (imGui.ShouldSwallowInputEvent(evt)) continue;
                     if (evt.IsKeyEventArg)
                     {
@@ -246,19 +278,17 @@ namespace player.Core.Input
 
         internal void MouseWheel(MouseWheelEventArgs args)
         {
-            MouseEventArgs clonedEvents = new MouseEventArgs(args); //clone args as required by opentk
             lock (inputQueueLock)
             {
-                inputQueue.Enqueue(new InputEventContainer(clonedEvents));
+                inputQueue.Enqueue(new InputEventContainer(args));
             }
         }
 
         internal void MouseMove(MouseMoveEventArgs args)
         {
-            MouseEventArgs clonedEvents = new MouseEventArgs(args); //clone args as required by opentk
             lock (inputQueueLock)
             {
-                inputQueue.Enqueue(new InputEventContainer(clonedEvents));
+                inputQueue.Enqueue(new InputEventContainer(args));
             }
         }
         #endregion
