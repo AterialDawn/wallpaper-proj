@@ -13,6 +13,7 @@ using player.Shaders;
 using OpenTK;
 using player.Core.Settings;
 using OpenTK.Graphics;
+using System.Drawing.Imaging;
 
 namespace player.Renderers.BarHelpers
 {
@@ -23,7 +24,7 @@ namespace player.Renderers.BarHelpers
         private int textureIndex;
         private FramebufferRenderTexture renderTargetHelper;
         private Primitives primitives;
-        private VertexFloatBuffer renderBuffer = new VertexFloatBuffer(VertexFormat.XY_UV_COLOR, bufferHint: BufferUsageHint.StaticDraw);
+        private VertexFloatBuffer renderBuffer = new VertexFloatBuffer(VertexFormat.XY_UV, bufferHint: BufferUsageHint.StaticDraw);
 
         bool alternativeRenderUsed = false;
         private GaussianBlurShader gaussianBlur;
@@ -75,15 +76,19 @@ namespace player.Renderers.BarHelpers
                             g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
-                            if (settingsForImage != null)
+                            using (var wrapMode = new ImageAttributes())
                             {
-                                g.DrawImage(image, new Rectangle(0, 0, targetWidth, (int)RenderResolution.Y), new Rectangle(settingsForImage.TrimPixelsLeft, settingsForImage.TrimPixelsTop, resizedWidth, resizedHeight), GraphicsUnit.Pixel);
-                            }
-                            else
-                            {
-                                g.DrawImage(image, 0, 0, targetWidth, RenderResolution.Y);
+                                wrapMode.SetWrapMode(System.Drawing.Drawing2D.WrapMode.TileFlipXY);
+                                if (settingsForImage != null)
+                                {
+                                    g.DrawImage(image, new Rectangle(0, 0, targetWidth, (int)RenderResolution.Y), settingsForImage.TrimPixelsLeft, settingsForImage.TrimPixelsTop, resizedWidth, resizedHeight, GraphicsUnit.Pixel, wrapMode);
+                                }
+                                else
+                                {
+                                    g.DrawImage(image, new Rectangle(0, 0, targetWidth, (int)RenderResolution.Y), 0, 0, targetWidth, (int)RenderResolution.Y, GraphicsUnit.Pixel, wrapMode);
+                                }
                             }
 
                             TextureUtils.LoadBitmapIntoTexture(resized, textureIndex);
@@ -246,13 +251,12 @@ namespace player.Renderers.BarHelpers
                     }
                 case BackgroundMode.SolidBackground:
                     {
-                        renderBuffer.AddVertex(0f, 0f, 0f, 0f, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(0f, Resolution.Height, 0f, 1f, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(0f, 0f, 0f, 0f, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f, 1f, 1f, 1f, 1f);
-                        renderBuffer.AddVertex(Resolution.Width, 0f, 1f, 0f, 1f, 1f, 1f, 1f);
-                        renderBuffer.UsageHint = BufferUsageHint.StaticDraw;
+                        renderBuffer.AddVertex(0f, 0f, 0f, 0f);
+                        renderBuffer.AddVertex(0f, Resolution.Height, 0f, 1f);
+                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
+                        renderBuffer.AddVertex(0f, 0f, 0f, 0f);
+                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
+                        renderBuffer.AddVertex(Resolution.Width, 0f, 1f, 0f);
                         renderBuffer.Load();
 
                         renderTargetHelper.BindAndRenderTo();
