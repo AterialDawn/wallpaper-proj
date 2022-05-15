@@ -87,7 +87,7 @@ namespace player.Renderers.BarHelpers
                                 }
                                 else
                                 {
-                                    g.DrawImage(image, new Rectangle(0, 0, targetWidth, (int)RenderResolution.Y), 0, 0, targetWidth, (int)RenderResolution.Y, GraphicsUnit.Pixel, wrapMode);
+                                    g.DrawImage(image, new Rectangle(0, 0, targetWidth, (int)RenderResolution.Y), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
                                 }
                             }
 
