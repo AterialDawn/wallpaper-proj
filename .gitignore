@@ -17,3 +17,5 @@ bld/
 [Ll]ogs/
 packages/
 .vs/
+
+*.user
