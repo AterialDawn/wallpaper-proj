@@ -49,7 +49,7 @@ namespace player.Core.Input
             FormBorderStyle = FormBorderStyle.None;
             Location = currentBounds.Location;
             Size = currentBounds.Size;
-            this.Opacity = 0.01;
+            Opacity = 0;
         }
 
         Action<KeyEventArgs> onKeyDownHandler;
@@ -68,12 +68,15 @@ namespace player.Core.Input
             FormBorderStyle = FormBorderStyle.None;
             Location = currentBounds.Location;
             Size = currentBounds.Size;
-            this.Opacity = 0.01;
+            TransparencyKey = Color.Red;
+            BackColor = Color.Red;
 
             //what the fuck.
             Win32.keybd_event((byte)0xA4, 0x45, 0x1 | 0, 0);
             Win32.keybd_event((byte)0xA4, 0x45, 0x1 | 0x2, 0);
             Win32.SetForegroundWindow(this.Handle);
+
+            Opacity = 1;
 
             base.OnShown(e);
         }
