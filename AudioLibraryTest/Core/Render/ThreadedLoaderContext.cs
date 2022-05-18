@@ -21,7 +21,7 @@ namespace player.Core.Render
         public static ThreadedLoaderContext Instance { get { return _instance; } }
         private ThreadedLoaderContext() { }
 
-        private int ContextCount = 3;
+        private int ContextCount = 1;
 
         public delegate void ThreadedResourceLoaderCallback();
         
