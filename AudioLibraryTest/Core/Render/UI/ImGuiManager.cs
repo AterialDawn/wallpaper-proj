@@ -24,6 +24,9 @@ namespace player.Core.Render.UI
         VisGameWindow vgs;
         List<char> pressedChars = new List<char>();
         bool anyItemInMenuOpened = false;
+        double timeLastMouseMoved;
+        float currentFrameOpacity = 0;
+        ConsoleManager console;
 
         public event EventHandler OnRenderingGui;
         public event EventHandler OnDisplayingPopupMenu;
@@ -58,11 +61,19 @@ namespace player.Core.Render.UI
             io.KeyMap[GuiKey.X] = (int)Key.X;
             io.KeyMap[GuiKey.Y] = (int)Key.Y;
             io.KeyMap[GuiKey.Z] = (int)Key.Z;
+
+            ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiController_MouseMoveEventRaw;
+            console = ServiceManager.GetService<ConsoleManager>();
         }
 
         public void Cleanup()
         {
 
+        }
+
+        private void ImGuiController_MouseMoveEventRaw(object sender, MouseMoveEventArgs e)
+        {
+            timeLastMouseMoved = TimeManager.TimeD;
         }
 
         public void CharPress(char c)
@@ -90,87 +101,60 @@ namespace player.Core.Render.UI
 
         public void NewFrame()
         {
-            controller.NewFrame(vgs.Width, vgs.Height);
+            currentFrameOpacity = console.Visible ? 1f : (float)UtilityMethods.Clamp(1.0 - ((TimeManager.TimeD - (timeLastMouseMoved + 5f)) / 2.5), 0, 1); //smooth opacity to 0 after 5 seconds of inactivity over a 2.5 second fade duration
+            if (currentFrameOpacity > 0)
+            {
+                controller.NewFrame(vgs.Width, vgs.Height);
+            }
         }
         public void Render()
         {
-            /*
-            ImGui.SetNextWindowSize(new Vector2(VisGameWindow.ThisForm.ClientSize.Width, VisGameWindow.ThisForm.ClientSize.Height), Condition.Always);
-            bool cmon = true;
-            ImGui.SetNextWindowPos(Vector2.Zero, Condition.Always, Vector2.Zero);
-            if (ImGui.BeginWindow("Background", ref cmon, 0f, WindowFlags.NoTitleBar | WindowFlags.NoMove | WindowFlags.NoInputs))
+            bool popupDrawn = false;
+            if (currentFrameOpacity > 0)
             {
-                if (ImGui.GetMousePos().Y <= 15 || anyItemInMenuOpened)
+                try
                 {
-                    anyItemInMenuOpened = false;
-                    if (ImGui.BeginMainMenuBar())
+                    OnRenderingGui?.Invoke(this, EventArgs.Empty);
+                }
+                catch (Exception e)
+                {
+                    Log.Log($"ImGuiRender : {e}");
+                }
+
+
+
+                if (!ImGui.IsAnyWindowHovered() && ImGui.IsMouseClicked(1))
+                {
+                    ImGui.OpenPopup("mainPopup");
+                }
+
+                if (ImGui.BeginPopup("mainPopup"))
+                {
+                    popupDrawn = true;
+                    ImGui.Text($"player v{Program.VersionNumber}");
+                    ImGui.Separator();
+                    if (OnDisplayingPopupMenu != null)
                     {
-                        if (ImGui.BeginMenu("wot"))
+                        var invoList = OnDisplayingPopupMenu.GetInvocationList();
+                        for (int i = 0; i < invoList.Length - 1; i++)
                         {
-                            anyItemInMenuOpened = true;
-                            ImGui.MenuItem("wot item");
-                            ImGui.EndMenu();
+                            invoList[i].DynamicInvoke(this, EventArgs.Empty);
+                            ImGui.Separator();
                         }
-                        ImGui.EndMainMenuBar();
-                    }
-                }
-                ImGui.EndWindow();
-            }
-            */
 
-            try
-            {
-                OnRenderingGui?.Invoke(this, EventArgs.Empty);
-            }
-            catch (Exception e)
-            {
-                Log.Log($"ImGuiRender : {e}");
-            }
-            
-            
-
-            if (!ImGui.IsAnyWindowHovered() && ImGui.IsMouseClicked(1))
-            {
-                ImGui.OpenPopup("mainPopup");
-            }
-
-            if (ImGui.BeginPopup("mainPopup"))
-            {
-                if (overrideContext == null)
-                {
-                    overrideContext = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("ImGuiRender", FpsLimitOverride.Maximum);
-                }
-                ImGui.Text($"player v{Program.VersionNumber}");
-                ImGui.Separator();
-                if (OnDisplayingPopupMenu != null)
-                {
-                    var invoList = OnDisplayingPopupMenu.GetInvocationList();
-                    for (int i = 0; i < invoList.Length - 1; i++)
-                    {
-                        invoList[i].DynamicInvoke(this, EventArgs.Empty);
-                        ImGui.Separator();
+                        if (invoList.Length > 0)
+                        {
+                            invoList[invoList.Length - 1].DynamicInvoke(this, EventArgs.Empty);
+                        }
                     }
 
-                    if (invoList.Length > 0)
-                    {
-                        invoList[invoList.Length - 1].DynamicInvoke(this, EventArgs.Empty);
-                    }
-                }
-
-                ImGui.EndPopup();
-            }
-            else
-            {
-                if (overrideContext != null)
-                {
-                    overrideContext.Dispose();
-                    overrideContext = null;
+                    ImGui.EndPopup();
                 }
             }
             
-            controller.Render();
+            controller.Render(currentFrameOpacity);
 
-            if (controller.DidRender)
+            if (controller.DidRender || popupDrawn)
             {
                 if (overrideContext == null)
                 {
@@ -254,8 +238,7 @@ namespace player.Core.Render.UI
             int lastWidth = 0, lastHeight = 0;
             TexturedQuadShader shader = new TexturedQuadShader();
             Primitives primitives;
-            ConsoleManager console;
-            double timeLastMouseMoved;
+            
 
             public bool DidRender { get; private set; }
 
@@ -265,13 +248,6 @@ namespace player.Core.Render.UI
             public ImGuiController()
             {
                 primitives = ServiceManager.GetService<Primitives>();
-                console = ServiceManager.GetService<ConsoleManager>();
-                ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiController_MouseMoveEventRaw;
-            }
-
-            private void ImGuiController_MouseMoveEventRaw(object sender, MouseMoveEventArgs e)
-            {
-                timeLastMouseMoved = TimeManager.TimeD;
             }
 
             public void NewFrame(int width, int height)
@@ -302,11 +278,11 @@ namespace player.Core.Render.UI
                 ImGui.NewFrame();
             }
 
-            public unsafe void Render()
+            public unsafe void Render(float opacity)
             {
                 ImGui.Render();
                 if (ImGuiNative.igGetIO()->RenderDrawListsFn == IntPtr.Zero)
-                    RenderDrawData(ImGuiNative.igGetDrawData(), width, height);
+                    RenderDrawData(ImGuiNative.igGetDrawData(), width, height, opacity);
             }
 
             public unsafe void Create()
@@ -341,7 +317,7 @@ namespace player.Core.Render.UI
                 GL.BindTexture(TextureTarget.Texture2D, 0);
             }
 
-            public unsafe void RenderDrawData(DrawData* drawData, int displayW, int displayH)
+            public unsafe void RenderDrawData(DrawData* drawData, int displayW, int displayH, float opacity)
             {
                 // We are using the OpenGL fixed pipeline to make the example code simpler to read!
                 // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers.
@@ -350,7 +326,6 @@ namespace player.Core.Render.UI
                 //GL.ClearColor(clear_color.X, clear_color.Y, clear_color.Z, clear_color.W);
                 //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-                float opacity = console.Visible ? 1f : (float)UtilityMethods.Clamp(1.0 - ((TimeManager.TimeD - (timeLastMouseMoved + 5f)) / 2.5), 0, 1); //smooth opacity to 0 after 5 seconds of inactivity over a 2.5 second fade duration
                 bool renderToTexture = opacity < 1;
 
                 if (drawData->CmdListsCount == 0 || opacity <= 0)
