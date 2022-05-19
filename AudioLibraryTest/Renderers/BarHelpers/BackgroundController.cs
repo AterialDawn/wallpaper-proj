@@ -426,7 +426,11 @@ namespace player.Renderers.BarHelpers
 
             ThreadedLoaderContext.Instance.ExecuteOnLoaderThread(() =>
             {
-                PreloadCompleteHandler(newBackground, newBackground.Preload());
+                var preloadResult = newBackground.Preload();
+                MainThreadDelegator.InvokeOn(InvocationTarget.BeforeRender, () =>
+                {
+                    PreloadCompleteHandler(newBackground, preloadResult);
+                });
             });
         }
 
