@@ -12,10 +12,20 @@ namespace player.Shaders
     {
         public override string ShaderName { get { return "TexturedQuadShader"; } }
 
+        int opacityLoc = 0;
+        float _opacity = 1;
+        public float Opacity { get { return _opacity; } set { _opacity = value; SetUniform(opacityLoc, _opacity); } }
+
         internal TexturedQuadShader() : base() { }
 
-        public override void Initialize() { }
+        public override void Initialize()
+        {
+            opacityLoc = GetUniformLocation("opacity");
+        }
 
-        protected override void OnActivate() { }
+        protected override void OnActivate()
+        {
+            Opacity = Opacity;
+        }
     }
 }

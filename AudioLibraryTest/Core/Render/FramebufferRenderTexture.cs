@@ -19,6 +19,8 @@ namespace player.Core.Render
         int Width, Height;
         bool resizePending = false;
         FramebufferCreationHooks callbacks;
+        FramebufferManager fbManager;
+        bool pushedToFbManager;
 
         public FramebufferRenderTexture(int width, int height, FramebufferCreationHooks hooks = null)
         {
@@ -32,10 +34,17 @@ namespace player.Core.Render
             {
                 callbacks = hooks;
             }
+
+            fbManager = ServiceManager.GetService<FramebufferManager>();
         }
 
         public void FinishRendering()
         {
+            if (pushedToFbManager)
+            {
+                fbManager.PopFramebuffer(FramebufferTarget.Framebuffer);
+                pushedToFbManager = false;
+            }
             GL.PopAttrib();
         }
 
@@ -54,7 +63,7 @@ namespace player.Core.Render
             MainRenderTexture = MainFramebuffer = MainDepthRenderBuffer = 0;
         }
 
-        public virtual void BindAndRenderTo()
+        public virtual void BindAndRenderTo(bool pushToFbManager = false)
         {
             if (MainFramebuffer == 0) CreateRenderFramebuffer();
             if (resizePending)
@@ -64,7 +73,15 @@ namespace player.Core.Render
                 resizePending = false;
             }
 
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, MainFramebuffer);
+            if (pushToFbManager)
+            {
+                fbManager.PushFramebuffer(FramebufferTarget.Framebuffer, MainFramebuffer);
+                pushedToFbManager = true;
+            }
+            else
+            {
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, MainFramebuffer);
+            }
             GL.PushAttrib(AttribMask.ViewportBit);
             GL.Viewport(0, 0, Width, Height);
         }
@@ -76,7 +93,7 @@ namespace player.Core.Render
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, MainFramebuffer);
             GL.GenTextures(1, out MainRenderTexture);
             GL.BindTexture(TextureTarget.Texture2D, MainRenderTexture);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, Width, Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureBaseLevel, 0);

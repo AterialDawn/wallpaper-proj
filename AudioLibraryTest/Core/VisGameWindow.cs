@@ -179,6 +179,7 @@ namespace player.Core
                 Log.Log($"Player v{Program.VersionNumber} loaded!");
                 initCompleteEvent.Set();
 
+                GL.ClearColor(0f, 0f, 0f, 0f);
                 GL.MatrixMode(MatrixMode.Projection);
                 GL.LoadIdentity();
                 GL.Ortho(0f, 1f, 0f, 1f, -1f, 1f);

@@ -32,7 +32,6 @@ namespace player.Renderers
             Vector2 buttonSize = new Vector2(135, 19);
             Vector2 pmButtonSize = new Vector2(33.5f, 20);
             WallpaperImageSettingsService wpSettings;
-            FpsLimitOverrideContext fpsOverride = null;
             bool forcedKeepWallpaper = false;
             Point lastMousePos = Point.Empty;
             Bitmap desktopBmp = new Bitmap(1, 1);
@@ -72,10 +71,6 @@ namespace player.Renderers
                 {
                     if (ImGui.BeginWindow("Image Settings", ref imageInfoWindowVisible, WindowFlags.Default))
                     {
-                        if (fpsOverride == null)
-                        {
-                            fpsOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Image Settings", FpsLimitOverride.Maximum);
-                        }
                         if (parent.backgroundController.LoadingNextWallpaper)
                         {
                             ImGui.Text("Busy loading a wallpaper...");
@@ -213,11 +208,6 @@ namespace player.Renderers
                 }
                 else
                 {
-                    if (fpsOverride != null)
-                    {
-                        fpsOverride.Dispose();
-                        fpsOverride = null;
-                    }
                     if (forcedKeepWallpaper)
                     {
                         forcedKeepWallpaper = false;

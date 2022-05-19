@@ -3,6 +3,8 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using player.Core.Input;
 using player.Core.Service;
+using player.Shaders;
+using player.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -136,7 +138,7 @@ namespace player.Core.Render.UI
             {
                 if (overrideContext == null)
                 {
-                    overrideContext = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("ImGuiPopup", FpsLimitOverride.Maximum);
+                    overrideContext = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("ImGuiRender", FpsLimitOverride.Maximum);
                 }
                 ImGui.Text($"player v{Program.VersionNumber}");
                 ImGui.Separator();
@@ -167,6 +169,22 @@ namespace player.Core.Render.UI
             }
             
             controller.Render();
+
+            if (controller.DidRender)
+            {
+                if (overrideContext == null)
+                {
+                    overrideContext = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("ImGuiRender", FpsLimitOverride.Maximum);
+                }
+            }
+            else
+            {
+                if (overrideContext != null)
+                {
+                    overrideContext.Dispose();
+                    overrideContext = null;
+                }
+            }
         }
 
         public bool ShouldSwallowInputEvent(InputManager.InputEventContainer evc)
@@ -232,16 +250,45 @@ namespace player.Core.Render.UI
             Stopwatch sw = new Stopwatch();
             int width;
             int height;
+            FramebufferRenderTexture renderTexture = null;
+            int lastWidth = 0, lastHeight = 0;
+            TexturedQuadShader shader = new TexturedQuadShader();
+            Primitives primitives;
+            ConsoleManager console;
+            double timeLastMouseMoved;
+
+            public bool DidRender { get; private set; }
 
             /// <summary>
             /// Constructs a new ImGuiController.
             /// </summary>
             public ImGuiController()
             {
+                primitives = ServiceManager.GetService<Primitives>();
+                console = ServiceManager.GetService<ConsoleManager>();
+                ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiController_MouseMoveEventRaw;
+            }
+
+            private void ImGuiController_MouseMoveEventRaw(object sender, MouseMoveEventArgs e)
+            {
+                timeLastMouseMoved = TimeManager.TimeD;
             }
 
             public void NewFrame(int width, int height)
             {
+                if (lastWidth != width || lastHeight != height)
+                {
+                    if (renderTexture != null)
+                    {
+                        renderTexture.Cleanup();
+                        renderTexture = null;
+                    }
+
+                    lastWidth = width;
+                    lastHeight = height;
+
+                    renderTexture = new FramebufferRenderTexture(width, height);
+                }
                 this.width = width; this.height = height;
                 IO io = ImGui.GetIO();
                 io.DisplaySize = new System.Numerics.Vector2(width, height);
@@ -302,7 +349,23 @@ namespace player.Core.Render.UI
                 //GL.Viewport(0, 0, displayW, displayH);
                 //GL.ClearColor(clear_color.X, clear_color.Y, clear_color.Z, clear_color.W);
                 //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-                if (drawData->CmdListsCount == 0) return; //nothing to do :)
+
+                float opacity = console.Visible ? 1f : (float)UtilityMethods.Clamp(1.0 - ((TimeManager.TimeD - (timeLastMouseMoved + 5f)) / 2.5), 0, 1); //smooth opacity to 0 after 5 seconds of inactivity over a 2.5 second fade duration
+                bool renderToTexture = opacity < 1;
+
+                if (drawData->CmdListsCount == 0 || opacity <= 0)
+                {
+                    DidRender = false;
+                    return; //nothing to do :>
+                }
+                DidRender = true;
+
+                //Render to texture, for transparency effects
+                if (renderToTexture)
+                {
+                    renderTexture.BindAndRenderTo(true);
+                    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+                }
 
                 int last_texture;
                 GL.GetInteger(GetPName.TextureBinding2D, out last_texture);
@@ -379,7 +442,6 @@ namespace player.Core.Render.UI
                 GL.DisableClientState(ArrayCap.ColorArray);
                 GL.DisableClientState(ArrayCap.TextureCoordArray);
                 GL.DisableClientState(ArrayCap.VertexArray);
-                GL.BindTexture(TextureTarget.Texture2D, last_texture);
                 GL.MatrixMode(MatrixMode.Modelview);
                 GL.PopMatrix();
                 GL.MatrixMode(MatrixMode.Projection);
@@ -387,7 +449,29 @@ namespace player.Core.Render.UI
                 GL.PopAttrib();
 
                 GL.Disable(EnableCap.ScissorTest);
+
+                if (renderToTexture)
+                {
+                    renderTexture.FinishRendering();
+                    shader.Activate();
+                    shader.Opacity = opacity;
+                    GL.BindTexture(TextureTarget.Texture2D, renderTexture.RenderTexture);
+                    ServiceManager.GetService<Primitives>().QuadBuffer.Draw();
+                }
+
+                GL.BindTexture(TextureTarget.Texture2D, last_texture);
+
             }
+        }
+    }
+
+    public class ImGuiRenderingEventArgs : EventArgs
+    {
+        public bool SomethingWasDrawn { get; private set; }
+
+        public void DidRender()
+        {
+            SomethingWasDrawn = true;
         }
     }
 }

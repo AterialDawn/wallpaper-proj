@@ -32,6 +32,8 @@ namespace player.Core.Input
         private Dictionary<string, ConsoleLineHandler> CommandCallbacks = new Dictionary<string, ConsoleLineHandler>();
 
         public delegate void ConsoleLineHandler(object sender, ConsoleLineReadEventArgs args);
+        public bool Visible { get { return consoleRenderer.Visible; } }
+
         private ConsoleLineHandler activeHandler = null;
         private string activeHandlerCommand = null;
         InputManager inputManager;

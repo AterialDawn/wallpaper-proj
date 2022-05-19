@@ -92,7 +92,6 @@ namespace player.Renderers.BarHelpers
                             }
 
                             TextureUtils.LoadBitmapIntoTexture(resized, textureIndex);
-                            Log.Log(GL.GetError().ToString());
                             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
                             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
                             Resolution = new SizeF(targetWidth, RenderResolution.Y);
