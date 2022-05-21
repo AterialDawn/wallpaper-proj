@@ -234,8 +234,6 @@ namespace player.Core.Render.UI
             Stopwatch sw = new Stopwatch();
             int width;
             int height;
-            FramebufferRenderTexture renderTexture = null;
-            int lastWidth = 0, lastHeight = 0;
             TexturedQuadShader shader = new TexturedQuadShader();
             Primitives primitives;
             
@@ -252,19 +250,6 @@ namespace player.Core.Render.UI
 
             public void NewFrame(int width, int height)
             {
-                if (lastWidth != width || lastHeight != height)
-                {
-                    if (renderTexture != null)
-                    {
-                        renderTexture.Cleanup();
-                        renderTexture = null;
-                    }
-
-                    lastWidth = width;
-                    lastHeight = height;
-
-                    renderTexture = new FramebufferRenderTexture(width, height);
-                }
                 this.width = width; this.height = height;
                 IO io = ImGui.GetIO();
                 io.DisplaySize = new System.Numerics.Vector2(width, height);
@@ -290,7 +275,7 @@ namespace player.Core.Render.UI
                 IO io = ImGui.GetIO();
 
                 // Build texture atlas
-                FontTextureData texData = io.FontAtlas.GetTexDataAsAlpha8();
+                FontTextureData texData = io.FontAtlas.GetTexDataAsRGBA32();
 
                 // Create OpenGL texture
                 g_FontTexture = GL.GenTexture();
@@ -300,11 +285,11 @@ namespace player.Core.Render.UI
                 GL.TexImage2D(
                     TextureTarget.Texture2D,
                     0,
-                    PixelInternalFormat.Alpha,
+                    PixelInternalFormat.Rgba,
                     texData.Width,
                     texData.Height,
                     0,
-                    PixelFormat.Alpha,
+                    PixelFormat.Rgba,
                     PixelType.UnsignedByte,
                     new IntPtr(texData.Pixels));
 
@@ -326,8 +311,6 @@ namespace player.Core.Render.UI
                 //GL.ClearColor(clear_color.X, clear_color.Y, clear_color.Z, clear_color.W);
                 //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-                bool renderToTexture = opacity < 1;
-
                 if (drawData->CmdListsCount == 0 || opacity <= 0)
                 {
                     DidRender = false;
@@ -335,26 +318,21 @@ namespace player.Core.Render.UI
                 }
                 DidRender = true;
 
-                //Render to texture, for transparency effects
-                if (renderToTexture)
-                {
-                    renderTexture.BindAndRenderTo(true);
-                    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-                }
-
                 int last_texture;
                 GL.GetInteger(GetPName.TextureBinding2D, out last_texture);
                 GL.PushAttrib(AttribMask.EnableBit | AttribMask.ColorBufferBit | AttribMask.TransformBit);
-                GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                GL.Disable(EnableCap.CullFace);
-                GL.Disable(EnableCap.DepthTest);
+                //commented due to engine defaults 
+                // GL.Enable(EnableCap.Blend);
+                // GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                // GL.Disable(EnableCap.CullFace);
+                // GL.Disable(EnableCap.DepthTest);
                 GL.Enable(EnableCap.ScissorTest);
                 GL.EnableClientState(ArrayCap.VertexArray);
                 GL.EnableClientState(ArrayCap.TextureCoordArray);
                 GL.EnableClientState(ArrayCap.ColorArray);
 
-                GL.UseProgram(0);
+                shader.Activate();
+                shader.Opacity = opacity;
 
                 // Handle cases of screen coordinates != from framebuffer coordinates (e.g. retina displays)
                 var io = ImGui.GetIO();
@@ -422,18 +400,7 @@ namespace player.Core.Render.UI
                 GL.MatrixMode(MatrixMode.Projection);
                 GL.PopMatrix();
                 GL.PopAttrib();
-
                 GL.Disable(EnableCap.ScissorTest);
-
-                if (renderToTexture)
-                {
-                    renderTexture.FinishRendering();
-                    shader.Activate();
-                    shader.Opacity = opacity;
-                    GL.BindTexture(TextureTarget.Texture2D, renderTexture.RenderTexture);
-                    ServiceManager.GetService<Primitives>().QuadBuffer.Draw();
-                }
-
                 GL.BindTexture(TextureTarget.Texture2D, last_texture);
 
             }

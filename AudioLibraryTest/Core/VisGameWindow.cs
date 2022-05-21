@@ -187,6 +187,7 @@ namespace player.Core
                 GL.MatrixMode(MatrixMode.Modelview);
                 GL.Disable(EnableCap.CullFace);
                 GL.Enable(EnableCap.Blend);
+                GL.Disable(EnableCap.DepthTest);
                 GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                 if (RTTEnabled)
                 {

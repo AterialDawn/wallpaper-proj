@@ -20,6 +20,7 @@ namespace player.Shaders
 
         public override void Initialize()
         {
+            SetUniform(GetUniformLocation("tex"), 0);
             opacityLoc = GetUniformLocation("opacity");
         }
 
