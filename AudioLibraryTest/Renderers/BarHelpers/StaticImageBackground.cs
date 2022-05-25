@@ -54,36 +54,49 @@ namespace player.Renderers.BarHelpers
             {
                 using (Bitmap image = new Bitmap(SourcePath))
                 {
-                    Resolution = new SizeF(image.Width, image.Height);
+                    var settingsForImage = ServiceManager.GetService<WallpaperImageSettingsService>().GetImageSettingsForPath(SourcePath);
+                    if (settingsForImage != null)
+                    {
+                        Resolution = new SizeF(
+                            image.Width - (settingsForImage.TrimPixelsLeft + settingsForImage.TrimPixelsRight),
+                            image.Height - (settingsForImage.TrimPixelsTop + settingsForImage.TrimPixelsBottom));
+                    }
+                    else
+                    {
+                        Resolution = new SizeF(image.Width, image.Height);
+                    }
 
                     if (Math.Abs((Resolution.Width / Resolution.Height) - (RenderResolution.X / RenderResolution.Y)) > 0.05f)
                     {
-                        var settingsForImage = ServiceManager.GetService<WallpaperImageSettingsService>().GetImageSettingsForPath(SourcePath);
-                        int resizedWidth = image.Width, resizedHeight = image.Height;
-
-                        if (settingsForImage != null)
-                        {
-                            resizedWidth = image.Width - (settingsForImage.TrimPixelsLeft + settingsForImage.TrimPixelsRight);
-                            resizedHeight = image.Height - (settingsForImage.TrimPixelsTop + settingsForImage.TrimPixelsBottom);
-                        }
-
-                        int targetWidth = (int)Math.Ceiling(((float)resizedWidth / (float)resizedHeight) * (float)RenderResolution.Y);
+                        int targetWidth = (int)Math.Ceiling((Resolution.Width / Resolution.Height) * (float)RenderResolution.Y);
 
                         using (Bitmap resized = new Bitmap(targetWidth, (int)RenderResolution.Y))
                         using (Graphics g = Graphics.FromImage(resized))
                         {
-                            g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                            g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
                             g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
+
+                            if (settingsForImage != null)
+                            {
+                                using (var brush = new SolidBrush(Color.FromArgb(
+                                    (int)(settingsForImage.BackgroundColor.W * 255),
+                                    (int)(settingsForImage.BackgroundColor.X * 255),
+                                    (int)(settingsForImage.BackgroundColor.Y * 255),
+                                    (int)(settingsForImage.BackgroundColor.Z * 255))))
+                                {
+                                    g.FillRectangle(brush, 0, 0, targetWidth, RenderResolution.Y);
+                                }
+                            }
 
                             using (var wrapMode = new ImageAttributes())
                             {
                                 wrapMode.SetWrapMode(System.Drawing.Drawing2D.WrapMode.TileFlipXY);
                                 if (settingsForImage != null)
                                 {
-                                    g.DrawImage(image, new Rectangle(0, 0, targetWidth, (int)RenderResolution.Y), settingsForImage.TrimPixelsLeft, settingsForImage.TrimPixelsTop, resizedWidth, resizedHeight, GraphicsUnit.Pixel, wrapMode);
+                                    g.DrawImage(image, new Rectangle(0, 0, targetWidth, (int)RenderResolution.Y), settingsForImage.TrimPixelsLeft, settingsForImage.TrimPixelsTop, Resolution.Width, Resolution.Height, GraphicsUnit.Pixel, wrapMode);
                                 }
                                 else
                                 {
