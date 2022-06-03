@@ -280,7 +280,6 @@ namespace player.Renderers.BarHelpers
                 try
                 {
                     BackgroundFactory.Initialize();
-                    BackgroundFactory.SetRandom(true);
                     currentBackground = BackgroundFactory.GetNextBackground();
                     currentBackground.RenderResolution = windowRes;
                 }
@@ -434,6 +433,7 @@ namespace player.Renderers.BarHelpers
         {
             if (!loaded)
             {
+                BackgroundFactory.RemoveFile(nextBackground.SourcePath);
                 nextBackground.Destroy();
                 GetNextBackground();
             }

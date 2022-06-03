@@ -8,6 +8,7 @@ using Log = player.Core.Logging.Logger;
 using player.Core.Service;
 using player.Core.Settings;
 using FolderSelect;
+using player.Core.Render;
 
 namespace player.Renderers.BarHelpers
 {
@@ -38,6 +39,15 @@ namespace player.Renderers.BarHelpers
             RescanAllSources();
         }
 
+        public void RemoveFile(string path)
+        {
+            if (registeredFiles.Contains(path))
+            {
+                registeredFiles.Remove(path);
+                Log.Log($"Removed {path} from rotation");
+            }
+        }
+
         private void LoadPathsFromSettings()
         {
             registeredPathsKey = ServiceManager.GetService<SettingsService>().GetAccessor<List<string>>(SettingsKeys.BarRenderer_SourceFolders, null);
@@ -57,10 +67,29 @@ namespace player.Renderers.BarHelpers
                     sourcePaths.Add(dialog.FileName);
                 }
             }
+
+            foreach (var directory in sourcePaths)
+            {
+                FileSystemWatcher watcher = new FileSystemWatcher(directory);
+                watcher.Created += Watcher_Created;
+                watcher.EnableRaisingEvents = true;
+            }
+        }
+
+        private void Watcher_Created(object sender, FileSystemEventArgs e)
+        {
+            if (IsValidExtension(Path.GetExtension(e.FullPath).ToLower()))
+            {
+                int maxScan = UtilityMethods.Clamp(registeredFiles.Count - 1 - currentIndex, 0, 100);
+                int idx = rng.Next(0, maxScan);
+                registeredFiles.Insert(currentIndex + idx, e.FullPath);
+                ServiceManager.GetService<MessageCenterService>().ShowMessage($"Added {e.Name} at {idx}");
+            }
         }
 
         public void SetRandom(bool random)
         {
+            if (IsRandom == random) return;
             IsRandom = random;
             if (IsRandom) ShuffleFiles();
             else OrderAlphabetically();
@@ -94,6 +123,9 @@ namespace player.Renderers.BarHelpers
                 else SingleBackgroundMode = false;
                 
             }
+            FileSystemWatcher watcher = new FileSystemWatcher(path);
+            watcher.Created += Watcher_Created;
+            watcher.EnableRaisingEvents = true;
             return true;
         }
 
