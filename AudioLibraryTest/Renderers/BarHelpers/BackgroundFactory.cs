@@ -151,8 +151,6 @@ namespace player.Renderers.BarHelpers
             else SingleBackgroundMode = false;
 
             Log.Log("Added {0} total backgorunds", tempFiles.Count);
-
-            ShuffleFiles();
         }
 
         public IBackground GetNextBackground()
