@@ -78,6 +78,7 @@ namespace player.Renderers
                         else if (parent.backgroundController.IsTransitioning())
                         {
                             ImGui.Text("Transitioning wallpapers...");
+                            ImGui.ProgressBar(parent.backgroundController.BlendTimeRemainingPercentage, Vector2.Zero, "Blend Duration");
                         }
                         else
                         {

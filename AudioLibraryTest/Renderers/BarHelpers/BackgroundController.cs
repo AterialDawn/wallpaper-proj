@@ -15,6 +15,7 @@ namespace player.Renderers.BarHelpers
     class BackgroundController
     {
         public double BlendDuration { get; set; } = 2.5;
+        public float BlendTimeRemainingPercentage { get; set; } = 0f;
         public double BackgroundDuration { get { return backgroundDurationAccessor.Get(); } private set { backgroundDurationAccessor.Set(value); } }
         public bool KeepCurrentBackground { get; set; } = false;
         public BackgroundScalingMode ScalingMode { get; set; } = BackgroundScalingMode.Fit;
@@ -151,7 +152,8 @@ namespace player.Renderers.BarHelpers
                 }
                 else
                 {
-                    pieChart.SetFillPercentage(1f - (float)timeFactor);
+                    BlendTimeRemainingPercentage = (float)timeFactor;
+                    pieChart.SetFillPercentage(1f - BlendTimeRemainingPercentage);
                     blended = true;
 
                     shader.Activate();
