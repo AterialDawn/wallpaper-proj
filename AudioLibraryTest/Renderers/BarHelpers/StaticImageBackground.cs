@@ -182,8 +182,6 @@ namespace player.Renderers.BarHelpers
                         gaussianBlur.SetBlurState(true);
                         gaussianBlur.SetStrength(3f);
 
-                        float scalar = RenderResolution.Y / Resolution.Height;
-
                         float bgImageScalar = Math.Max(1f, 1f / aspect * 0.75f);
 
                         float horizontalMove = aspect;
@@ -197,6 +195,8 @@ namespace player.Renderers.BarHelpers
                         gaussianBlur.Activate();
 
                         {
+                            GL.Enable(EnableCap.ScissorTest);
+                            GL.Scissor(0, 0, (int)(RenderResolution.X * 0.5f), (int)RenderResolution.Y);
                             GL.PushMatrix();
                             GL.Translate(-horizontalMove, 0, 0);
                             GL.Scale(aspect, 1, 1);
@@ -205,12 +205,14 @@ namespace player.Renderers.BarHelpers
                             GL.PopMatrix();
                         }
                         {
+                            GL.Scissor((int)(RenderResolution.X * 0.5f), 0, (int)(RenderResolution.X * 0.5f), (int)RenderResolution.Y);
                             GL.PushMatrix();
                             GL.Translate(horizontalMove, 0, 0);
                             GL.Scale(aspect, 1, 1);
                             GL.Scale(bgImageScalar, bgImageScalar, 1);
                             primitives.CenteredQuad.Draw();
                             GL.PopMatrix();
+                            GL.Disable(EnableCap.ScissorTest);
                         }
 
 
