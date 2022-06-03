@@ -75,6 +75,10 @@ namespace player.Renderers
                         {
                             ImGui.Text("Busy loading a wallpaper...");
                         }
+                        else if (parent.backgroundController.IsTransitioning())
+                        {
+                            ImGui.Text("Transitioning wallpapers...");
+                        }
                         else
                         {
                             if (parent.backgroundController.CurrentBackground is StaticImageBackground bg)
