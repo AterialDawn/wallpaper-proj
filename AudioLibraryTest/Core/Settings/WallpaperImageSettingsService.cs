@@ -1,10 +1,15 @@
-﻿using OpenTK.Graphics;
+﻿using Nito.AsyncEx;
+using OpenTK.Graphics;
+using player.Core.Logging;
+using player.Core.Render;
 using player.Core.Service;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace player.Core.Settings
@@ -12,23 +17,112 @@ namespace player.Core.Settings
     class WallpaperImageSettingsService : IService
     {
         public string ServiceName => "WallpaperImageSettings";
-        SettingsService settings;
+        string settingsFilePath = "";
         List<PathComponent> pathComponentList = new List<PathComponent>();
+        SemaphoreSlim saveSemaphore = new SemaphoreSlim(1, 1);
+        AsyncAutoResetEvent dirtyEvent = new AsyncAutoResetEvent();
 
         public void Initialize()
         {
-            settings = ServiceManager.GetService<SettingsService>();
+            settingsFilePath = ServiceManager.GetService<SettingsService>().GetFileRelativeToSettings("ImageSettingsDB.json");
 
-            var loaded = settings.GetSettingAs<List<PathComponent>>("Wallpaper.ImageSettings", null);
-            if (loaded != null)
+            if (File.Exists(settingsFilePath))
             {
-                pathComponentList = loaded;
+                try
+                {
+                    pathComponentList = SettingsService.JsonToObject<List<PathComponent>>(File.ReadAllText(settingsFilePath));
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"Unable to load ImageSettingsDB.json\n{e}");
+                }
             }
 
-            settings.SetSetting("Wallpaper.ImageSettings", pathComponentList);
+            SaveOnTimer();
         }
         public void Cleanup()
         {
+            bool taken = saveSemaphore.Wait(500); //wait up to 500ms to save settings when shutting down. maybe tweak?
+            if (!taken) return;
+            try
+            {
+                SaveSettings();
+            }
+            finally
+            {
+                saveSemaphore.Release();
+            }
+        }
+
+        void SaveSettings()
+        {
+            string serialized = SettingsService.ObjectToJson(pathComponentList);
+
+            try
+            {
+                File.WriteAllText(settingsFilePath, serialized);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Error writing ImageSettingsDB.json\n{e}");
+                try
+                {
+                    File.WriteAllText(settingsFilePath + ".lastchance", serialized);
+                }
+                catch (Exception e2)
+                {
+                    Logger.Log($"Also failed writing last chance.\n{e2}\n{serialized}"); //maybe file logging is turned on :)
+                }
+            }
+        }
+
+        private async void SaveOnTimer()
+        {
+            await Task.Yield();
+            for (; ; )
+            {
+                await dirtyEvent.WaitAsync();
+                //we were released, wait for 30 seconds to save the new config, but re-wait if the dirty event was set again
+                for (; ; )
+                {
+                    var cancelTokenSource = new CancellationTokenSource(15 * 1000);
+                    try
+                    {
+                        await dirtyEvent.WaitAsync(cancelTokenSource.Token);
+                        //dirty event was set again, loop again and wait once more
+                        //but wait a second or two to not check too much
+                        await Task.Delay(1000);
+                        continue;
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        //timeout expired, proceed to save
+                        break;
+                    }
+                }
+                try
+                {
+                    bool taken = await saveSemaphore.WaitAsync(0);
+                    if (!taken) continue;
+                    try
+                    {
+                        SaveSettings();
+                        ServiceManager.GetService<MessageCenterService>().ShowMessage("Image Settings saved!");
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"Error saving settings on timer : {e}");
+                    }
+                    finally
+                    {
+                        saveSemaphore.Release();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"SaveOnTimer : {e}");
+                }
+            }
         }
 
         /// <summary>
@@ -52,6 +146,11 @@ namespace player.Core.Settings
                 currentFile = new ImageFileComponent(fileName);
                 parentComponentOfFile.SubComponents.Add(currentFile);
             }
+
+            if (createIfNotExists) //if we're creating something that might not exist, we probably intend to write a value to it.
+            {
+                dirtyEvent.Set();
+            }
             return currentFile?.Settings;
         }
 
@@ -67,7 +166,7 @@ namespace player.Core.Settings
             if (currentFile != null)
             {
                 parentComponentOfFile.SubComponents.Remove(currentFile);
-                Logging.Logger.Log($"Settings for image {fileName} removed");
+                Logger.Log($"Settings for image {fileName} removed");
             }
         }
 
@@ -155,10 +254,17 @@ namespace player.Core.Settings
         public Vector4 BackgroundColor { get; set; } = Vector4.One;
         public BackgroundAnchorPosition AnchorPosition { get; set; } = BackgroundAnchorPosition.Center;
 
+        //image is cropped via GDI+ with these variables
         public int TrimPixelsLeft { get; set; } = 0;
         public int TrimPixelsRight { get; set; } = 0;
         public int TrimPixelsTop { get; set; } = 0;
         public int TrimPixelsBottom { get; set; } = 0;
+        //image is cropped via opengl with these
+        public int RenderTrimLeft { get; set; } = 0;
+        public int RenderTrimRight { get; set; } = 0;
+        public int RenderTrimTop { get; set; } = 0;
+        public int RenderTrimBot { get; set; } = 0;
+        public bool EditingDisabled { get; set; } = false;
     }
 
     enum BackgroundMode

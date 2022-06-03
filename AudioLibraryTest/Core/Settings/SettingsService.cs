@@ -204,7 +204,7 @@ namespace player.Core.Settings
             }
         }
 
-        private T JsonToObject<T>(string jsonString)
+        internal static T JsonToObject<T>(string jsonString)
         {
             T obj = default(T);
 
@@ -218,7 +218,7 @@ namespace player.Core.Settings
             return obj;
         }
 
-        private string ObjectToJson(object objectToConvert)
+        internal static string ObjectToJson(object objectToConvert)
         {
             fsSerializer serializer = new fsSerializer();
             fsData dataInst;
@@ -229,7 +229,7 @@ namespace player.Core.Settings
             }
             else
             {
-                return fsJsonPrinter.PrettyJson(dataInst);
+                return fsJsonPrinter.CompressedJson(dataInst);
             }
         }
     }

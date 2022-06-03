@@ -20,6 +20,7 @@ namespace player.Renderers.BarHelpers
     class StaticImageBackground : BackgroundBase
     {
         public override bool Animated { get { return false; } }
+        public Size SourceImageSize { get; private set; } = Size.Empty;
 
         private int textureIndex;
         private FramebufferRenderTexture renderTargetHelper;
@@ -54,6 +55,7 @@ namespace player.Renderers.BarHelpers
             {
                 using (Bitmap image = new Bitmap(SourcePath))
                 {
+                    SourceImageSize = image.Size;
                     var settingsForImage = ServiceManager.GetService<WallpaperImageSettingsService>().GetImageSettingsForPath(SourcePath);
                     if (settingsForImage != null)
                     {
@@ -262,13 +264,50 @@ namespace player.Renderers.BarHelpers
                     }
                 case BackgroundMode.SolidBackground:
                     {
-                        renderBuffer.AddVertex(0f, 0f, 0f, 0f);
-                        renderBuffer.AddVertex(0f, Resolution.Height, 0f, 1f);
-                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
-                        renderBuffer.AddVertex(0f, 0f, 0f, 0f);
-                        renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
-                        renderBuffer.AddVertex(Resolution.Width, 0f, 1f, 0f);
-                        renderBuffer.Load();
+                        float normPixelX = 1f / Resolution.Width;
+                        float normPixelY = 1f / Resolution.Height;
+                        float imageWidth = Resolution.Width;
+                        float imageHeight = Resolution.Height;
+                        if (settingsForImage != null &&
+                            (
+                            settingsForImage.RenderTrimBot != 0 ||
+                            settingsForImage.RenderTrimTop != 0 ||
+                            settingsForImage.RenderTrimLeft != 0 ||
+                            settingsForImage.RenderTrimRight != 0)
+                            )
+                        {
+                            float normBot = settingsForImage.RenderTrimBot * normPixelY;
+
+                            float top = imageHeight;
+
+                            float normTop = 1f - (settingsForImage.RenderTrimTop * normPixelY);
+                            float normLeft = settingsForImage.RenderTrimLeft * normPixelX;
+
+                            float right = imageWidth - (settingsForImage.RenderTrimLeft + settingsForImage.RenderTrimRight);
+                            float normRight = 1f - (settingsForImage.RenderTrimRight * normPixelX);
+
+                            renderBuffer.AddVertex(0, 0, normLeft, normBot);
+                            renderBuffer.AddVertex(0, imageHeight, normLeft, normTop);
+                            renderBuffer.AddVertex(right, top, normRight, normTop);
+                            renderBuffer.AddVertex(0, 0, normLeft, normBot);
+                            renderBuffer.AddVertex(right, top, normRight, normTop);
+                            renderBuffer.AddVertex(right, 0, normRight, normBot);
+                            renderBuffer.Load();
+
+                            imageWidth = imageWidth - (settingsForImage.RenderTrimLeft + settingsForImage.RenderTrimRight);
+                        }
+                        else
+                        {
+                            renderBuffer.AddVertex(0f, 0f, 0f, 0f);
+                            renderBuffer.AddVertex(0f, Resolution.Height, 0f, 1f);
+                            renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
+                            renderBuffer.AddVertex(0f, 0f, 0f, 0f);
+                            renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
+                            renderBuffer.AddVertex(Resolution.Width, 0f, 1f, 0f);
+                            renderBuffer.Load();
+                        }
+
+
 
                         renderTargetHelper.BindAndRenderTo();
 
@@ -289,11 +328,11 @@ namespace player.Renderers.BarHelpers
                             switch (align)
                             {
                                 case BackgroundAnchorPosition.Center:
-                                    GL.Translate((int)((RenderResolution.X * 0.5f) - (Resolution.Width * 0.5f)), 0, 0);
+                                    GL.Translate((int)((RenderResolution.X * 0.5f) - (imageWidth * 0.5f)), 0, 0);
                                     break;
 
                                 case BackgroundAnchorPosition.Right:
-                                    GL.Translate((int)(RenderResolution.X - Resolution.Width), 0, 0);
+                                    GL.Translate((int)(RenderResolution.X - imageWidth), 0, 0);
                                     break;
                             }
 
