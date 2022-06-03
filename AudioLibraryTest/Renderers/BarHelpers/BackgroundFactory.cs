@@ -70,21 +70,26 @@ namespace player.Renderers.BarHelpers
 
             foreach (var directory in sourcePaths)
             {
+                string curDirCache = directory;
                 FileSystemWatcher watcher = new FileSystemWatcher(directory);
-                watcher.Created += Watcher_Created;
+                watcher.Created += (s, e) =>
+                {
+                    if (IsValidExtension(Path.GetExtension(e.FullPath).ToLower()) && !registeredFiles.Contains(e.FullPath)) //sometimes programs (FIREFOX) creates a file multiple times, check that it hasn't already been added to the list first before continuing
+                    {
+                        int maxScan = UtilityMethods.Clamp(registeredFiles.Count - 1 - currentIndex, 0, 100);
+                        int idx = rng.Next(0, maxScan);
+                        registeredFiles.Insert(currentIndex + idx, e.FullPath);
+                        ServiceManager.GetService<MessageCenterService>().ShowMessage($"Added {e.Name} at {idx}");
+                        Log.Log($"Watcher at {curDirCache} detected file at {e.FullPath} {e.ChangeType}");
+                    }
+                };
                 watcher.EnableRaisingEvents = true;
             }
         }
 
         private void Watcher_Created(object sender, FileSystemEventArgs e)
         {
-            if (IsValidExtension(Path.GetExtension(e.FullPath).ToLower()))
-            {
-                int maxScan = UtilityMethods.Clamp(registeredFiles.Count - 1 - currentIndex, 0, 100);
-                int idx = rng.Next(0, maxScan);
-                registeredFiles.Insert(currentIndex + idx, e.FullPath);
-                ServiceManager.GetService<MessageCenterService>().ShowMessage($"Added {e.Name} at {idx}");
-            }
+            
         }
 
         public void SetRandom(bool random)
