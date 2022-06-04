@@ -20,3 +20,4 @@ packages/
 
 *.user
 *.suo
+cloc.exe
