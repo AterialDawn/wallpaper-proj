@@ -241,18 +241,19 @@ namespace player.Renderers.BarHelpers
                         gaussianBlur.SetColorOverride(true, new Vector4(0,0,0,1));
                         {
                             float targetSizeInPixels = 9f * (RenderResolution.X / 1920f);
+                            float barWidth = (1f / RenderResolution.X) * targetSizeInPixels;
 
                             GL.PushMatrix();
                             GL.Translate(horizontalMove * 0.5f, -0.5f, 0);
-                            GL.Scale((1f / RenderResolution.X) * targetSizeInPixels, 1, 1);
+                            GL.Scale(barWidth, 1, 1);
 
                             primitives.QuadBuffer.Draw();
 
                             GL.PopMatrix();
 
                             GL.PushMatrix();
-                            GL.Translate(-horizontalMove * 0.5f, -0.5f, 0);
-                            GL.Scale((1f / RenderResolution.X) * targetSizeInPixels, 1, 1);
+                            GL.Translate(-horizontalMove * 0.5f - barWidth, -0.5f, 0);
+                            GL.Scale(barWidth, 1, 1);
 
                             primitives.QuadBuffer.Draw();
 
