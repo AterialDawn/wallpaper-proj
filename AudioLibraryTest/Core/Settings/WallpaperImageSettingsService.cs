@@ -24,7 +24,16 @@ namespace player.Core.Settings
 
         public void Initialize()
         {
-            settingsFilePath = ServiceManager.GetService<SettingsService>().GetFileRelativeToSettings("ImageSettingsDB.json");
+            var settingsOverrideOpt = Program.CLIParser.ActiveOptions.Where(o => o.Item1.Equals("ImageSettingsFile")).FirstOrDefault();
+            if (settingsOverrideOpt != null)
+            {
+                Logger.Log($"Overriding image settings file to {settingsOverrideOpt.Item2}");
+                settingsFilePath = ServiceManager.GetService<SettingsService>().GetFileRelativeToSettings(settingsOverrideOpt.Item2 + ".json");
+            }
+            else
+            {
+                settingsFilePath = ServiceManager.GetService<SettingsService>().GetFileRelativeToSettings("ImageSettingsDB.json");
+            }
 
             if (File.Exists(settingsFilePath))
             {
