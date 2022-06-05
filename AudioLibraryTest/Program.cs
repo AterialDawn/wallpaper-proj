@@ -52,6 +52,7 @@ namespace player
             CLIParser.AddOption("SettingsFile", "Changes the settings file used, without the extension", true, settingsFileCallback);
             CLIParser.AddOption("NoAudioProcess", "Disables all audio processing", false, (arg) => { DisableAudioProcessing = true; Log.Log("Audio Processing Disabled"); });
             CLIParser.AddOption("EnableShadowplayKill", "When starting in wallpaper mode, kills shadowplay as the app comes up to prevent it from capturing this", false, (_) => { EnableKillingShadowplay = true; Log.Log("Shadowplay Killer enabled"); });
+            CLIParser.AddOption("ImageSettingsFile", "Override the filename for the ImageSettingsDB.json file", true);
             CLIParser.IgnoreCase = true;
             CLIParser.ExitOnUsagePrinted = true;
             CLIParser.Parse(args);
