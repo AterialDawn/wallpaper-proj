@@ -18,7 +18,7 @@ namespace player.Renderers.BarHelpers
         List<string> sourcePaths = new List<string>();
 
         List<string> animatedExtensions = new List<string>(new string[] { ".gif" });
-        List<string> staticExtensions = new List<string>(new string[] { ".jpg", ".jpeg", ".png", ".bmp", ".tiff" });
+        List<string> staticExtensions = new List<string>(new string[] { ".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".jfif" });
         List<string> videoExtensions = new List<string>(new string[] { ".mp4", ".webm", ".avi", ".mkv", ".mov", ".wmv" });
         Random rng = new Random();
         int currentIndex = -1; //-1 to use first image on startup
