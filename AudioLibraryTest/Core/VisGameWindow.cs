@@ -219,10 +219,6 @@ namespace player.Core
                 {
                     soundDataProcessor.SetSoundProviderSource(ServiceManager.GetService<WasapiSoundManager>());
                 }
-                else
-                {
-                    soundDataProcessor.SetSoundProviderSource(ServiceManager.GetService<BassSoundManager>());
-                }
 
                 if (FormWallpaperMode == WallpaperMode.None)
                 {
@@ -269,10 +265,6 @@ namespace player.Core
                 if (WasapiMode)
                 {
                     ServiceManager.RegisterService(new WasapiSoundManager());
-                }
-                else
-                {
-                    ServiceManager.RegisterService(new BassSoundManager());
                 }
                 fpsTracker = ServiceManager.RegisterService(new FpsTracker());
                 visRenderer = ServiceManager.RegisterService(new VisRenderer());
