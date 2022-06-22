@@ -169,6 +169,7 @@
     <Compile Include="Core\Render\UI\Controls\OLabel.cs" />
     <Compile Include="Core\Render\MessageCenterService.cs" />
     <Compile Include="Core\Render\UI\Controls\PieChartControl.cs" />
+    <Compile Include="Core\Render\UI\ImGuiEx.cs" />
     <Compile Include="Core\Render\UI\ImGuiManager.cs" />
     <Compile Include="Core\Render\UI\UIManager.cs" />
     <Compile Include="Core\Service\IService.cs" />

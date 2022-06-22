@@ -38,9 +38,12 @@ namespace player.Renderers
             Graphics desktopDC;
             IntPtr colorPickerTexture;
             Vector2 pickerSize = new Vector2(16, 16);
+            int selectedTabIdx = 0;
+            int bgStyleIndex;
 
             string[] renderModeItems = new string[] { "Default", "Solid Background" };
             string[] anchorPosItems = new string[] { "Centered", "Left", "Right" };
+            string[] bgStyleItems = new string[] { "Solid Color", "Source Region (Mirror)", "Source Region (Stretch)" };
 
             public ImGuiHandler(BarRenderer parent)
             {
@@ -152,144 +155,238 @@ namespace player.Renderers
                     wpSettings.GetImageSettingsForPath(curPath, true).AnchorPosition = (BackgroundAnchorPosition)anchorPosIdx;
                 }
 
-                if (ImGui.ColorPicker4("Background Color", ref color, ColorEditFlags.RGB | ColorEditFlags.NoOptions | ColorEditFlags.NoPicker | ColorEditFlags.NoSmallPreview | ColorEditFlags.NoTooltip | ColorEditFlags.AlphaBar))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = color;
-                }
+                ImGuiEx.TabButtons(ref selectedTabIdx, "Color&Pos", "Background");
 
-                ImGui.ImageButton(colorPickerTexture, pickerSize, Vector2.Zero, Vector2.One, 0, Vector4.Zero, Vector4.One);
-                if (ImGui.IsLastItemActive())
+                if (selectedTabIdx == 0) //Color&Pos
                 {
-                    desktopDC.CopyFromScreen(lastMousePos.X, lastMousePos.Y, 0, 0, new Size(1, 1), CopyPixelOperation.SourceCopy);
+                    if (ImGui.ColorPicker4("Background Color", ref color, ColorEditFlags.RGB | ColorEditFlags.NoOptions | ColorEditFlags.NoPicker | ColorEditFlags.NoSmallPreview | ColorEditFlags.NoTooltip | ColorEditFlags.AlphaBar))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = color;
+                    }
 
-                    var sampled = desktopBmp.GetPixel(0, 0);
-                    wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = new Vector4(sampled.R / 255f, sampled.G / 255f, sampled.B / 255f, 1);
-                }
+                    ImGui.ImageButton(colorPickerTexture, pickerSize, Vector2.Zero, Vector2.One, 0, Vector4.Zero, Vector4.One);
+                    if (ImGui.IsLastItemActive())
+                    {
+                        desktopDC.CopyFromScreen(lastMousePos.X, lastMousePos.Y, 0, 0, new Size(1, 1), CopyPixelOperation.SourceCopy);
 
-                ImGui.SameLine();
-                ImGui.Text("Source Crop (Left / Right / Top / Bot)");
-                ImGui.PushItemWidth(75);
-                if (ImGui.SliderInt("##Left", ref left, 0, imageWidth / 2, $"{left}"))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft = left;
-                }
-                ImGui.SameLine();
-                if (ImGui.SliderInt("##Right", ref right, 0, imageWidth / 2, $"{right}"))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight = right;
-                }
-                ImGui.SameLine();
-                if (ImGui.SliderInt("##Top", ref top, 0, imageHeight / 2, $"{top}"))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop = top;
-                }
-                ImGui.SameLine();
-                if (ImGui.SliderInt("##Bottom", ref bot, 0, imageHeight / 2, $"{bot}"))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom = bot;
-                }
+                        var sampled = desktopBmp.GetPixel(0, 0);
+                        wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = new Vector4(sampled.R / 255f, sampled.G / 255f, sampled.B / 255f, 1);
+                    }
 
-                if (ImGui.Button("-##Left", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft--;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("+##Left", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("-##Right", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight--;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("+##Right", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("-##Top", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop--;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("+##Top", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("-##Bot", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom--;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("+##Bot", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
-                }
+                    ImGui.SameLine();
+                    ImGui.Text("Source Crop (Left / Right / Top / Bot)");
+                    ImGui.PushItemWidth(75);
+                    if (ImGui.SliderInt("##Left", ref left, 0, imageWidth / 2, $"{left}"))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft = left;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.SliderInt("##Right", ref right, 0, imageWidth / 2, $"{right}"))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight = right;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.SliderInt("##Top", ref top, 0, imageHeight / 2, $"{top}"))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop = top;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.SliderInt("##Bottom", ref bot, 0, imageHeight / 2, $"{bot}"))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom = bot;
+                    }
 
-                ImGui.Text("Render Crop");
-                if (ImGui.SliderInt("##RLeft", ref rLeft, 0, 5, $"{rLeft}"))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft = rLeft;
-                }
-                ImGui.SameLine();
-                if (ImGui.SliderInt("##RRight", ref rRight, 0, 5, $"{rRight}"))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight = rRight;
-                }
-                ImGui.SameLine();
-                if (ImGui.SliderInt("##RTop", ref rTop, 0, 5, $"{rTop}"))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop = rTop;
-                }
-                ImGui.SameLine();
-                if (ImGui.SliderInt("##RBottom", ref rBot, 0, 5, $"{rBot}"))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot = rBot;
-                }
+                    if (ImGui.Button("-##Left", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft--;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("+##Left", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("-##Right", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight--;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("+##Right", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("-##Top", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop--;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("+##Top", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("-##Bot", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom--;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("+##Bot", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
+                    }
 
-                ImGui.PopItemWidth();
+                    ImGui.Text("Render Crop");
+                    if (ImGui.SliderInt("##RLeft", ref rLeft, 0, 5, $"{rLeft}"))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft = rLeft;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.SliderInt("##RRight", ref rRight, 0, 5, $"{rRight}"))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight = rRight;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.SliderInt("##RTop", ref rTop, 0, 5, $"{rTop}"))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop = rTop;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.SliderInt("##RBottom", ref rBot, 0, 5, $"{rBot}"))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot = rBot;
+                    }
 
-                if (ImGui.Button("-##RLeft", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft--;
+                    ImGui.PopItemWidth();
+
+                    if (ImGui.Button("-##RLeft", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft--;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("+##RLeft", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft++;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("-##RRight", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight--;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("+##RRight", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight++;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("-##RTop", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop--;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("+##RTop", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop++;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("-##RBot", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot--;
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("+##RBot", pmButtonSize))
+                    {
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot++;
+                    }
+
                 }
-                ImGui.SameLine();
-                if (ImGui.Button("+##RLeft", pmButtonSize))
+                else if (selectedTabIdx == 1) //Testing
                 {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft++;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("-##RRight", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight--;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("+##RRight", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight++;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("-##RTop", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop--;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("+##RTop", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop++;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("-##RBot", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot--;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("+##RBot", pmButtonSize))
-                {
-                    wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot++;
+                    if (curSettings == null || curSettings.Mode != BackgroundMode.SolidBackground) //null implies default rendering mode, no special settings available in default mode here anyways (for now)
+                    {
+                        ImGui.Text("No settings available for this mode");
+                    }
+                    else
+                    {
+                        if (ImGui.Combo("Background Style", ref bgStyleIndex, bgStyleItems))
+                        {
+                            //update background style mode
+                        }
+
+                        if (bgStyleIndex == 0)
+                        {
+                            ImGui.Text("Static Color, Set color in Color&Pos menu");
+                        }
+                        else
+                        {
+                            int topPos = 0;
+                            int leftPos = 0;
+                            int botPos = 0;
+                            int rightPos = 0;
+                            ImGui.Text("Source Sample Position");
+                            ImGui.PushItemWidth(75);
+                            if (ImGui.SliderInt("##Top", ref topPos, 0, imageHeight, $"{topPos}"))
+                            {
+                                
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.SliderInt("##Left", ref leftPos, 0, imageWidth, $"{leftPos}"))
+                            {
+                                
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.SliderInt("##Bottom", ref botPos, 0, imageHeight, $"{botPos}"))
+                            {
+                                
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.SliderInt("##Right", ref rightPos, 0, imageWidth, $"{rightPos}"))
+                            {
+                                
+                            }                            
+
+                            if (ImGui.Button("-##SamTop", pmButtonSize))
+                            {
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+##SamTop", pmButtonSize))
+                            {
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("-##SamLeft", pmButtonSize))
+                            {
+
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+##SamLeft", pmButtonSize))
+                            {
+
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("-##SamBot", pmButtonSize))
+                            {
+
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+##SamBot", pmButtonSize))
+                            {
+
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("-##SamRight", pmButtonSize))
+                            {
+
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+##SamRight", pmButtonSize))
+                            {
+
+                            }
+
+                            ImGui.PopItemWidth();
+                        }
+                        
+                    }
                 }
                 if (ImGui.Button("Redraw Image"))
                 {
