@@ -43,7 +43,7 @@ namespace player.Renderers
 
             string[] renderModeItems = new string[] { "Default", "Solid Background" };
             string[] anchorPosItems = new string[] { "Centered", "Left", "Right" };
-            string[] bgStyleItems = new string[] { "Solid Color", "Source Region (Mirror)", "Source Region (Stretch)" };
+            string[] bgStyleItems = new string[] { "Solid Color", "Source Region (Mirror)", "Source Region (Stretch)", "Stretch Edges" };
 
             public ImGuiHandler(BarRenderer parent)
             {
@@ -315,7 +315,13 @@ namespace player.Renderers
 
                         if (bgStyleIndex == 0)
                         {
-                            ImGui.Text("Static Color, Set color in Color&Pos menu");
+                            //Solid Color
+                            ImGui.Text("Solid Color, Set color in Color&Pos menu");
+                        }
+                        else if (bgStyleIndex == 3)
+                        {
+                            //stretch edges
+
                         }
                         else
                         {
@@ -327,23 +333,23 @@ namespace player.Renderers
                             ImGui.PushItemWidth(75);
                             if (ImGui.SliderInt("##Top", ref topPos, 0, imageHeight, $"{topPos}"))
                             {
-                                
+
                             }
                             ImGui.SameLine();
                             if (ImGui.SliderInt("##Left", ref leftPos, 0, imageWidth, $"{leftPos}"))
                             {
-                                
+
                             }
                             ImGui.SameLine();
                             if (ImGui.SliderInt("##Bottom", ref botPos, 0, imageHeight, $"{botPos}"))
                             {
-                                
+
                             }
                             ImGui.SameLine();
                             if (ImGui.SliderInt("##Right", ref rightPos, 0, imageWidth, $"{rightPos}"))
                             {
-                                
-                            }                            
+
+                            }
 
                             if (ImGui.Button("-##SamTop", pmButtonSize))
                             {
