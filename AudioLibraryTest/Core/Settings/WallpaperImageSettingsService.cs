@@ -337,6 +337,7 @@ namespace player.Core.Settings
         public BackgroundMode Mode { get; set; } = BackgroundMode.BorderedDefault;
         public Vector4 BackgroundColor { get; set; } = Vector4.One;
         public BackgroundAnchorPosition AnchorPosition { get; set; } = BackgroundAnchorPosition.Center;
+        public SolidBackgroundStyle BackgroundStyle { get; set; } = SolidBackgroundStyle.SolidColor;
 
         //image is cropped via GDI+ with these variables
         public int TrimPixelsLeft { get; set; } = 0;
@@ -348,6 +349,12 @@ namespace player.Core.Settings
         public int RenderTrimRight { get; set; } = 0;
         public int RenderTrimTop { get; set; } = 0;
         public int RenderTrimBot { get; set; } = 0;
+        public int SrcSampleTop { get; set; } = 0;
+        public int SrcSampleLeft { get; set; } = 0;
+        public int SrcSampleBot { get; set; } = 10;
+        public int SrcSampleRight { get; set; } = 10;
+        public int StretchXPos { get; set; } = 0;
+        public int StretchWidth { get; set; } = 10;
         public bool EditingDisabled { get; set; } = false;
     }
 
@@ -362,5 +369,13 @@ namespace player.Core.Settings
         Center = 0,
         Left = 1,
         Right = 2
+    }
+
+    enum SolidBackgroundStyle
+    {
+        SolidColor = 0,
+        SourceCopyMirror = 1,
+        SourceCopyStretch = 2,
+        StretchEdge = 3
     }
 }

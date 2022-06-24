@@ -31,6 +31,7 @@ namespace player.Renderers
             bool imageInfoWindowVisible = false;
             Vector2 buttonSize = new Vector2(135, 19);
             Vector2 pmButtonSize = new Vector2(33.5f, 20);
+            Vector2 stretchButtonSize = new Vector2(67f, 20);
             WallpaperImageSettingsService wpSettings;
             bool forcedKeepWallpaper = false;
             Point lastMousePos = Point.Empty;
@@ -142,6 +143,8 @@ namespace player.Renderers
                     rRight = curSettings.RenderTrimRight;
                     rTop = curSettings.RenderTrimTop;
                     rBot = curSettings.RenderTrimBot;
+
+                    bgStyleIndex = (int)curSettings.BackgroundStyle;
                 }
                 int imageWidth = bg.SourceImageSize.Width;
                 int imageHeight = bg.SourceImageSize.Height;
@@ -311,6 +314,7 @@ namespace player.Renderers
                         if (ImGui.Combo("Background Style", ref bgStyleIndex, bgStyleItems))
                         {
                             //update background style mode
+                            wpSettings.GetImageSettingsForPath(curPath, true).BackgroundStyle = (SolidBackgroundStyle)bgStyleIndex;
                         }
 
                         if (bgStyleIndex == 0)
@@ -320,76 +324,129 @@ namespace player.Renderers
                         }
                         else if (bgStyleIndex == 3)
                         {
+                            int xPos = 0;
+                            int width = 10;
+                            if (curSettings != null)
+                            {
+                                xPos = curSettings.StretchXPos;
+                                width = curSettings.StretchWidth;
+                            }
                             //stretch edges
+                            ImGui.Text("Stretch X Position | Stretch Width");
+                            ImGui.PushItemWidth(150);
+                            if (ImGui.SliderInt("##StretchX", ref xPos, 0, imageWidth, $"{xPos}"))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).StretchXPos = xPos;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.SliderInt("##StretchW", ref width, 1, imageWidth, $"{width}"))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).StretchWidth = width;
+                            }
 
+                            if (ImGui.Button("-##StretchX", stretchButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).StretchXPos--;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+##StretchX", stretchButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).StretchXPos++;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("-##StretchW", stretchButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).StretchWidth--;
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("+##StretchW", stretchButtonSize))
+                            {
+                                wpSettings.GetImageSettingsForPath(curPath, true).StretchWidth++;
+                            }
+
+                            ImGui.PopItemWidth();
                         }
                         else
                         {
+                            ImGui.Text("Soon TM");
+                            /*
                             int topPos = 0;
                             int leftPos = 0;
-                            int botPos = 0;
-                            int rightPos = 0;
+                            int botPos = 10;
+                            int rightPos = 10;
+                            if (curSettings != null)
+                            {
+                                topPos = curSettings.SrcSampleTop;
+                                leftPos = curSettings.SrcSampleLeft;
+                                botPos = curSettings.SrcSampleBot;
+                                rightPos = curSettings.SrcSampleRight;
+                            }
+
+
                             ImGui.Text("Source Sample Position");
                             ImGui.PushItemWidth(75);
                             if (ImGui.SliderInt("##Top", ref topPos, 0, imageHeight, $"{topPos}"))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleTop = topPos;
                             }
                             ImGui.SameLine();
                             if (ImGui.SliderInt("##Left", ref leftPos, 0, imageWidth, $"{leftPos}"))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleLeft = leftPos;
                             }
                             ImGui.SameLine();
                             if (ImGui.SliderInt("##Bottom", ref botPos, 0, imageHeight, $"{botPos}"))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleBot = botPos;
                             }
                             ImGui.SameLine();
                             if (ImGui.SliderInt("##Right", ref rightPos, 0, imageWidth, $"{rightPos}"))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleRight = rightPos;
                             }
 
                             if (ImGui.Button("-##SamTop", pmButtonSize))
                             {
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleTop--;
                             }
                             ImGui.SameLine();
                             if (ImGui.Button("+##SamTop", pmButtonSize))
                             {
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleTop++;
                             }
                             ImGui.SameLine();
                             if (ImGui.Button("-##SamLeft", pmButtonSize))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleLeft--;
                             }
                             ImGui.SameLine();
                             if (ImGui.Button("+##SamLeft", pmButtonSize))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleLeft++;
                             }
                             ImGui.SameLine();
                             if (ImGui.Button("-##SamBot", pmButtonSize))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleBot--;
                             }
                             ImGui.SameLine();
                             if (ImGui.Button("+##SamBot", pmButtonSize))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleBot++;
                             }
                             ImGui.SameLine();
                             if (ImGui.Button("-##SamRight", pmButtonSize))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleRight--;
                             }
                             ImGui.SameLine();
                             if (ImGui.Button("+##SamRight", pmButtonSize))
                             {
-
+                                wpSettings.GetImageSettingsForPath(curPath, true).SrcSampleRight++;
                             }
 
                             ImGui.PopItemWidth();
+                            */
                         }
                         
                     }

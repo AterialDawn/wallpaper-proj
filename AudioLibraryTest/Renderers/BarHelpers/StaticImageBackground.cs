@@ -25,7 +25,6 @@ namespace player.Renderers.BarHelpers
         private int textureIndex;
         private FramebufferRenderTexture renderTargetHelper;
         private Primitives primitives;
-        private VertexFloatBuffer renderBuffer = new VertexFloatBuffer(VertexFormat.XY_UV, bufferHint: BufferUsageHint.StaticDraw);
 
         bool alternativeRenderUsed = false;
         private GaussianBlurShader gaussianBlur;
@@ -171,7 +170,7 @@ namespace player.Renderers.BarHelpers
 
             float aspect = ((Resolution.Width / Resolution.Height) / (RenderResolution.X / RenderResolution.Y));
 
-            renderBuffer.Clear();
+            VertexFloatBuffer renderBuffer = new VertexFloatBuffer(VertexFormat.XY_UV, bufferHint: BufferUsageHint.StreamDraw);
 
             GL.PushMatrix();
             GL.LoadIdentity();
@@ -311,18 +310,38 @@ namespace player.Renderers.BarHelpers
                         }
 
 
-
                         renderTargetHelper.BindAndRenderTo();
 
-                        gaussianBlur.SetColorOverride(true, new Vector4(backgroundColor.X, backgroundColor.Y, backgroundColor.Z, backgroundColor.W));
-                        GL.PushMatrix();
-                        GL.Scale(2, 2, 1);
-                        primitives.CenteredQuad.Draw();
-                        GL.PopMatrix();
+                        GL.Ortho(0, RenderResolution.X, 0, RenderResolution.Y, -1, 1);
+
+                        if (settingsForImage.BackgroundStyle == SolidBackgroundStyle.SolidColor)
+                        {
+                            gaussianBlur.SetColorOverride(true, new Vector4(backgroundColor.X, backgroundColor.Y, backgroundColor.Z, backgroundColor.W));
+                            GL.PushMatrix();
+                            GL.Scale(RenderResolution.X, RenderResolution.Y, 1);
+                            primitives.QuadBuffer.Draw();
+                            GL.PopMatrix();
+                        }
+                        else if (settingsForImage.BackgroundStyle == SolidBackgroundStyle.StretchEdge)
+                        {
+                            GL.BindTexture(TextureTarget.Texture2D, textureIndex);
+
+                            var leftRect = Primitives.GenerateXY_UVRect(
+                                new RectangleF(0, 0, RenderResolution.X * 0.5f, RenderResolution.Y),
+                                new RectangleF(settingsForImage.StretchXPos / RenderResolution.X, 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+
+                            leftRect.Draw();
+                            leftRect.Unload();
+
+                            var rightRect = Primitives.GenerateXY_UVRect(
+                                new RectangleF(RenderResolution.X * 0.5f, 0, RenderResolution.X * 0.5f, RenderResolution.Y),
+                                new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+
+                            rightRect.Draw();
+                            rightRect.Unload();
+                        }
 
                         gaussianBlur.SetColorOverride(false, Vector4.Zero);
-
-                        GL.Ortho(0, RenderResolution.X, 0, RenderResolution.Y, -1, 1);
 
                         GL.BindTexture(TextureTarget.Texture2D, textureIndex);
 
@@ -346,6 +365,7 @@ namespace player.Renderers.BarHelpers
                         break;
                     }
             }
+            renderBuffer.Unload();
 
             GL.PopMatrix();
 
