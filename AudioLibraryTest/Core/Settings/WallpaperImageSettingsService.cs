@@ -1,4 +1,5 @@
-﻿using Nito.AsyncEx;
+﻿using FullSerializer;
+using Nito.AsyncEx;
 using OpenTK.Graphics;
 using player.Core.Logging;
 using player.Core.Render;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +41,7 @@ namespace player.Core.Settings
             {
                 try
                 {
-                    pathComponentList = SettingsService.JsonToObject<List<PathComponent>>(File.ReadAllText(settingsFilePath));
+                    pathComponentList = JsonToObject<List<PathComponent>>(File.ReadAllText(settingsFilePath));
                 }
                 catch (Exception e)
                 {
@@ -65,7 +67,7 @@ namespace player.Core.Settings
 
         void SaveSettings()
         {
-            string serialized = SettingsService.ObjectToJson(pathComponentList);
+            string serialized = ObjectToJson(pathComponentList);
 
             try
             {
@@ -229,6 +231,36 @@ namespace player.Core.Settings
             return parentComponent;
         }
 
+        internal static T JsonToObject<T>(string jsonString)
+        {
+            T obj = default(T);
+
+            fsSerializer serializer = new fsSerializer();
+            fsData data = fsJsonParser.Parse(jsonString);
+            fsResult result = serializer.TryDeserialize<T>(data, ref obj);
+            if (!result.Succeeded)
+            {
+                throw result.AsException;
+            }
+            return obj;
+        }
+
+        internal static string ObjectToJson(object objectToConvert)
+        {
+            fsSerializer serializer = new fsSerializer();
+            serializer.AddProcessor(new ImageSettingsProcessor());
+            fsData dataInst;
+            fsResult result = serializer.TrySerialize(objectToConvert, out dataInst);
+            if (!result.Succeeded)
+            {
+                throw result.AsException;
+            }
+            else
+            {
+                return fsJsonPrinter.CompressedJson(dataInst);
+            }
+        }
+
 
 
         class PathComponent
@@ -255,6 +287,49 @@ namespace player.Core.Settings
             }
         }
 
+    }
+
+    class ImageSettingsProcessor : fsObjectProcessor
+    {
+        Dictionary<string, PropertyInfo> propInfoCache = new Dictionary<string, PropertyInfo>();
+
+        public ImageSettingsProcessor()
+        {
+            foreach (var prop in typeof(ImageSettings).GetProperties())
+            {
+                propInfoCache.Add(prop.Name, prop);
+            }
+        }
+        public override bool CanProcess(Type type)
+        {
+            return type == typeof(ImageSettings);
+        }
+
+        public override void OnAfterSerialize(Type storageType, object instance, ref fsData data)
+        {
+            var dict = data.AsDictionary;
+            var reference = new ImageSettings();
+
+            List<string> propsToRemove = new List<string>();
+
+            foreach (var prop in dict)
+            {
+                var propInfo = propInfoCache[prop.Key];
+                var serializedValue = propInfo.GetValue(instance);
+                var referenceValue = propInfo.GetValue(reference);
+
+                if (serializedValue.Equals(referenceValue))
+                {
+                    propsToRemove.Add(prop.Key);
+                }
+            }
+
+            foreach (var prop in propsToRemove)
+            {
+                dict.Remove(prop);
+            }
+
+        }
     }
 
     class ImageSettings
