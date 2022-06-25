@@ -13,7 +13,6 @@ namespace player.Shaders
         public override string ShaderName => "GaussianBlurShader";
 
         int resolutionLocation;
-        int strengthLocation;
         int blurLocation;
         int colorOverrideLocation;
         int colorLocation;
@@ -28,7 +27,6 @@ namespace player.Shaders
         {
             SetUniform(GetUniformLocation("image"), 0);
             resolutionLocation = GetUniformLocation("resolution");
-            strengthLocation = GetUniformLocation("strength");
             blurLocation = GetUniformLocation("blur");
             colorOverrideLocation = GetUniformLocation("colorOverride");
             colorLocation = GetUniformLocation("color");
@@ -37,7 +35,6 @@ namespace player.Shaders
         protected override void OnActivate()
         {
             SetUniform(resolutionLocation, resolution);
-            SetUniform(strengthLocation, strength);
             SetUniform(blurLocation, blur);
             SetUniform(colorOverrideLocation, colorOverride);
             SetUniform(colorLocation, color);
@@ -47,12 +44,6 @@ namespace player.Shaders
         {
             this.resolution = resolution;
             SetUniform(resolutionLocation, resolution);
-        }
-
-        public void SetStrength(float strength)
-        {
-            this.strength = strength;
-            SetUniform(strengthLocation, strength);
         }
 
         public void SetBlurState(bool state)

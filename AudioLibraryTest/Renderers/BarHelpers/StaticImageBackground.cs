@@ -14,6 +14,7 @@ using OpenTK;
 using player.Core.Settings;
 using OpenTK.Graphics;
 using System.Drawing.Imaging;
+using player.Core;
 
 namespace player.Renderers.BarHelpers
 {
@@ -179,7 +180,6 @@ namespace player.Renderers.BarHelpers
                 case BackgroundMode.BorderedDefault:
                     {
                         gaussianBlur.SetBlurState(true);
-                        gaussianBlur.SetStrength(3f);
 
                         float bgImageScalar = Math.Max(1f, 1f / aspect * 0.75f);
 
@@ -325,20 +325,43 @@ namespace player.Renderers.BarHelpers
                         else if (settingsForImage.BackgroundStyle == SolidBackgroundStyle.StretchEdge)
                         {
                             GL.BindTexture(TextureTarget.Texture2D, textureIndex);
+                            gaussianBlur.SetColorOverride(false, Vector4.One);
 
-                            var leftRect = Primitives.GenerateXY_UVRect(
-                                new RectangleF(0, 0, RenderResolution.X * 0.5f, RenderResolution.Y),
-                                new RectangleF(settingsForImage.StretchXPos / RenderResolution.X, 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+                            if (settingsForImage.AnchorPosition == BackgroundAnchorPosition.Center)
+                            {
+                                VertexFloatBuffer leftRect = Primitives.GenerateXY_UVRect(
+                                    new RectangleF(0, 0, (int)((RenderResolution.X * 0.5f) - (imageWidth * 0.5f)), RenderResolution.Y),
+                                    new RectangleF(settingsForImage.StretchXPos / RenderResolution.X, 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
 
-                            leftRect.Draw();
-                            leftRect.Unload();
+                                leftRect.Draw();
 
-                            var rightRect = Primitives.GenerateXY_UVRect(
-                                new RectangleF(RenderResolution.X * 0.5f, 0, RenderResolution.X * 0.5f, RenderResolution.Y),
-                                new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+                                VertexFloatBuffer rightRect = Primitives.GenerateXY_UVRect(
+                                    new RectangleF((int)((RenderResolution.X * 0.5f) + (imageWidth * 0.5f)), 0, (int)((RenderResolution.X * 0.5f) - (imageWidth * 0.5f)), RenderResolution.Y),
+                                    new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
 
-                            rightRect.Draw();
-                            rightRect.Unload();
+                                rightRect.Draw();
+
+                                rightRect.Unload();
+                                leftRect.Unload();
+                            }
+                            else if (settingsForImage.AnchorPosition == BackgroundAnchorPosition.Left)
+                            {
+                                var rightRect = Primitives.GenerateXY_UVRect(
+                                    new RectangleF(imageWidth, 0, RenderResolution.X - imageWidth, RenderResolution.Y),
+                                    new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+
+                                rightRect.Draw();
+                                rightRect.Unload();
+                            }
+                            else if(settingsForImage.AnchorPosition == BackgroundAnchorPosition.Right)
+                            {
+                                var leftRect = Primitives.GenerateXY_UVRect(
+                                    new RectangleF(0, 0, RenderResolution.X - imageWidth, RenderResolution.Y),
+                                    new RectangleF(settingsForImage.StretchXPos / RenderResolution.X, 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+
+                                leftRect.Draw();
+                                leftRect.Unload();
+                            }
                         }
 
                         gaussianBlur.SetColorOverride(false, Vector4.Zero);

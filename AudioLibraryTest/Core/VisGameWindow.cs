@@ -23,6 +23,8 @@ using System.Threading;
 using System.Diagnostics;
 using player.Utility.DropTarget;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace player.Core
 {
@@ -37,7 +39,7 @@ namespace player.Core
         private uint MainRenderTexture;
         private uint MainDepthRenderBuffer;
         private Shader RTTQuadShader;
-        
+
         private Thread renderingThread;
         private bool sizeUpdated = false;
         private object sizeLock = new object();
@@ -54,13 +56,13 @@ namespace player.Core
         private OLabel clockLabel;
         private DropTargetManager dropTarget;
         private FramebufferManager fbManager;
-        
+
         public VisGameWindow(int newWidth, int newHeight)
             : base(newWidth, newHeight, GraphicsMode.Default)
         {
             ThisForm = this;
             Log.Log($"Player v{Program.VersionNumber} loading...");
-            this.Title = "Aterial's Visualizer";            
+            this.Title = "Aterial's Visualizer";
 
             dropTarget = new DropTargetManager(this.GetHandleOfGameWindow(true));
 
@@ -126,7 +128,7 @@ namespace player.Core
                 imGuiManager.OnInputsProcessed();
 
                 ThreadedRendering(renderWatch.Elapsed.TotalSeconds);
-                
+
                 renderWatch.Restart();
 
                 SwapBuffers();
@@ -151,7 +153,7 @@ namespace player.Core
             clockLabel.Text = $"{DateTime.Now.ToString("hh:mm:ss tt")}";
             visRenderer.Render(time);
             fpsTracker.Update();
-            
+
             uiManager.Render(time);
             imGuiManager.Render();
 
@@ -246,6 +248,17 @@ namespace player.Core
                     clockLabel.Enabled = !clockLabel.Enabled;
                     ServiceManager.GetService<SettingsService>().SetSetting("Core.ClockEnabled", clockLabel.Enabled);
                 };
+
+#if DEBUG
+                if (Program.CLIParser.ActiveOptions.Where(opt => opt.Item1 == "GLDebug").Any())
+                {
+                    //add opengl debug logging on debug builds if -GLDebug is specified
+                    _debugHandle = GCHandle.Alloc(_debugProcCallback);
+                    GL.DebugMessageCallback(_debugProcCallback, IntPtr.Zero);
+                    GL.Enable(EnableCap.DebugOutput);
+                    GL.Enable(EnableCap.DebugOutputSynchronous);
+                }
+#endif
             }
         }
 
@@ -350,7 +363,7 @@ namespace player.Core
         {
             RTTQuadShader = new TexturedQuadShader();
         }
-        
+
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             //After the first OnRenderFrame call, we take over the event loop so we can avoid GameWindow's "Catchup" system
@@ -412,8 +425,6 @@ namespace player.Core
                 sizeUpdated = true;
             }
         }
-
-
         protected override void OnClosed(EventArgs e)
         {
             WallpaperUtils.BeforeClose();
@@ -421,5 +432,16 @@ namespace player.Core
             ServiceManager.CleanupAllServices();
             Log.Log($"Player v{Program.VersionNumber} Shutting down!");
         }
+
+#if DEBUG
+        static DebugProc _debugProcCallback = DebugCallback;
+        static GCHandle _debugHandle;
+        private static void DebugCallback(DebugSource source, DebugType type, int id,
+    DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
+        {
+            string messageString = Marshal.PtrToStringAnsi(message, length);
+            Log.Log($"[{DateTime.Now.Ticks}] {severity} {type} | {messageString}");
+        }
+#endif
     }
 }

@@ -58,7 +58,7 @@ namespace QuickFont
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, VboID);
 
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(VertexCount * BlittableValueType.StrideOf(Vertices)), Vertices, BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(VertexCount * BlittableValueType.StrideOf(Vertices)), Vertices, BufferUsageHint.StaticDraw);
         }
 
         public void Draw()

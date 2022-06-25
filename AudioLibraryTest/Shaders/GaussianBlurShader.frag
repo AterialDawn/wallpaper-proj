@@ -4,7 +4,6 @@ varying vec2 fragCoord;
 
 uniform sampler2D image;
 uniform vec2 resolution;
-uniform float strength;
 uniform bool blur;
 uniform bool colorOverride;
 uniform vec4 color;
