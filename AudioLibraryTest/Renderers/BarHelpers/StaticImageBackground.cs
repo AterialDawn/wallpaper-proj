@@ -326,18 +326,21 @@ namespace player.Renderers.BarHelpers
                         {
                             GL.BindTexture(TextureTarget.Texture2D, textureIndex);
                             gaussianBlur.SetColorOverride(false, Vector4.One);
+                            //flip uv coordinates of left rect
+                            float uvSampleWidth = settingsForImage.StretchWidth / RenderResolution.X;
+                            float uvLeftSamplePos = (settingsForImage.StretchXPos / RenderResolution.X) + uvSampleWidth;
 
                             if (settingsForImage.AnchorPosition == BackgroundAnchorPosition.Center)
                             {
                                 VertexFloatBuffer leftRect = Primitives.GenerateXY_UVRect(
                                     new RectangleF(0, 0, (int)((RenderResolution.X * 0.5f) - (imageWidth * 0.5f)), RenderResolution.Y),
-                                    new RectangleF(settingsForImage.StretchXPos / RenderResolution.X, 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+                                    new RectangleF(uvLeftSamplePos, 0, -uvSampleWidth, 1));
 
                                 leftRect.Draw();
 
                                 VertexFloatBuffer rightRect = Primitives.GenerateXY_UVRect(
                                     new RectangleF((int)((RenderResolution.X * 0.5f) + (imageWidth * 0.5f)), 0, (int)((RenderResolution.X * 0.5f) - (imageWidth * 0.5f)), RenderResolution.Y),
-                                    new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+                                    new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, uvSampleWidth, 1));
 
                                 rightRect.Draw();
 
@@ -348,7 +351,7 @@ namespace player.Renderers.BarHelpers
                             {
                                 var rightRect = Primitives.GenerateXY_UVRect(
                                     new RectangleF(imageWidth, 0, RenderResolution.X - imageWidth, RenderResolution.Y),
-                                    new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+                                    new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, uvSampleWidth, 1));
 
                                 rightRect.Draw();
                                 rightRect.Unload();
@@ -357,7 +360,7 @@ namespace player.Renderers.BarHelpers
                             {
                                 var leftRect = Primitives.GenerateXY_UVRect(
                                     new RectangleF(0, 0, RenderResolution.X - imageWidth, RenderResolution.Y),
-                                    new RectangleF(settingsForImage.StretchXPos / RenderResolution.X, 0, settingsForImage.StretchWidth / RenderResolution.X, 1));
+                                    new RectangleF(uvLeftSamplePos, 0, -uvSampleWidth, 1));
 
                                 leftRect.Draw();
                                 leftRect.Unload();
