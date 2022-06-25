@@ -18,7 +18,6 @@ namespace player.Shaders
         int colorLocation;
 
         Vector2 resolution = Vector2.Zero;
-        float strength = 0;
         bool blur = true;
         bool colorOverride = false;
         Vector4 color = new Vector4();

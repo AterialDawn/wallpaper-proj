@@ -23,7 +23,7 @@ namespace player.Core.Render.UI
         ImGuiController controller;
         VisGameWindow vgs;
         List<char> pressedChars = new List<char>();
-        bool anyItemInMenuOpened = false;
+        //bool anyItemInMenuOpened = false; //maybe will use later maybe
         double timeLastMouseMoved;
         float currentFrameOpacity = 0;
         ConsoleManager console;
