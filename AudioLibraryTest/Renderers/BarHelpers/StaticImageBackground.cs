@@ -175,13 +175,14 @@ namespace player.Renderers.BarHelpers
 
             GL.PushMatrix();
             GL.LoadIdentity();
+            gaussianBlur.Activate();
             switch (currentMode)
             {
                 case BackgroundMode.BorderedDefault:
                     {
                         gaussianBlur.SetBlurState(true);
 
-                        float bgImageScalar = Math.Max(1f, 1f / aspect * 0.75f);
+                        float bgImageScalar = Math.Max(1f, 1f / aspect * (backgroundColor.W == 1 ? 0.75f : 1));
 
                         float horizontalMove = aspect;
                         var bgTargetHelper = new FramebufferRenderTexture((int)RenderResolution.X, (int)RenderResolution.Y, framebufferHooks);
@@ -190,9 +191,6 @@ namespace player.Renderers.BarHelpers
                         GL.BindTexture(TextureTarget.Texture2D, textureIndex);
 
                         GL.Scale(2, 2, 1);
-
-                        gaussianBlur.Activate();
-
                         {
                             GL.Enable(EnableCap.ScissorTest);
                             GL.Scissor(0, 0, (int)(RenderResolution.X * 0.5f), (int)RenderResolution.Y);
@@ -213,7 +211,6 @@ namespace player.Renderers.BarHelpers
                             GL.PopMatrix();
                             GL.Disable(EnableCap.ScissorTest);
                         }
-
 
 
                         bgTargetHelper.FinishRendering();
@@ -266,6 +263,7 @@ namespace player.Renderers.BarHelpers
                     }
                 case BackgroundMode.SolidBackground:
                     {
+                        gaussianBlur.SetBlurState(false);
                         float normPixelX = 1f / Resolution.Width;
                         float normPixelY = 1f / Resolution.Height;
                         float imageWidth = Resolution.Width;
@@ -329,6 +327,7 @@ namespace player.Renderers.BarHelpers
                             //flip uv coordinates of left rect
                             float uvSampleWidth = settingsForImage.StretchWidth / RenderResolution.X;
                             float uvLeftSamplePos = (settingsForImage.StretchXPos / RenderResolution.X) + uvSampleWidth;
+                            float uvRightSamplePos = 1f - (((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X) - uvSampleWidth);
 
                             if (settingsForImage.AnchorPosition == BackgroundAnchorPosition.Center)
                             {
@@ -340,7 +339,7 @@ namespace player.Renderers.BarHelpers
 
                                 VertexFloatBuffer rightRect = Primitives.GenerateXY_UVRect(
                                     new RectangleF((int)((RenderResolution.X * 0.5f) + (imageWidth * 0.5f)), 0, (int)((RenderResolution.X * 0.5f) - (imageWidth * 0.5f)), RenderResolution.Y),
-                                    new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, uvSampleWidth, 1));
+                                    new RectangleF(uvRightSamplePos, 0, -uvSampleWidth, 1));
 
                                 rightRect.Draw();
 
@@ -351,7 +350,7 @@ namespace player.Renderers.BarHelpers
                             {
                                 var rightRect = Primitives.GenerateXY_UVRect(
                                     new RectangleF(imageWidth, 0, RenderResolution.X - imageWidth, RenderResolution.Y),
-                                    new RectangleF(1f - ((settingsForImage.StretchXPos + settingsForImage.StretchWidth) / RenderResolution.X), 0, uvSampleWidth, 1));
+                                    new RectangleF(uvRightSamplePos, 0, -uvSampleWidth, 1));
 
                                 rightRect.Draw();
                                 rightRect.Unload();
