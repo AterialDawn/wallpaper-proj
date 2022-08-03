@@ -68,7 +68,7 @@ namespace player.Renderers.BarHelpers
                         Resolution = new SizeF(image.Width, image.Height);
                     }
 
-                    if (Math.Abs((Resolution.Width / Resolution.Height) - (RenderResolution.X / RenderResolution.Y)) > 0.05f)
+                    if (Resolution.Width != RenderResolution.X || Resolution.Height != RenderResolution.Y)
                     {
                         int targetWidth = (int)Math.Ceiling((Resolution.Width / Resolution.Height) * (float)RenderResolution.Y);
 
