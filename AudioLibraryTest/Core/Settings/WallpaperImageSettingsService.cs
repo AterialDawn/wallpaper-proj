@@ -18,11 +18,14 @@ namespace player.Core.Settings
 {
     class WallpaperImageSettingsService : IService
     {
+        public bool WereSettingsUpdatedThisFrame { get { return lastFrameSettingsChanged == TimeManager.FrameNumber; } }
+
         public string ServiceName => "WallpaperImageSettings";
         string settingsFilePath = "";
         List<PathComponent> pathComponentList = new List<PathComponent>();
         SemaphoreSlim saveSemaphore = new SemaphoreSlim(1, 1);
         AsyncAutoResetEvent dirtyEvent = new AsyncAutoResetEvent();
+        long lastFrameSettingsChanged = 0;
 
         public void Initialize()
         {
@@ -161,6 +164,7 @@ namespace player.Core.Settings
             if (createIfNotExists) //if we're creating something that might not exist, we probably intend to write a value to it.
             {
                 dirtyEvent.Set();
+                lastFrameSettingsChanged = TimeManager.FrameNumber;
             }
             return currentFile?.Settings;
         }

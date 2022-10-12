@@ -26,6 +26,7 @@ namespace player.Renderers
     {
         class ImGuiHandler
         {
+            const float HOLD_ROTATION_TIME = 5f;
             BarRenderer parent;
             SettingsService settings;
             bool imageInfoWindowVisible = false;
@@ -33,7 +34,6 @@ namespace player.Renderers
             Vector2 pmButtonSize = new Vector2(33.5f, 20);
             Vector2 stretchButtonSize = new Vector2(67f, 20);
             WallpaperImageSettingsService wpSettings;
-            bool forcedKeepWallpaper = false;
             Point lastMousePos = Point.Empty;
             Bitmap desktopBmp = new Bitmap(1, 1);
             Graphics desktopDC;
@@ -41,6 +41,8 @@ namespace player.Renderers
             Vector2 pickerSize = new Vector2(16, 16);
             int selectedTabIdx = 0;
             int bgStyleIndex;
+
+            float timeToHoldRotation = 0;
 
             string[] renderModeItems = new string[] { "Default", "Solid Background" };
             string[] anchorPosItems = new string[] { "Centered", "Left", "Right" };
@@ -111,13 +113,22 @@ namespace player.Renderers
                     }
                     ImGui.EndWindow();
                 }
-                else
+
+                if (timeToHoldRotation > 0)
                 {
-                    if (forcedKeepWallpaper)
+                    timeToHoldRotation -= TimeManager.Delta;
+                    if (timeToHoldRotation <= 0)
                     {
-                        forcedKeepWallpaper = false;
                         parent.backgroundController.KeepCurrentBackground = false;
+                        Log.Log("Hold rotation expired, disabling KeepCurrentBackground");
                     }
+                }
+
+                if (wpSettings.WereSettingsUpdatedThisFrame && !parent.backgroundController.KeepCurrentBackground)
+                {
+                    timeToHoldRotation = HOLD_ROTATION_TIME;
+                    parent.backgroundController.KeepCurrentBackground = true;
+                    Log.Log($"Settings Updated. Holding current wallpaper for {timeToHoldRotation} seconds");
                 }
             }
 
@@ -498,21 +509,9 @@ namespace player.Renderers
                 if (ImGui.Checkbox("Keep Current Wallpaper", ref keep))
                 {
                     parent.ToggleKeepRotation();
-                    forcedKeepWallpaper = false;
                 }
 
-                if (ImGui.Checkbox("Image Settings", ref imageInfoWindowVisible))
-                {
-                    if (imageInfoWindowVisible)
-                    {
-                        if (!parent.backgroundController.KeepCurrentBackground)
-                        {
-                            parent.backgroundController.KeepCurrentBackground = true;
-                            forcedKeepWallpaper = true;
-                            Log.Log("Keeping current background");
-                        }
-                    }
-                }
+                ImGui.Checkbox("Image Settings", ref imageInfoWindowVisible);
 
                 var paths = settings.GetSettingAs<string[]>("Wallpaper.MoveToPaths", null);
                 if (paths != null && paths.Length > 0)

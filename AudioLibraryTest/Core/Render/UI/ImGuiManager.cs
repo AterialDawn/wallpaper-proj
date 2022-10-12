@@ -360,10 +360,6 @@ namespace player.Core.Render.UI
                     byte* vtx_buffer = (byte*)cmd_list->VtxBuffer.Data;
                     ushort* idx_buffer = (ushort*)cmd_list->IdxBuffer.Data;
 
-                    DrawVert vert0 = *((DrawVert*)vtx_buffer);
-                    DrawVert vert1 = *(((DrawVert*)vtx_buffer) + 1);
-                    DrawVert vert2 = *(((DrawVert*)vtx_buffer) + 2);
-
                     GL.VertexPointer(2, VertexPointerType.Float, sizeof(DrawVert), new IntPtr(vtx_buffer + DrawVert.PosOffset));
                     GL.TexCoordPointer(2, TexCoordPointerType.Float, sizeof(DrawVert), new IntPtr(vtx_buffer + DrawVert.UVOffset));
                     GL.ColorPointer(4, ColorPointerType.UnsignedByte, sizeof(DrawVert), new IntPtr(vtx_buffer + DrawVert.ColOffset));
