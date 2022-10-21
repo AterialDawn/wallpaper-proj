@@ -11,7 +11,7 @@ using Log = player.Core.Logging.Logger;
 
 namespace player.Renderers.BarHelpers.VideoRenderers
 {
-    class YUV420PlanarVideoRenderer : BaseVideoRenderer
+    class YUV444PlanarVideoRenderer : BaseVideoRenderer
     {
         int[] yTex = new int[FRAME_BUFFER_SIZE];
         int[] uTex = new int[FRAME_BUFFER_SIZE];
@@ -19,7 +19,7 @@ namespace player.Renderers.BarHelpers.VideoRenderers
 
         YUVPlanarShader shader;
 
-        public YUV420PlanarVideoRenderer(FFMpegDecoder decoder, FFMpegYUV420FrameContainer frame) : base(decoder, frame.Width, frame.Height)
+        public YUV444PlanarVideoRenderer(FFMpegDecoder decoder, FFMpegYUV444FrameContainer frame) : base(decoder, frame.Width, frame.Height)
         {
             //we are in threadedloadercontext, still inside Preload handler, the framebuffer has been created already in base(), so we initialize our 3? textures
             GL.GenTextures(FRAME_BUFFER_SIZE, yTex);
@@ -31,8 +31,8 @@ namespace player.Renderers.BarHelpers.VideoRenderers
             for (int i = 0; i < FRAME_BUFFER_SIZE; i++)
             {
                 TextureUtils.LoadPtrIntoTexture(frame.Width, frame.Height, yTex[i], OpenTK.Graphics.OpenGL4.PixelInternalFormat.R8, OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.YFramePointer, frame.YFrameSize);
-                TextureUtils.LoadPtrIntoTexture(frame.Width / 2, frame.Height / 2, uTex[i], OpenTK.Graphics.OpenGL4.PixelInternalFormat.R8, OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
-                TextureUtils.LoadPtrIntoTexture(frame.Width / 2, frame.Height / 2, vTex[i], OpenTK.Graphics.OpenGL4.PixelInternalFormat.R8, OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
+                TextureUtils.LoadPtrIntoTexture(frame.Width, frame.Height, uTex[i], OpenTK.Graphics.OpenGL4.PixelInternalFormat.R8, OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
+                TextureUtils.LoadPtrIntoTexture(frame.Width, frame.Height, vTex[i], OpenTK.Graphics.OpenGL4.PixelInternalFormat.R8, OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
             }
 
             decoder.ReleaseFrame();
@@ -54,8 +54,8 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                 var frame = Decoder.GetFrame<FFMpegYUV420FrameContainer>();
 
                 TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, yTex[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.YFramePointer, frame.YFrameSize);
-                TextureUtils.UpdateTextureFromPtr(frame.Width / 2, frame.Height / 2, uTex[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
-                TextureUtils.UpdateTextureFromPtr(frame.Width / 2, frame.Height / 2, vTex[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
+                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, uTex[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
+                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, vTex[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
 
                 Decoder.ReleaseFrame();
             }
@@ -91,8 +91,8 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                 var frame = Decoder.GetFrame<FFMpegYUV420FrameContainer>();
 
                 TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, yTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.YFramePointer, frame.YFrameSize);
-                TextureUtils.UpdateTextureFromPtr(frame.Width / 2, frame.Height / 2, uTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
-                TextureUtils.UpdateTextureFromPtr(frame.Width / 2, frame.Height / 2, vTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
+                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, uTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
+                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, vTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
 
                 currentWriteIndex++;
                 if (currentWriteIndex >= FRAME_BUFFER_SIZE) currentWriteIndex = 0;

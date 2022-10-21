@@ -173,6 +173,7 @@ namespace player.Core.FFmpeg
             {
                 case AVPixelFormat.AV_PIX_FMT_YUV420P:
                 case AVPixelFormat.AV_PIX_FMT_GBR24P:
+                case AVPixelFormat.AV_PIX_FMT_YUV444P:
                     break;
                 default:
                     throw new InvalidOperationException($"Pixel Format {PixelFormat} not supported!");
@@ -192,6 +193,11 @@ namespace player.Core.FFmpeg
                 case AVPixelFormat.AV_PIX_FMT_YUV420P:
                     {
                         currentFrame = new FFMpegYUV420FrameContainer(width, height, timeStamp, frame);
+                        break;
+                    }
+                case AVPixelFormat.AV_PIX_FMT_YUV444P:
+                    {
+                        currentFrame = new FFMpegYUV444FrameContainer(width, height, timeStamp, frame);
                         break;
                     }
                 default:

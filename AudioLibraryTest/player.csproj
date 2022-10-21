@@ -256,6 +256,7 @@
     <Compile Include="Renderers\BarHelpers\VideoBackground.cs" />
     <Compile Include="Renderers\BarHelpers\VideoRenderers\BaseVideoRenderer.cs" />
     <Compile Include="Renderers\BarHelpers\VideoRenderers\GBRPlanarVideoRenderer.cs" />
+    <Compile Include="Renderers\BarHelpers\VideoRenderers\YUV444PlanarVideoRenderer.cs" />
     <Compile Include="Renderers\BarHelpers\VideoRenderers\YUV420PlanarVideoRenderer.cs" />
     <Compile Include="Shaders\BarShader.cs" />
     <Compile Include="Shaders\CitySkylineShader.cs" />
@@ -266,7 +267,7 @@
     <Compile Include="Shaders\OscilloscopeShader.cs" />
     <Compile Include="Shaders\PieChartShader.cs" />
     <Compile Include="Shaders\TexturedQuadShader.cs" />
-    <Compile Include="Shaders\YUV420PlanarShader.cs" />
+    <Compile Include="Shaders\YUVPlanarShader.cs" />
     <Compile Include="Utility\CommandLineParser.cs" />
     <Compile Include="Core\Render\TextRenderer.cs" />
     <Compile Include="Core\Render\FpsTracker.cs" />
@@ -335,8 +336,8 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="Shaders\GBRPlanarShader.frag" />
     <EmbeddedResource Include="Shaders\GBRPlanarShader.vert" />
-    <EmbeddedResource Include="Shaders\YUV420PlanarShader.frag" />
-    <EmbeddedResource Include="Shaders\YUV420PlanarShader.vert" />
+    <EmbeddedResource Include="Shaders\YUVPlanarShader.frag" />
+    <EmbeddedResource Include="Shaders\YUVPlanarShader.vert" />
     <EmbeddedResource Include="Shaders\PieChartShader.frag" />
     <EmbeddedResource Include="Shaders\PieChartShader.vert" />
     <EmbeddedResource Include="Shaders\GaussianBlurShader.frag" />

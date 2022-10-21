@@ -65,6 +65,11 @@ namespace player.Core.FFmpeg
         }
     }
 
+    class FFMpegYUV444FrameContainer : FFMpegYUV420FrameContainer
+    {
+        public FFMpegYUV444FrameContainer(int width, int height, double presentationTimeStamp, AVFrame sourceFrame) : base(width, height, presentationTimeStamp, sourceFrame) { }
+    }
+
     unsafe class FFMpegGBRPFrameContainer : BaseFFMpegFrameContainer
     {
         public IntPtr GreenFramePointer { get; private set; }

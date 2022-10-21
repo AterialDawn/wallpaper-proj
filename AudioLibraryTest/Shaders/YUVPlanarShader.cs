@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace player.Shaders
 {
-    class YUV420PlanarShader : Shader
+    class YUVPlanarShader : Shader
     {
-        public override string ShaderName => "YUV420PlanarShader";
+        public override string ShaderName => "YUVPlanarShader";
         public bool LimitedToFullColorRangeConvert { get { return _limitedConvert; } set { _limitedConvert = value; SetUniform(_limitedConvertLocation, _limitedConvert); } }
         private bool _limitedConvert = false;
         private int _limitedConvertLocation = 0;

@@ -97,10 +97,15 @@ namespace player.Renderers.BarHelpers
             {
                 videoRenderer = new GBRPlanarVideoRenderer(decoder, gbrFrame);
             }
+            else if (container is FFMpegYUV444FrameContainer yuv444pFrame) //444 inherits from 420, move it up higher
+            {
+                videoRenderer = new YUV444PlanarVideoRenderer(decoder, yuv444pFrame);
+            }
             else if (container is FFMpegYUV420FrameContainer yuv420pFrame)
             {
                 videoRenderer = new YUV420PlanarVideoRenderer(decoder, yuv420pFrame);
             }
+            
 
             videoRenderer.PreloadFrames();
         }
