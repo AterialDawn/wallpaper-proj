@@ -194,7 +194,7 @@ namespace player.Core.Input
 
         private void f3KeyPress(object source, Key key, bool keyDown)
         {
-            if (!keyDown) return; //Only worry about key presses
+            if (keyDown) return; //Only worry about key release
             consoleRenderer.ToggleDisplay();
         }
 

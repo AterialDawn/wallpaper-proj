@@ -24,28 +24,11 @@ namespace player.Core.Input
 {
     class ConsoleRenderer
     {
-        class Pair<T,V>
-        {
-            public T Item1;
-            public V Item2;
-
-            public Pair(T item1, V item2)
-            {
-                Item1 = item1;
-                Item2 = item2;
-            }
-        }
-        class ProcessedTextInfo
-        {
-            public ProcessedText Text { get; set; }
-            public SizeF TextHeight { get; set; }
-        }
-
         public bool Visible { get { return enabled; } }
 
         private bool enabled = false;
         bool justActivated = false;
-        private CircularBuffer<Pair<string, ProcessedTextInfo>> messageStack = new CircularBuffer<Pair<string, ProcessedTextInfo>>(100); //100 msgs seems fine
+        private CircularBuffer<string> messageStack = new CircularBuffer<string>(500); //MORE MESSAGES
         private ConsoleManager consoleManager;
         private ConsoleHistoryHelper historyHelper = new ConsoleHistoryHelper();
         private FpsLimitOverrideContext fpsOverride = null;
@@ -62,7 +45,7 @@ namespace player.Core.Input
 
         private void Logger_MessageLogged(object sender, MessageLoggedEventArgs e)
         {
-            messageStack.PushFront(new Pair<string, ProcessedTextInfo>(e.Message, null));
+            messageStack.PushFront(e.Message);
         }
 
         byte[] textBuf = new byte[256];
@@ -75,7 +58,7 @@ namespace player.Core.Input
             ImGui.BeginChild("scrolling", textScrollingHeight, false, WindowFlags.Default);
             for (int i = messageStack.Size - 1; i > -1 ; i--)
             {
-                ImGui.TextWrapped(messageStack[i].Item1);
+                ImGui.TextWrapped(messageStack[i]);
             }
             ImGui.SetScrollHere(1.0f);
             ImGui.EndChild();
@@ -87,7 +70,7 @@ namespace player.Core.Input
                 var str = Encoding.ASCII.GetString(textBuf).TrimEnd((char)0);
                 textBuf = new byte[256];
 
-                messageStack.PushFront(new Pair<string, ProcessedTextInfo>(str, null));
+                messageStack.PushFront(str);
                 consoleManager.ExecuteCommand(str);
                 refocus = true;
             }
