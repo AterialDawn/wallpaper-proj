@@ -173,6 +173,49 @@ namespace player.Renderers.BarHelpers
 
             VertexFloatBuffer renderBuffer = new VertexFloatBuffer(VertexFormat.XY_UV, bufferHint: BufferUsageHint.StreamDraw);
 
+            float normPixelX = 1f / Resolution.Width;
+            float normPixelY = 1f / Resolution.Height;
+            float imageWidth = Resolution.Width;
+            float imageHeight = Resolution.Height;
+            if (settingsForImage != null &&
+                (
+                settingsForImage.RenderTrimBot != 0 ||
+                settingsForImage.RenderTrimTop != 0 ||
+                settingsForImage.RenderTrimLeft != 0 ||
+                settingsForImage.RenderTrimRight != 0)
+                )
+            {
+                float normBot = settingsForImage.RenderTrimBot * normPixelY;
+
+                float top = imageHeight;
+
+                float normTop = 1f - (settingsForImage.RenderTrimTop * normPixelY);
+                float normLeft = settingsForImage.RenderTrimLeft * normPixelX;
+
+                float right = imageWidth - (settingsForImage.RenderTrimLeft + settingsForImage.RenderTrimRight);
+                float normRight = 1f - (settingsForImage.RenderTrimRight * normPixelX);
+
+                renderBuffer.AddVertex(0, 0, normLeft, normBot);
+                renderBuffer.AddVertex(0, imageHeight, normLeft, normTop);
+                renderBuffer.AddVertex(right, top, normRight, normTop);
+                renderBuffer.AddVertex(0, 0, normLeft, normBot);
+                renderBuffer.AddVertex(right, top, normRight, normTop);
+                renderBuffer.AddVertex(right, 0, normRight, normBot);
+                renderBuffer.Load();
+
+                imageWidth = imageWidth - (settingsForImage.RenderTrimLeft + settingsForImage.RenderTrimRight);
+            }
+            else
+            {
+                renderBuffer.AddVertex(0f, 0f, 0f, 0f);
+                renderBuffer.AddVertex(0f, Resolution.Height, 0f, 1f);
+                renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
+                renderBuffer.AddVertex(0f, 0f, 0f, 0f);
+                renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
+                renderBuffer.AddVertex(Resolution.Width, 0f, 1f, 0f);
+                renderBuffer.Load();
+            }
+
             GL.PushMatrix();
             GL.LoadIdentity();
             gaussianBlur.Activate();
@@ -226,11 +269,12 @@ namespace player.Renderers.BarHelpers
                         gaussianBlur.SetBlurState(false);
 
                         {
+                            //pixel-perfect rendering of center image
                             GL.PushMatrix();
-                            GL.Scale(aspect, 1, 1);
-
-                            primitives.CenteredQuad.Draw();
-
+                            GL.LoadIdentity();
+                            GL.Ortho(0, RenderResolution.X, 0, RenderResolution.Y, -1, 1);
+                            GL.Translate((int)((RenderResolution.X * 0.5f) - (imageWidth * 0.5f)), 0, 0);
+                            renderBuffer.Draw();
                             GL.PopMatrix();
                         }
 
@@ -264,50 +308,7 @@ namespace player.Renderers.BarHelpers
                 case BackgroundMode.SolidBackground:
                     {
                         gaussianBlur.SetBlurState(false);
-                        float normPixelX = 1f / Resolution.Width;
-                        float normPixelY = 1f / Resolution.Height;
-                        float imageWidth = Resolution.Width;
-                        float imageHeight = Resolution.Height;
-                        if (settingsForImage != null &&
-                            (
-                            settingsForImage.RenderTrimBot != 0 ||
-                            settingsForImage.RenderTrimTop != 0 ||
-                            settingsForImage.RenderTrimLeft != 0 ||
-                            settingsForImage.RenderTrimRight != 0)
-                            )
-                        {
-                            float normBot = settingsForImage.RenderTrimBot * normPixelY;
-
-                            float top = imageHeight;
-
-                            float normTop = 1f - (settingsForImage.RenderTrimTop * normPixelY);
-                            float normLeft = settingsForImage.RenderTrimLeft * normPixelX;
-
-                            float right = imageWidth - (settingsForImage.RenderTrimLeft + settingsForImage.RenderTrimRight);
-                            float normRight = 1f - (settingsForImage.RenderTrimRight * normPixelX);
-
-                            renderBuffer.AddVertex(0, 0, normLeft, normBot);
-                            renderBuffer.AddVertex(0, imageHeight, normLeft, normTop);
-                            renderBuffer.AddVertex(right, top, normRight, normTop);
-                            renderBuffer.AddVertex(0, 0, normLeft, normBot);
-                            renderBuffer.AddVertex(right, top, normRight, normTop);
-                            renderBuffer.AddVertex(right, 0, normRight, normBot);
-                            renderBuffer.Load();
-
-                            imageWidth = imageWidth - (settingsForImage.RenderTrimLeft + settingsForImage.RenderTrimRight);
-                        }
-                        else
-                        {
-                            renderBuffer.AddVertex(0f, 0f, 0f, 0f);
-                            renderBuffer.AddVertex(0f, Resolution.Height, 0f, 1f);
-                            renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
-                            renderBuffer.AddVertex(0f, 0f, 0f, 0f);
-                            renderBuffer.AddVertex(Resolution.Width, Resolution.Height, 1f, 1f);
-                            renderBuffer.AddVertex(Resolution.Width, 0f, 1f, 0f);
-                            renderBuffer.Load();
-                        }
-
-
+                        
                         renderTargetHelper.BindAndRenderTo();
 
                         GL.Ortho(0, RenderResolution.X, 0, RenderResolution.Y, -1, 1);
