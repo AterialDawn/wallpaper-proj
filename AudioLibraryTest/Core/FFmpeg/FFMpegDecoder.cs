@@ -39,8 +39,6 @@ namespace player.Core.FFmpeg
         private double timeBase;
 
         private Thread decoderThread = null;
-        object lFrameSkip = new object();
-        int frameSkip = 0;
 
 
         public FFMpegDecoder(string sourceFilePath)
@@ -65,14 +63,6 @@ namespace player.Core.FFmpeg
         {
             frameWaitingToBeFreed.Set();
             framesDecodedEvent.Reset();
-        }
-
-        public void SkipFrames(int framesToSkip)
-        {
-            lock (lFrameSkip)
-            {
-                frameSkip = framesToSkip;
-            }
         }
 
         /// <summary>
@@ -132,13 +122,6 @@ namespace player.Core.FFmpeg
             while (Decoding)
             {
                 frameWaitingToBeFreed.WaitOne();
-                lock (lFrameSkip)
-                {
-                    while (frameSkip-- > 0)
-                    {
-                        TryDecodeNextFrame(out var unused);
-                    }
-                }
                 if (TryDecodeNextFrame(out var frame))
                 {
                     AddFrameToBuffer(frame);

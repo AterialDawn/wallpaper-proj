@@ -88,15 +88,17 @@ namespace player.Renderers.BarHelpers.VideoRenderers
             while (framesToDecode-- > 0)
             {
                 Decoder.WaitUntilFramesDecoded();
-                var frame = Decoder.GetFrame<FFMpegYUV420FrameContainer>();
+                if (framesToDecode == 0)
+                {
+                    var frame = Decoder.GetFrame<FFMpegYUV420FrameContainer>();
 
-                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, yTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.YFramePointer, frame.YFrameSize);
-                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, uTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
-                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, vTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
+                    TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, yTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.YFramePointer, frame.YFrameSize);
+                    TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, uTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
+                    TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, vTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
 
-                currentWriteIndex++;
-                if (currentWriteIndex >= FRAME_BUFFER_SIZE) currentWriteIndex = 0;
-
+                    currentWriteIndex++;
+                    if (currentWriteIndex >= FRAME_BUFFER_SIZE) currentWriteIndex = 0;
+                }
                 Decoder.ReleaseFrame();
             }
 

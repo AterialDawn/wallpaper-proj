@@ -89,14 +89,17 @@ namespace player.Renderers.BarHelpers.VideoRenderers
             while (framesToDecode-- > 0)
             {
                 Decoder.WaitUntilFramesDecoded();
-                var frame = Decoder.GetFrame<FFMpegGBRPFrameContainer>();
+                if (framesToDecode == 0) //only upload the non-skipped frame to opengl
+                {
+                    var frame = Decoder.GetFrame<FFMpegGBRPFrameContainer>();
 
-                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, greenTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.GreenFramePointer);
-                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, blueTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.BlueFramePointer);
-                TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, redTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.RedFramePointer);
+                    TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, greenTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.GreenFramePointer);
+                    TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, blueTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.BlueFramePointer);
+                    TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, redTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.RedFramePointer);
 
-                currentWriteIndex++;
-                if (currentWriteIndex >= FRAME_BUFFER_SIZE) currentWriteIndex = 0;
+                    currentWriteIndex++;
+                    if (currentWriteIndex >= FRAME_BUFFER_SIZE) currentWriteIndex = 0;
+                }
                 Decoder.ReleaseFrame();
             }
         }
