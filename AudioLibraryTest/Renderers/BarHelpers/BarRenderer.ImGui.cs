@@ -41,6 +41,7 @@ namespace player.Renderers
             Vector2 pickerSize = new Vector2(16, 16);
             int selectedTabIdx = 0;
             int bgStyleIndex;
+            private SettingsAccessor<List<string>> quickloadImagesSetting;
 
             float timeToHoldRotation = 0;
 
@@ -57,6 +58,7 @@ namespace player.Renderers
                 ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiHandler_MouseMoveEventRaw;
                 settings = ServiceManager.GetService<SettingsService>();
                 settings.SetSettingDefault("Wallpaper.MoveToPaths", new string[0]);
+                quickloadImagesSetting = settings.GetAccessor("bar.quickloadimages", new List<string>());
 
                 wpSettings = ServiceManager.GetService<WallpaperImageSettingsService>();
                 desktopDC = Graphics.FromImage(desktopBmp);
@@ -512,6 +514,63 @@ namespace player.Renderers
                 }
 
                 ImGui.Checkbox("Image Settings", ref imageInfoWindowVisible);
+
+                ImGui.Separator();
+
+                if (ImGui.BeginMenu("Quickload Images"))
+                {
+                    var lst = quickloadImagesSetting.Get();
+                    var currentWp = parent.backgroundController.CurrentBackground;
+                    if (ImGui.Button("Add Current to Quickload"))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        if (currentWp == null)
+                        {
+                            parent.DisplayFadeoutMessage($"No loaded wallpaper?");
+                        }
+                        else
+                        {
+                            if (lst.Contains(currentWp.SourcePath))
+                            {
+                                parent.DisplayFadeoutMessage("Image already exists in quickload setting!");
+                            }
+                            else
+                            {
+                                lst.Add(currentWp.SourcePath);
+                                parent.DisplayFadeoutMessage($"Added {currentWp.SourcePath} to quickload!");
+                            }
+                        }
+                    }
+                    if (currentWp != null && lst.Contains(currentWp.SourcePath) && ImGui.Button("Remove Current from Quickload"))
+                    {
+                        ImGui.CloseCurrentPopup();
+                        lst.Remove(currentWp.SourcePath);
+                        Log.Log($"{currentWp.SourcePath} removed from Quickload");
+                    }
+
+                    if (lst.Count > 0)
+                    {
+                        ImGui.Separator();
+                        foreach (var imgPath in lst)
+                        {
+                            if (ImGui.Button(Path.GetFileName(imgPath)))
+                            {
+                                ImGui.CloseCurrentPopup();
+
+                                if (parent.backgroundController.ImmediatelyLoadNewWallpaper(imgPath))
+                                {
+                                    parent.DisplayFadeoutMessage($"{imgPath} loaded!");
+                                }
+                                else
+                                {
+                                    parent.DisplayFadeoutMessage("Unable to load image");
+                                }
+                            }
+                        }
+                    }
+
+                    ImGui.EndMenu();
+                }
 
                 var paths = settings.GetSettingAs<string[]>("Wallpaper.MoveToPaths", null);
                 if (paths != null && paths.Length > 0)
