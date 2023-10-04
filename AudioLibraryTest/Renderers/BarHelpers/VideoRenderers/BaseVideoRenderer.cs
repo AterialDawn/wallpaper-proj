@@ -54,12 +54,6 @@ namespace player.Renderers.BarHelpers.VideoRenderers
         public void SkipFrames(int framesToSkip)
         {
             skippedFrames = framesToSkip;
-            while (framesToSkip-- > 0)
-            {
-                currentTextureIndex += 1;
-
-                if (currentTextureIndex >= FRAME_BUFFER_SIZE) currentTextureIndex = 0;
-            }
         }
 
         public virtual void Cleanup()

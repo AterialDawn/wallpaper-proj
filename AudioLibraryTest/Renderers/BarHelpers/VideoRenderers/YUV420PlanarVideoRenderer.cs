@@ -79,9 +79,6 @@ namespace player.Renderers.BarHelpers.VideoRenderers
 
             Primitives.QuadBuffer.Draw();
 
-            currentTextureIndex++;
-            if (currentTextureIndex >= FRAME_BUFFER_SIZE) currentTextureIndex = 0;
-
 
             int framesToDecode = 1 + skippedFrames;
 
@@ -97,6 +94,8 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                     TextureUtils.UpdateTextureFromPtr(frame.Width / 2, frame.Height / 2, uTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
                     TextureUtils.UpdateTextureFromPtr(frame.Width / 2, frame.Height / 2, vTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
 
+                    currentTextureIndex++;
+                    if (currentTextureIndex >= FRAME_BUFFER_SIZE) currentTextureIndex = 0;
                     currentWriteIndex++;
                     if (currentWriteIndex >= FRAME_BUFFER_SIZE) currentWriteIndex = 0;
                 }
