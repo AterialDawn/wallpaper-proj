@@ -74,6 +74,13 @@ namespace player.Core.FFmpeg
         public void StopDecoding()
         {
             this.Decoding = false;
+            Log.Log("Stop Decoding");
+            _frameCollection.CompleteAdding();
+            _availableFrames.CompleteAdding();
+
+            //Flush Buffers
+            while (_frameCollection.TryTake(out var _)) ;
+            while (_availableFrames.TryTake(out var _)) ;
         }
 
         private void DecodeProc(object _)
@@ -121,13 +128,24 @@ namespace player.Core.FFmpeg
 
             while (Decoding)
             {
-                if (TryDecodeNextFrame(out var frame))
+                bool decodeResult = false;
+                AVFrame* frame = null;
+                try
+                {
+                    decodeResult = TryDecodeNextFrame(out frame);
+                }
+                catch (InvalidOperationException)
+                {
+                    break;
+                }
+                if (decodeResult)
                 {
                     AddFrameToBuffer(frame);
                     framesDecodedEvent.Set();
                 }
                 else
                 {
+                    _frameCollection.Add(new FrameContainer { _frame = frame }); //restore frame to buffer
                     ffmpeg.avcodec_flush_buffers(_pCodecContext);
                     ffmpeg.avformat_seek_file(pFormatContext, _streamIndex, 0, 0, 0, 0);
                     Log.Log("Looping Video");
@@ -194,8 +212,8 @@ namespace player.Core.FFmpeg
 
         private bool TryDecodeNextFrame(out AVFrame* frame)
         {
-            //ffmpeg.av_frame_unref(_pFrame);
             var _pFrame = _frameCollection.Take()._frame;
+            ffmpeg.av_frame_unref(_pFrame);
             int error;
             do
             {
