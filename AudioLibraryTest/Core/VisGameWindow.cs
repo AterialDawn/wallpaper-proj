@@ -1,30 +1,29 @@
 ﻿//#define SHOW_COPYRIGHT
 
-using System;
-using System.Collections.Generic;
-using player.Core.Audio;
-using player.Core.Input;
-using player.Core.Render;
-using player.Utility;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using player.Core.FFmpeg;
+using player.Core.Audio;
 using player.Core.Commands;
-using player.Core.Service;
-using Log = player.Core.Logging.Logger;
-using player.Shaders;
+using player.Core.FFmpeg;
+using player.Core.Input;
+using player.Core.Render;
 using player.Core.Render.UI;
 using player.Core.Render.UI.Controls;
-using player.Utility.Shader;
+using player.Core.Service;
 using player.Core.Settings;
-using System.Threading;
-using System.Diagnostics;
+using player.Shaders;
+using player.Utility;
 using player.Utility.DropTarget;
-using System.Windows.Forms;
-using System.Runtime.InteropServices;
+using player.Utility.Shader;
+using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Windows.Forms;
+using Log = player.Core.Logging.Logger;
 
 namespace player.Core
 {

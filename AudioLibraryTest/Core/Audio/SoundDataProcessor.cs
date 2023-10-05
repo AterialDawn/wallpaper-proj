@@ -1,14 +1,13 @@
 ﻿//#define FOOBARSCALING
 
+using player.Core.Render;
+using player.Core.Service;
+using player.Core.Settings;
+using player.Utility;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using player.Core.Render;
-using player.Utility;
 using Un4seen.Bass;
-using player.Core.Service;
-using Aterial.Utility;
-using player.Core.Settings;
 
 namespace player.Core.Audio
 {
@@ -25,10 +24,10 @@ namespace player.Core.Audio
         public static float SmoothingFactor { get { return smoothingFactorSetting.Get(); } set { smoothingFactorSetting.Set(UtilityMethods.Clamp(value, 0, 1)); } }
         static SettingsAccessor<float> smoothingFactorSetting;
         public int SampleFrequency = 48000;
-        
+
         private BASSData maxFFT = (BASSData.BASS_DATA_FFT8192);
         float[] fftData = new float[4096];
-        
+
         private float OscilloscopeDataLength = 1000;
         private int[] logIndex = new int[BarCount];
         private float[] freqVolScalar = new float[BarCount];
@@ -56,14 +55,14 @@ namespace player.Core.Audio
         private List<UpdateDataDelegate> DataProcessors = new List<UpdateDataDelegate>();
         private Action<float[]> dataPostProcessDelegate = null;
         int DataProcessorIndex = 0;
-        
+
         int[] frequencyMap;
 
         internal SoundDataProcessor()
         {
             smoothingFactorSetting = ServiceManager.GetService<SettingsService>().GetAccessor<float>(SettingsKeys.SDP_Smoothing, 0.85f);
             List<float[]> fillerList = new List<float[]>();
-            for(int i = 0; i < barValuesBuffer.Count; i++)
+            for (int i = 0; i < barValuesBuffer.Count; i++)
             {
                 fillerList.Add(new float[BarCount]);
             }
@@ -174,7 +173,7 @@ namespace player.Core.Audio
         private void Update()
         {
             GetBarData(); //Because of KeyboardSpectrum visualizer
-            
+
             if (DataProcessorIndex == 1) GetStereoOscilloscopeData();
 
             //Update volume

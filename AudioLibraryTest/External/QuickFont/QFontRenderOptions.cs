@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using OpenTK;
-using System.Drawing;
+﻿using OpenTK;
 using OpenTK.Graphics;
+using System.Drawing;
 
 namespace QuickFont
 {
 
 
-    public enum QFontAlignment { Left=0, Right, Centre, Justify }
+    public enum QFontAlignment { Left = 0, Right, Centre, Justify }
     public enum QFontMonospacing { Natural = 0, Yes, No }
 
     public class QFontRenderOptions
@@ -17,7 +14,7 @@ namespace QuickFont
         /// <summary>
         /// The font colour
         /// </summary>
-        public Color4 Colour = Color.FromArgb(255,255,255,255);
+        public Color4 Colour = Color.FromArgb(255, 255, 255, 255);
 
         /// <summary>
         /// Spacing between characters in units of average glyph width
@@ -158,7 +155,8 @@ namespace QuickFont
         public float JustifyCharacterWeightForExpand
         {
             get { return justifyCharWeightForExpand; }
-            set { 
+            set
+            {
 
                 justifyCharWeightForExpand = value;
 
@@ -248,7 +246,7 @@ namespace QuickFont
             clone.LockToPixelRatio = LockToPixelRatio;
             clone.UseDefaultBlendFunction = UseDefaultBlendFunction;
             clone.JustifyCharacterWeightForExpand = JustifyCharacterWeightForExpand;
-            clone.justifyCharWeightForExpand = justifyCharWeightForExpand; 
+            clone.justifyCharWeightForExpand = justifyCharWeightForExpand;
             clone.JustifyCharacterWeightForContract = JustifyCharacterWeightForContract;
             clone.justifyCharWeightForContract = justifyCharWeightForContract;
             clone.JustifyCapExpand = JustifyCapExpand;

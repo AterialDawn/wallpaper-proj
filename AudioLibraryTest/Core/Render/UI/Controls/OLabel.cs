@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using player.Core.Input;
+﻿using OpenTK;
 using QuickFont;
-using System.Drawing;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
-using player.Utility;
-using OpenTK.Graphics;
-using player.Shaders;
 
 namespace player.Core.Render.UI.Controls
 {

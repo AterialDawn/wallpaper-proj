@@ -1,12 +1,10 @@
-﻿using System;
+﻿using FullSerializer;
+using player.Core.Service;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FullSerializer;
 using Log = player.Core.Logging.Logger;
-using player.Core.Service;
 
 namespace player.Core.Settings
 {

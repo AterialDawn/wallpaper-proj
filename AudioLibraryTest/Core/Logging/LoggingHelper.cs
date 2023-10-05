@@ -1,9 +1,6 @@
 ﻿using Nito.AsyncEx;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace player.Core.Logging
@@ -154,7 +151,7 @@ namespace player.Core.Logging
                 streamWriter = new StreamWriter(currentLogStream);
                 streamWriter.AutoFlush = true;
             }
-            
+
         }
 
         private static string GetTime()
@@ -162,6 +159,6 @@ namespace player.Core.Logging
             return DateTime.Now.ToLongTimeString();
         }
         #endregion
-        
+
     }
 }

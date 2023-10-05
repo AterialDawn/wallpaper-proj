@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace player.Core
 {
@@ -11,7 +7,7 @@ namespace player.Core
     {
         private static ConcurrentQueue<Action> beforeRenderDelegates = new ConcurrentQueue<Action>();
         private static ConcurrentQueue<Action> afterRenderDelegates = new ConcurrentQueue<Action>();
-        
+
         public static void InvokeOn(InvocationTarget timeToExecute, Action actionToInvoke)
         {
             ConcurrentQueue<Action> targetCollection = null;

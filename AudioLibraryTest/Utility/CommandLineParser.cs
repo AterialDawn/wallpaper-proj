@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
 using Log = player.Core.Logging.Logger;
 
 namespace Aterial.Utility
@@ -61,7 +61,7 @@ namespace Aterial.Utility
                     }
                     continue;
                 }
-                
+
                 CommandLineOption Option = GetOptionByName(CurrentOptionString);
                 if (Option == null) continue; // Option isn't registered or invalid casing. Ignore.
                 if (Option.ArgumentRequired) // Unconditionally grab the next argument and skip it for the purposes of parsing.

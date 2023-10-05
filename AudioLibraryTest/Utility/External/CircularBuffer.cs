@@ -1,9 +1,8 @@
 ﻿//Taken from https://github.com/joaoportela/CircullarBuffer-CSharp/blob/master/CircularBuffer/CircularBuffer.cs on 4/18/17
 
 using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace CircularBuffer
 {

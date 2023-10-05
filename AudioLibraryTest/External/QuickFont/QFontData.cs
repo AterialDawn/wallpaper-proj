@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 
 namespace QuickFont
@@ -21,7 +20,7 @@ namespace QuickFont
         /// <summary>
         /// Mapping from character to glyph index
         /// </summary>
-        public Dictionary<char, QFontGlyph> CharSetMapping; 
+        public Dictionary<char, QFontGlyph> CharSetMapping;
 
         /// <summary>
         /// The average glyph width
@@ -52,7 +51,7 @@ namespace QuickFont
 
         public bool IsMonospacingActive(QFontRenderOptions options)
         {
-            return (options.Monospacing == QFontMonospacing.Natural && naturallyMonospaced) || options.Monospacing == QFontMonospacing.Yes; 
+            return (options.Monospacing == QFontMonospacing.Natural && naturallyMonospaced) || options.Monospacing == QFontMonospacing.Yes;
         }
 
 
@@ -78,7 +77,7 @@ namespace QuickFont
                 var chr = glyphChar.Key;
                 var glyph = glyphChar.Value;
 
-                data.Add("" + chr + " " + 
+                data.Add("" + chr + " " +
                     glyph.page + " " +
                     glyph.rect.X + " " +
                     glyph.rect.Y + " " +
@@ -112,7 +111,7 @@ namespace QuickFont
             }
             catch (Exception e)
             {
-                throw new Exception("Failed to parse qfont file. Invalid format.",e);
+                throw new Exception("Failed to parse qfont file. Invalid format.", e);
             }
 
             charSet = charSetList.ToArray();
@@ -177,7 +176,7 @@ namespace QuickFont
                 return KerningPairs[str];
 
             return 0;
-            
+
         }
 
 

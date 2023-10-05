@@ -42,7 +42,7 @@ namespace player.Renderers.BarHelpers
         private double backgroundTimeLeft = 0;
         private SettingsAccessor<double> backgroundDurationAccessor;
         bool skipBlending = false;
-        
+
         private IBackground currentBackground = null;
         private IBackground nextBackground = null;
         private IBackground overrideBackground = null;
@@ -51,7 +51,7 @@ namespace player.Renderers.BarHelpers
 
         PieChartControl pieChart;
 
-        public BackgroundController( BarShader shader)
+        public BackgroundController(BarShader shader)
         {
             this.shader = shader;
             texMatrices[0] = Matrix4.Identity;
@@ -190,7 +190,7 @@ namespace player.Renderers.BarHelpers
                 shader.Activate();
                 GL.PopAttrib();
                 currentBackground.BindTexture();
-                if(!blended && !loadingBackground) pieChart.SetFillPercentage((float)(backgroundTimeLeft / backgroundTimeTotal));
+                if (!blended && !loadingBackground) pieChart.SetFillPercentage((float)(backgroundTimeLeft / backgroundTimeTotal));
             }
         }
 

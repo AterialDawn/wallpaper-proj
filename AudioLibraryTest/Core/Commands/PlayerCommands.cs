@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using player.Core;
-using player.Core.Audio;
+﻿using player.Core.Audio;
 using player.Core.Input;
 using player.Core.Render;
-using player.Utility;
 using player.Core.Service;
-using Log = player.Core.Logging.Logger;
 using player.Core.Settings;
+using player.Utility;
+using System;
+using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Commands
 {
@@ -24,7 +19,7 @@ namespace player.Core.Commands
         {
             //Register all commands and their handlers
             ConsoleManager conMan = ServiceManager.GetService<ConsoleManager>();
-            
+
             conMan.RegisterCommandHandler("quit", quitHandler);
             conMan.RegisterCommandHandler("fps", fpsHandler);
             conMan.RegisterCommandHandler("fpsmax", fpsMaxHandler);
@@ -50,7 +45,7 @@ namespace player.Core.Commands
                 Log.Log("Enter a smoothing factor [0-1] : ");
                 return;
             }
-            
+
             if (args.Arguments[0].Equals("q", StringComparison.InvariantCultureIgnoreCase))
             {
                 return;

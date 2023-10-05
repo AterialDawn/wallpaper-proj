@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using OpenTK.Graphics.OpenGL4;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using OpenTK.Graphics.OpenGL4;
 
 namespace player.Utility
 {
@@ -25,7 +22,7 @@ namespace player.Utility
 
         public static void LoadPtrIntoTexture(int width, int height, int oglTexture, OpenTK.Graphics.OpenGL4.PixelFormat pixelFormat, IntPtr ptr, int stride = 0)
         {
-            if(stride != 0) GL.PixelStore(PixelStoreParameter.UnpackRowLength, stride);
+            if (stride != 0) GL.PixelStore(PixelStoreParameter.UnpackRowLength, stride);
 
             GL.BindTexture(TextureTarget.Texture2D, oglTexture);
 
@@ -61,13 +58,13 @@ namespace player.Utility
 
         public static void UpdateTextureFromPtr(int width, int height, int oglTexture, OpenTK.Graphics.OpenGL4.PixelFormat pixelFormat, IntPtr ptr, int stride = 0, int xOffset = 0, int yOffset = 0)
         {
-            if(stride != 0) GL.PixelStore(PixelStoreParameter.UnpackRowLength, stride);
+            if (stride != 0) GL.PixelStore(PixelStoreParameter.UnpackRowLength, stride);
 
             GL.BindTexture(TextureTarget.Texture2D, oglTexture);
 
             GL.TexSubImage2D(TextureTarget.Texture2D, 0, xOffset, yOffset, width, height, pixelFormat, PixelType.UnsignedByte, ptr);
 
-            if(stride != 0) GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
+            if (stride != 0) GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
         }
 
         public static Bitmap LoadFlippedBitmapFromPath(string path)

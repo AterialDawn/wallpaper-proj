@@ -1,15 +1,10 @@
 ﻿using player.Core;
 using player.Core.Render;
-using player.Core.Render.UI.Controls;
 using player.Core.Service;
 using player.Core.Settings;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace player.Utility
@@ -93,7 +88,7 @@ namespace player.Utility
 
         public void Initialize()
         {
-            
+
         }
 
         private void ExitItem_Click(object sender, EventArgs e)

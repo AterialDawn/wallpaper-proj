@@ -1,9 +1,9 @@
-﻿using player.Core.Audio;
-using player.Utility;
-using OpenTK.Graphics.OpenGL;
-using player.Shaders;
-using player.Core.Render;
+﻿using OpenTK.Graphics.OpenGL;
 using player.Core;
+using player.Core.Audio;
+using player.Core.Render;
+using player.Shaders;
+using player.Utility;
 using System;
 
 namespace player.Renderers
@@ -27,7 +27,7 @@ namespace player.Renderers
         public GlslTunnelRenderer()
         {
             shader = new GlslTunnelShader();
-            
+
             buffer = new VertexFloatBuffer(VertexFormat.XY, 6);
             buffer.AddVertex(0f, 0f);
             buffer.AddVertex(0f, 1f);
@@ -48,7 +48,7 @@ namespace player.Renderers
         {
             time += (float)FrameRenderTime;
             float beat = GetBassBeatMeter();
-            float scaledBeat =  (float)Math.Pow((beat), 3.2) * 0.06f;
+            float scaledBeat = (float)Math.Pow((beat), 3.2) * 0.06f;
             time += scaledBeat;
             shader.Activate();
             shader.SetTime(time);
@@ -64,7 +64,7 @@ namespace player.Renderers
 
         public override void Deinitialize()
         {
-            
+
         }
 
         public override void ResolutionUpdated()

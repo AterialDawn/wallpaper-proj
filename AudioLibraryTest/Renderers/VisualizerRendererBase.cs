@@ -1,5 +1,5 @@
-﻿using player.Core.Audio;
-using OpenTK;
+﻿using OpenTK;
+using player.Core.Audio;
 using player.Core.Service;
 
 namespace player.Renderers

@@ -3,11 +3,6 @@ using player.Core.Service;
 using player.Core.Settings;
 using player.Utility;
 using player.Utility.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace player.Core.Render.UI.Controls
 {
@@ -45,7 +40,7 @@ namespace player.Core.Render.UI.Controls
             }
             float textOffset = 0f;
 
-            for(int i = 0; i < messageQueue.Size; i ++)
+            for (int i = 0; i < messageQueue.Size; i++)
             {
                 var msg = messageQueue[i];
                 float yPos = TransformedBounds.Y - uiManagerInst.TextRenderer.FontHeight - textOffset;

@@ -1,11 +1,5 @@
-﻿using player.Core.Render.UI;
-using player.Core.Render.UI.Controls;
+﻿using player.Core.Render.UI.Controls;
 using player.Core.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace player.Core.Render
 {
@@ -25,7 +19,7 @@ namespace player.Core.Render
         {
             messageCenter = new MessageCenterControl();
             messageCenter.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
-            messageCenter.Location = new System.Drawing.PointF(0,  VisGameWindow.RenderResolution.Y * 0.5f);
+            messageCenter.Location = new System.Drawing.PointF(0, VisGameWindow.RenderResolution.Y * 0.5f);
         }
 
         public void Cleanup()

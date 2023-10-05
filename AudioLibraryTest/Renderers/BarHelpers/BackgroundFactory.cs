@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using player.Utility;
-using Log = player.Core.Logging.Logger;
+﻿using FolderSelect;
+using player.Core.Render;
 using player.Core.Service;
 using player.Core.Settings;
-using FolderSelect;
-using player.Core.Render;
+using player.Utility;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Log = player.Core.Logging.Logger;
 
 namespace player.Renderers.BarHelpers
 {
@@ -89,7 +87,7 @@ namespace player.Renderers.BarHelpers
 
         private void Watcher_Created(object sender, FileSystemEventArgs e)
         {
-            
+
         }
 
         public void SetRandom(bool random)
@@ -103,7 +101,7 @@ namespace player.Renderers.BarHelpers
         public bool AddSourceFolder(string path)
         {
             if (!Directory.Exists(path)) return false;
-            if(sourcePaths.Contains(path)) return false;
+            if (sourcePaths.Contains(path)) return false;
 
             //Go through all files in 'path' and add any paths that have an IBackground implementation into the list
             List<string> filesToAdd = new List<string>();
@@ -126,7 +124,7 @@ namespace player.Renderers.BarHelpers
                 registeredFiles.AddRange(filesToAdd);
                 if (registeredFiles.Count == 1) SingleBackgroundMode = true;
                 else SingleBackgroundMode = false;
-                
+
             }
             FileSystemWatcher watcher = new FileSystemWatcher(path);
             watcher.Created += Watcher_Created;

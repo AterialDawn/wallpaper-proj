@@ -1,18 +1,13 @@
-﻿using System;
-using System.IO;
-using Aterial.Utility;
+﻿using Aterial.Utility;
 using player.Core;
 using player.Core.Audio;
-using player.Core.Input;
-using player.Core.Render;
-using player.Utility;
-using Un4seen.Bass;
-using System.Linq;
-using System.Reflection;
-using System.Collections.Generic;
-using player.Core.Logging;
-using Log = player.Core.Logging.Logger;
 using player.Core.Settings;
+using player.Utility;
+using System;
+using System.IO;
+using System.Reflection;
+using Un4seen.Bass;
+using Log = player.Core.Logging.Logger;
 
 namespace player
 {
@@ -63,7 +58,7 @@ namespace player
             if (EnableKillingShadowplay)
             {
                 //https://www.reddit.com/r/nvidia/comments/89mtzr/nvidia_freestyleoverlay_any_way_to_disable_for/
-				//set 0x809D5F60 to 0x10000000 on profile for this app
+                //set 0x809D5F60 to 0x10000000 on profile for this app
                 //figured out how to disable shadowplay per program
                 ShadowplayUtil.KillIfNeeded();
             }

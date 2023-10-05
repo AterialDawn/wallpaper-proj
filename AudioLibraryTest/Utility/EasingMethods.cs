@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace player.Utility
 {
@@ -27,7 +24,7 @@ namespace player.Utility
 
         public static float PolyInOut(float time, float exponent = 3f)
         {
-            return (float)((time *= 2f) <= 1 ? Math.Pow(time, exponent): 2.0 - Math.Pow(2.0 - time, exponent)) / 2f;
+            return (float)((time *= 2f) <= 1 ? Math.Pow(time, exponent) : 2.0 - Math.Pow(2.0 - time, exponent)) / 2f;
         }
         #endregion
 

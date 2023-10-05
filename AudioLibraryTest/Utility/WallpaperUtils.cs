@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using player.Core;
+using System;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using player.Core;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Utility
@@ -79,7 +77,7 @@ namespace player.Utility
             Win32.SetWindowLong(selfHandle, (int)Win32.GetWindowLongFields.GWL_EXSTYLE, (IntPtr)exStyle);
 
             //Win32.SetWindowPos(thisForm.GetHandleOfGameWindow(false), Win32.SetWindowPosLocationFlags.HWND_BOTTOM, 0, 0, 0, 0, Win32.SetWindowPosFlags.IgnoreResize | Win32.SetWindowPosFlags.IgnoreMove | Win32.SetWindowPosFlags.DoNotActivate);
-            IntPtr hprog = W32.FindWindowEx(W32.FindWindowEx(W32.FindWindow("Progman", "Program Manager"),IntPtr.Zero, "SHELLDLL_DefView", ""), IntPtr.Zero, "SysListView32", "FolderView");
+            IntPtr hprog = W32.FindWindowEx(W32.FindWindowEx(W32.FindWindow("Progman", "Program Manager"), IntPtr.Zero, "SHELLDLL_DefView", ""), IntPtr.Zero, "SysListView32", "FolderView");
             if (hprog == null) throw new InvalidOperationException("Unable to find the desktop!");
             W32.SetParent(selfHandle, hprog);
 

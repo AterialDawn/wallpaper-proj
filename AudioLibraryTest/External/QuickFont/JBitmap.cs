@@ -1,15 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Collections.Generic;  
-
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Audio;
-using OpenTK.Input;
-using OpenTK.Platform;
-
-using OpenTK.Graphics.OpenGL;
 
 namespace QuickFont
 {
@@ -23,7 +15,7 @@ namespace QuickFont
     /// </summary>
     public partial class JBitmap
     {
-        public enum JBitmapPixelFormat {Format8bpp=1, Format24bppBGR=3, Format32bppBGRA=4 }
+        public enum JBitmapPixelFormat { Format8bpp = 1, Format24bppBGR = 3, Format32bppBGRA = 4 }
 
 
         /// <summary>
@@ -31,12 +23,14 @@ namespace QuickFont
         /// </summary>
         /// <param name="format"></param>
         /// <returns></returns>
-        private static System.Drawing.Imaging.PixelFormat GetPixFormat(JBitmapPixelFormat format) {
-            switch (format){
+        private static System.Drawing.Imaging.PixelFormat GetPixFormat(JBitmapPixelFormat format)
+        {
+            switch (format)
+            {
 
                 case JBitmapPixelFormat.Format8bpp:
                     return System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
-                
+
                 case JBitmapPixelFormat.Format24bppBGR:
                     return System.Drawing.Imaging.PixelFormat.Format24bppRgb;
 
@@ -74,7 +68,7 @@ namespace QuickFont
 
             format = _format;
             bitmap = new Bitmap(w, h, GetPixFormat(format));
-            bitmapData = bitmap.LockBits(new Rectangle(0, 0, w, h),ImageLockMode.ReadWrite, GetPixFormat(format));
+            bitmapData = bitmap.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite, GetPixFormat(format));
         }
 
 
@@ -99,7 +93,7 @@ namespace QuickFont
         }
 
 
- 
+
 
         public void Clear(byte val)
         {
@@ -111,7 +105,7 @@ namespace QuickFont
                 {
                     for (int j = 0; j < bitmapData.Width; j++)
                     {
-                       (*sourcePtr) = val;
+                        (*sourcePtr) = val;
                         sourcePtr++;
                     }
                     sourcePtr += bitmapData.Stride - bitmapData.Width * 1; //move to the end of the line (past unused space)
@@ -153,7 +147,8 @@ namespace QuickFont
         /// <param name="target"></param>
         /// <param name="targetX"></param>
         /// <param name="targetY"></param>
-        public void BlitOLD(JBitmap target, int px, int py){
+        public void BlitOLD(JBitmap target, int px, int py)
+        {
 
             //currently only supported for 8 bpp source / target
             if (bitmapData.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed &&
@@ -161,29 +156,31 @@ namespace QuickFont
             {
 
 
-                    int targetStartX, targetEndX;
-                    int targetStartY, targetEndY;
-                    int copyW, copyH;
+                int targetStartX, targetEndX;
+                int targetStartY, targetEndY;
+                int copyW, copyH;
 
-                    targetStartX = Math.Max(px,0);
-                    targetEndX = Math.Min(px + bitmapData.Width, target.bitmapData.Width);
-                    
-                    targetStartY = Math.Max(py,0);
-                    targetEndY = Math.Min(py + bitmapData.Height, target.bitmapData.Height);
+                targetStartX = Math.Max(px, 0);
+                targetEndX = Math.Min(px + bitmapData.Width, target.bitmapData.Width);
 
-                    copyW = targetEndX - targetStartX;
-                    copyH = targetEndY - targetStartY;
+                targetStartY = Math.Max(py, 0);
+                targetEndY = Math.Min(py + bitmapData.Height, target.bitmapData.Height);
 
-                    if(copyW < 0 ){
-                        return;
-                    }
+                copyW = targetEndX - targetStartX;
+                copyH = targetEndY - targetStartY;
 
-                    if(copyH < 0){
-                        return;
-                    }
+                if (copyW < 0)
+                {
+                    return;
+                }
 
-                    int sourceStartX = targetStartX - px;
-                    int sourceStartY = targetStartY - py;
+                if (copyH < 0)
+                {
+                    return;
+                }
+
+                int sourceStartX = targetStartX - px;
+                int sourceStartY = targetStartY - py;
 
 
                 unsafe
@@ -204,7 +201,7 @@ namespace QuickFont
                             *(targetOffset) = *(sourceOffset);
 
                         }
-                        
+
                     }
                 }
 
@@ -217,8 +214,9 @@ namespace QuickFont
 
 
 
-        
-        public void Blit(JBitmap target, int srcPx, int srcPy, int srcW, int srcH, int px, int py){
+
+        public void Blit(JBitmap target, int srcPx, int srcPy, int srcW, int srcH, int px, int py)
+        {
 
             if (target.format != format)
             {
@@ -331,9 +329,9 @@ namespace QuickFont
                 for (int y = 0; y < copyH; y++, targetY += target.bitmapData.Stride, sourceY += bitmapData.Stride)
                 {
 
-                    byte* targetOffset = targetY + targetStartX*bpp;
-                    byte* sourceOffset = sourceY + sourceStartX*bpp;
-                    for (int x = 0; x < copyW*bpp; x++, targetOffset++, sourceOffset++)
+                    byte* targetOffset = targetY + targetStartX * bpp;
+                    byte* sourceOffset = sourceY + sourceStartX * bpp;
+                    for (int x = 0; x < copyW * bpp; x++, targetOffset++, sourceOffset++)
                     {
                         *(targetOffset) = *(sourceOffset);
 
@@ -347,7 +345,7 @@ namespace QuickFont
         }
 
 
-       
+
 
 
         /// <summary>
@@ -409,12 +407,14 @@ namespace QuickFont
                         byte* sourceOffset = sourceY + sourceStartX;
                         for (int x = 0; x < copyW; x++, targetOffset++, sourceOffset++)
                         {
-                            sum = (int)*(targetOffset) + (int) (*(sourceOffset) * strength);
+                            sum = (int)*(targetOffset) + (int)(*(sourceOffset) * strength);
 
                             if (sum > 255)
                             {
                                 *(targetOffset) = 255;
-                            } else {
+                            }
+                            else
+                            {
                                 *(targetOffset) = (byte)sum;
                             }
 
@@ -490,9 +490,9 @@ namespace QuickFont
                     for (int y = 0; y < copyH; y++, targetY += target.bitmapData.Stride, sourceY += bitmapData.Stride)
                     {
 
-                        byte* targetOffset = targetY + targetStartX*3;
-                        byte* sourceOffset = sourceY + sourceStartX*3;
-                        for (int x = 0; x < copyW*3; x++, targetOffset++, sourceOffset++)
+                        byte* targetOffset = targetY + targetStartX * 3;
+                        byte* sourceOffset = sourceY + sourceStartX * 3;
+                        for (int x = 0; x < copyW * 3; x++, targetOffset++, sourceOffset++)
                         {
                             sum = (int)*(targetOffset) + (int)(*(sourceOffset) * strength);
 
@@ -567,11 +567,11 @@ namespace QuickFont
                         byte* sourceOffset = sourceY + sourceStartX;
                         for (int x = 0; x < copyW; x++, targetOffset++, sourceOffset++)
                         {
-                            max = Math.Max((int)*(targetOffset), (int) (*(sourceOffset) * strength));
+                            max = Math.Max((int)*(targetOffset), (int)(*(sourceOffset) * strength));
 
                             if (*(sourceOffset) * strength > *(targetOffset))
                             {
-                                max = (int) (*(sourceOffset) * strength );
+                                max = (int)(*(sourceOffset) * strength);
 
                                 if (max > 255)
                                 {
@@ -603,7 +603,8 @@ namespace QuickFont
         /// <summary>
         /// Just unlocks the bits, so that the bitmap can no longer be blitted to / from.
         /// </summary>
-        public void Free(){
+        public void Free()
+        {
             bitmap.UnlockBits(bitmapData);
             bitmap.Dispose();
         }

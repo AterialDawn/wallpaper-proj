@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using player.Core.Input;
-using player.Utility;
-using System.Drawing;
-using player.Core.Render;
+﻿using player.Core.Input;
 using player.Core.Service;
+using player.Utility;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Commands
@@ -29,7 +23,7 @@ namespace player.Core.Commands
 
         public void Cleanup()
         {
-            
+
         }
 
         private void ResetZOrderCommand(object sender, ConsoleLineReadEventArgs args)

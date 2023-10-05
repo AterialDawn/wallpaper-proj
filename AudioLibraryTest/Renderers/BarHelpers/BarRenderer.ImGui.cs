@@ -2,7 +2,6 @@
 using OpenTK.Graphics.OpenGL;
 using player.Core;
 using player.Core.Input;
-using player.Core.Render;
 using player.Core.Render.UI;
 using player.Core.Service;
 using player.Core.Settings;
@@ -12,11 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Log = player.Core.Logging.Logger;
 using Point = System.Drawing.Point;
 
@@ -461,7 +456,7 @@ namespace player.Renderers
                             ImGui.PopItemWidth();
                             */
                         }
-                        
+
                     }
                 }
                 if (ImGui.Button("Redraw Image"))

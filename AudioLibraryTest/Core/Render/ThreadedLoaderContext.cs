@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using player.Core.Input;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using System;
 using System.Collections.Concurrent;
-using Log = player.Core.Logging.Logger;
 using System.Collections.Generic;
+using System.Threading;
+using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Render
 {
@@ -24,7 +20,7 @@ namespace player.Core.Render
         private int ContextCount = 2;
 
         public delegate void ThreadedResourceLoaderCallback();
-        
+
         private BlockingCollection<ThreadedResourceLoaderCallback> callbackCollection = new BlockingCollection<ThreadedResourceLoaderCallback>();
         private List<GLLoaderContext> contextList = new List<GLLoaderContext>();
 

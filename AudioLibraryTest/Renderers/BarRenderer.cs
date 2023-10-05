@@ -14,8 +14,6 @@ using player.Utility.DropTarget;
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Log = player.Core.Logging.Logger;
 
@@ -89,11 +87,11 @@ namespace player.Renderers
             consoleManager.RegisterCommandHandler("bar:removesourcepath", RemoveSourcePathCommand);
             consoleManager.RegisterCommandHandler("bar:changebackgrounddelay", ChangeBackgroundDelayCommand);
             consoleManager.RegisterCommandHandler("bar:rescansourcepaths", RescanSourcePathsCommand);
-            consoleManager.RegisterCommandHandler("bar:opencurrent", (_1,_2) =>
+            consoleManager.RegisterCommandHandler("bar:opencurrent", (_1, _2) =>
             {
                 backgroundController.OpenCurrentWallpaper();
             });
-            consoleManager.RegisterCommandHandler("bar:printcurrent", (_1,_2) =>
+            consoleManager.RegisterCommandHandler("bar:printcurrent", (_1, _2) =>
             {
                 DisplayFadeoutMessage($"Path : {backgroundController.GetCurrentWallpaperPath()}");
             });
@@ -129,7 +127,7 @@ namespace player.Renderers
             trayManager.BeforeTrayIconShown += TrayManager_BeforeTrayIconShown;
             backgroundController.OnActivate();
         }
-        
+
         public override void Deactivated()
         {
             SoundDataProcessor.SetDataPostProcessDelegate(null); //Reset the delegate
@@ -348,7 +346,7 @@ namespace player.Renderers
                 Log.Log("Unable to remove directory '{0}'", pathToRemove);
             }
         }
-        
+
         private void ChangeBackgroundDelayCommand(object sender, ConsoleLineReadEventArgs args)
         {
             if (args.Arguments.Length < 1)
@@ -436,7 +434,7 @@ namespace player.Renderers
         private void SoundDataProcessorPostProcess(float[] barValues)
         {
             int indexSubtractend = SoundDataProcessor.BarCount - 1;
-            for(int i = 0; i < SoundDataProcessor.BarCount; i++)
+            for (int i = 0; i < SoundDataProcessor.BarCount; i++)
             {
                 int opposingBarIndex = indexSubtractend - i;
                 if (barValues[i] + barValues[opposingBarIndex] > 1f) barValues[i] = 1f - barValues[opposingBarIndex];
@@ -447,7 +445,7 @@ namespace player.Renderers
         {
             verticalOffset = (1f / Resolution.Y) / 2f; //dividing the result by 2 makes the inverted line look a lot cleaner.
 
-            if(loadingLabel != null) loadingLabel.Location = new System.Drawing.PointF(Resolution.X / 2f, Resolution.Y / 2f);
+            if (loadingLabel != null) loadingLabel.Location = new System.Drawing.PointF(Resolution.X / 2f, Resolution.Y / 2f);
 
             backgroundController.UpdateWindowResolution(Resolution);
         }
@@ -468,7 +466,7 @@ namespace player.Renderers
             barBufferInv = new VertexFloatBuffer(VertexFormat.XY, 6 * SoundDataProcessor.BarCount, BufferUsageHint.DynamicDraw); //double triangle, 6 components per bar
             barLineBuffer = new VertexFloatBuffer(VertexFormat.XY, SoundDataProcessor.BarCount, BufferUsageHint.DynamicDraw, PrimitiveType.LineStrip);
             barLineBufferInv = new VertexFloatBuffer(VertexFormat.XY, SoundDataProcessor.BarCount, BufferUsageHint.DynamicDraw, PrimitiveType.LineStrip);
-            
+
             barBuffer.Load();
             barBufferInv.Load();
             barLineBuffer.Load();
@@ -480,7 +478,7 @@ namespace player.Renderers
             shader.Activate();
             backgroundController.Update(time);
             shader.Activate();
-            if(interpolateSetting.Get() != InterpolationMode.None) UpdateShaderUniforms(); //update interpolation uniforms only if interpolation is enabled
+            if (interpolateSetting.Get() != InterpolationMode.None) UpdateShaderUniforms(); //update interpolation uniforms only if interpolation is enabled
 
             shader.SetTexturing(true);
 
@@ -514,7 +512,7 @@ namespace player.Renderers
             shader.SetSecondarySize(backgroundController.SecondaryTextureResolution);
 
             if (interpolateSetting.Get() == InterpolationMode.Automatic) AutomaticInterpolation();
-            
+
         }
 
         private void AutomaticInterpolation()
@@ -802,7 +800,7 @@ namespace player.Renderers
 
         private void BarRenderer_OnDragOver(object sender, DragEventArgs e)
         {
-            
+
         }
 
         private void BarRenderer_OnDragEnter(object sender, DragEventArgs e)

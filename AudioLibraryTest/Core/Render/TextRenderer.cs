@@ -1,16 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using player.Utility;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
-using QuickFont;
-using System;
-using System.Drawing.Text;
-using Log = player.Core.Logging.Logger;
+using OpenTK.Graphics.OpenGL;
 using player.Shaders;
 using player.Utility.Shader;
-using OpenTK.Graphics.OpenGL;
+using QuickFont;
+using System;
+using System.Drawing;
+using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Render
 {
@@ -26,7 +22,7 @@ namespace player.Core.Render
         private Shader fontShader;
         private Font cachedFont = null;
         private bool rebuildQfont = false;
-        
+
         internal TextRenderer()
         {
             fontShader = new FontShader();
@@ -97,7 +93,7 @@ namespace player.Core.Render
                 rebuildQfont = false;
             }
 
-            _qFont.ResetVBOs();            
+            _qFont.ResetVBOs();
             QFont.Begin();
         }
 
@@ -160,7 +156,7 @@ namespace player.Core.Render
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
-        
+
         private void InitFont()
         {
             const string UsageString = "Font option invalid! Specify it as '-Font \"Font Name,FontSize\"";

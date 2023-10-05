@@ -1,13 +1,8 @@
-﻿using System;
+﻿using OpenTK;
+using OpenTK.Graphics.OpenGL;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Collections.Generic;
-
-using OpenTK.Graphics.OpenGL;
-using OpenTK;
-using OpenTK.Audio;
-using OpenTK.Input;
-using OpenTK.Platform;
 
 
 
@@ -82,12 +77,12 @@ namespace QuickFont
 
         public void Draw(Vector2 pos)
         {
-            Draw(pos,1f);
+            Draw(pos, 1f);
 
         }
         public void Draw(Vector2 pos, float scale)
         {
-            Draw(pos, new Vector2(scale,scale));
+            Draw(pos, new Vector2(scale, scale));
         }
 
 
@@ -96,7 +91,7 @@ namespace QuickFont
             GL.PushMatrix();
             GL.Translate(pos.X, pos.Y, 0f);
             GL.Scale(scale.X, scale.Y, 1f);
-                Draw();
+            Draw();
             GL.PopMatrix();
 
         }
@@ -110,13 +105,13 @@ namespace QuickFont
         /// </summary>
         public void Draw()
         {
-           
+
             if (_GLTexID == -1)
             {
                 return;  //no texture loaded yet
             }
 
-            
+
             if (_useAlpha)
             {
                 GL.Enable(EnableCap.Blend);
@@ -128,7 +123,7 @@ namespace QuickFont
             }
 
             DrawBasic();
-        
+
         }
 
 
@@ -164,16 +159,16 @@ namespace QuickFont
 
 
 
-        public void DrawBasicCentred(Vector2 pos, Vector2 scale,float ang)
+        public void DrawBasicCentred(Vector2 pos, Vector2 scale, float ang)
         {
             GL.PushMatrix();
 
-                GL.Translate(pos.X, pos.Y, 0f);
-                GL.Scale(scale.X, scale.Y, 1f);
-                GL.Rotate(ang, 0f, 0f, 1f);
-                GL.Translate(-w * 0.5f, -h * 0.5f, 0f);
+            GL.Translate(pos.X, pos.Y, 0f);
+            GL.Scale(scale.X, scale.Y, 1f);
+            GL.Rotate(ang, 0f, 0f, 1f);
+            GL.Translate(-w * 0.5f, -h * 0.5f, 0f);
 
-                DrawBasic();
+            DrawBasic();
             GL.PopMatrix();
         }
 
@@ -182,8 +177,8 @@ namespace QuickFont
         public void DrawBasicCentred()
         {
             GL.PushMatrix();
-                GL.Translate(-w * 0.5f, -h * 0.5f, 0f);
-                DrawBasic();
+            GL.Translate(-w * 0.5f, -h * 0.5f, 0f);
+            DrawBasic();
             GL.PopMatrix();
         }
 
@@ -201,9 +196,9 @@ namespace QuickFont
         public void DrawBasic(Vector2 pos, Vector2 scale)
         {
             GL.PushMatrix();
-                GL.Translate(pos.X, pos.Y, 0f);
-                GL.Scale(scale.X, scale.Y, 1f);
-                DrawBasic();
+            GL.Translate(pos.X, pos.Y, 0f);
+            GL.Scale(scale.X, scale.Y, 1f);
+            DrawBasic();
             GL.PopMatrix();
         }
 
@@ -217,10 +212,10 @@ namespace QuickFont
             GL.BindTexture(TextureTarget.Texture2D, _GLTexID);
 
             GL.Begin(PrimitiveType.Quads);
-                GL.TexCoord2(bottomLeft); GL.Vertex2(0f, _h);
-                GL.TexCoord2(bottomLeft.X, topRight.Y); GL.Vertex2(0, 0);
-                GL.TexCoord2(topRight); GL.Vertex2(_w, 0f);
-                GL.TexCoord2(topRight.X, bottomLeft.Y); GL.Vertex2(_w, _h);
+            GL.TexCoord2(bottomLeft); GL.Vertex2(0f, _h);
+            GL.TexCoord2(bottomLeft.X, topRight.Y); GL.Vertex2(0, 0);
+            GL.TexCoord2(topRight); GL.Vertex2(_w, 0f);
+            GL.TexCoord2(topRight.X, bottomLeft.Y); GL.Vertex2(_w, _h);
             GL.End();
         }
 
@@ -238,7 +233,7 @@ namespace QuickFont
             if (_GLTexID != -1)
             {
                 //only free root textures
-                if (!isSubTexture) 
+                if (!isSubTexture)
                     GL.DeleteTexture(_GLTexID);
             }
 
@@ -324,13 +319,13 @@ namespace QuickFont
         {
             Bitmap bitmapSource = new Bitmap(fileName);
 
-            
+
             var format = alpha ? System.Drawing.Imaging.PixelFormat.Format32bppArgb : System.Drawing.Imaging.PixelFormat.Format24bppRgb;
-            BitmapData dataSource = bitmapSource.LockBits(new Rectangle(0, 0, bitmapSource.Width, bitmapSource.Height),ImageLockMode.ReadOnly, format);
+            BitmapData dataSource = bitmapSource.LockBits(new Rectangle(0, 0, bitmapSource.Width, bitmapSource.Height), ImageLockMode.ReadOnly, format);
 
             JTextureConstructorHelper(dataSource, alpha, padToPowerOfTwo);
-            
-            
+
+
             bitmapSource.UnlockBits(dataSource);
         }
 
@@ -356,11 +351,11 @@ namespace QuickFont
 
             Bitmap bitmapTarget;
 
-            _w  = dataSource.Width;
-            _h  = dataSource.Height;
+            _w = dataSource.Width;
+            _h = dataSource.Height;
             _hasAlpha = _useAlpha = alpha;
 
-           
+
             isSubTexture = false;
 
             GL.Enable(EnableCap.Texture2D);
@@ -404,7 +399,7 @@ namespace QuickFont
                 targetW = JMath.pot((int)_w);
                 targetH = JMath.pot((int)_h);
 
-           
+
             }
 
             bitmapTarget = new Bitmap(targetW, targetH, format1);
@@ -467,7 +462,7 @@ namespace QuickFont
         }
 
 
-        
+
 
 
 

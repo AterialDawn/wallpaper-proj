@@ -1,20 +1,13 @@
-﻿using player.Core.FFmpeg;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
-using player.Utility;
+﻿using OpenTK.Graphics.OpenGL;
+using player.Core.FFmpeg;
 using player.Shaders;
-using Log = player.Core.Logging.Logger;
+using player.Utility;
 
 namespace player.Renderers.BarHelpers.VideoRenderers
 {
     class GBRPlanarVideoRenderer : BaseVideoRenderer
     {
-        
+
         int[] greenTextures = new int[FRAME_BUFFER_SIZE];
         int[] blueTextures = new int[FRAME_BUFFER_SIZE];
         int[] redTextures = new int[FRAME_BUFFER_SIZE];
@@ -36,7 +29,7 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                 TextureUtils.LoadPtrIntoTexture(frame.Width, frame.Height, redTextures[i], OpenTK.Graphics.OpenGL4.PixelInternalFormat.R8, OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.RedFramePointer);
             }
 
-            decoder.ReleaseFrame();
+            decoder.ReleaseFrame(frame);
         }
 
         public override void Cleanup()
@@ -58,7 +51,7 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                 TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, blueTextures[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.BlueFramePointer);
                 TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, redTextures[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.RedFramePointer);
 
-                Decoder.ReleaseFrame();
+                Decoder.ReleaseFrame(frame);
             }
             currentWriteIndex = FRAME_BUFFER_SIZE - 1; //change write head to last element
         }
@@ -84,11 +77,10 @@ namespace player.Renderers.BarHelpers.VideoRenderers
 
             while (framesToDecode-- > 0)
             {
-                Decoder.WaitUntilFramesDecoded();
+                var frame = Decoder.GetFrame<FFMpegGBRPFrameContainer>();
+
                 if (framesToDecode == 0) //only upload the non-skipped frame to opengl
                 {
-                    var frame = Decoder.GetFrame<FFMpegGBRPFrameContainer>();
-
                     TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, greenTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.GreenFramePointer);
                     TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, blueTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.BlueFramePointer);
                     TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, redTextures[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.RedFramePointer);
@@ -98,7 +90,8 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                     currentWriteIndex++;
                     if (currentWriteIndex >= FRAME_BUFFER_SIZE) currentWriteIndex = 0;
                 }
-                Decoder.ReleaseFrame();
+
+                Decoder.ReleaseFrame(frame);
             }
         }
     }

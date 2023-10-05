@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
-using System.Drawing.Text;
 using System.Drawing.Imaging;
 
 namespace QuickFont
@@ -202,18 +199,18 @@ namespace QuickFont
 
                     byte* targetOffset = targetY + targetStartX * bpp;
                     byte* sourceOffset = sourceY + sourceStartX * bpp;
-                    for (int x = 0; x < copyW*bpp; x++, targetOffset ++, sourceOffset ++)
+                    for (int x = 0; x < copyW * bpp; x++, targetOffset++, sourceOffset++)
                         *(targetOffset) = *(sourceOffset);
 
                 }
             }
         }
-        
+
 
         public unsafe void PutPixel32(int px, int py, byte r, byte g, byte b, byte a)
         {
             byte* addr = (byte*)(bitmapData.Scan0) + bitmapData.Stride * py + px * 4;
-       
+
             *addr = b;
             *(addr + 1) = g;
             *(addr + 2) = r;
@@ -223,11 +220,11 @@ namespace QuickFont
         public unsafe void GetPixel32(int px, int py, ref byte r, ref byte g, ref byte b, ref byte a)
         {
             byte* addr = (byte*)(bitmapData.Scan0) + bitmapData.Stride * py + px * 4;
-        
+
             b = *addr;
             g = *(addr + 1);
             r = *(addr + 2);
-            a = *(addr + 3); 
+            a = *(addr + 3);
         }
 
 
@@ -243,7 +240,7 @@ namespace QuickFont
 
         public void DownScale32(int newWidth, int newHeight)
         {
-            
+
 
             QBitmap newBitmap = new QBitmap(new Bitmap(newWidth, newHeight, bitmap.PixelFormat));
 
@@ -344,10 +341,10 @@ namespace QuickFont
                 }
 
             }
-            
+
 
             this.Free();
-            
+
             this.bitmap = newBitmap.bitmap;
             this.bitmapData = newBitmap.bitmapData;
         }
@@ -511,7 +508,7 @@ namespace QuickFont
 
 
                 //vertical pass
-                for (x = 0; x <width; ++x)
+                for (x = 0; x < width; ++x)
                 {
                     for (y = 0; y < height; ++y)
                     {
@@ -521,7 +518,7 @@ namespace QuickFont
                             ypos = y + ky;
                             if (ypos >= 0 && ypos < height)
                             {
-                                tmp.GetAlpha32(x, ypos,ref a);
+                                tmp.GetAlpha32(x, ypos, ref a);
                                 summedA += a;
                                 weight++;
                             }

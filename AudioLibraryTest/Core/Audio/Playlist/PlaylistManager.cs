@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 
 //Temporarily ignore warnings since the playlist manager isn't ready.
@@ -14,7 +11,7 @@ namespace player.Core.Audio.Playlist
         private static PlaylistManager _instance = new PlaylistManager();
         public static PlaylistManager Instance { get { return _instance; } }
 
-        public IEnumerable<Song> SongList { get { foreach (KeyValuePair<int,Song> kvp in songList) yield return kvp.Value; } } //Check if performance of this is acceptable
+        public IEnumerable<Song> SongList { get { foreach (KeyValuePair<int, Song> kvp in songList) yield return kvp.Value; } } //Check if performance of this is acceptable
 
         private Dictionary<int, Song> songList = new Dictionary<int, Song>();
         private PlayMode playMode = PlayMode.Normal;
@@ -23,7 +20,7 @@ namespace player.Core.Audio.Playlist
 
         private PlaylistManager()
         {
-            
+
         }
 
         public Song AddSongToPlaylist(string filePath)

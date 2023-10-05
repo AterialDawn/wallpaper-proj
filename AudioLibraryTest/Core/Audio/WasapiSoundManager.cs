@@ -50,13 +50,13 @@ namespace player.Core.Audio
 
         private void volumeScalarCommand(object sender, ConsoleLineReadEventArgs args)
         {
-            if(args.Arguments.Length == 0)
+            if (args.Arguments.Length == 0)
             {
                 Log.Log("Usage : wasapi:scalar [0.0-2.0]");
                 return;
             }
             float newScalar;
-            if(!float.TryParse(args.Arguments[0], out newScalar))
+            if (!float.TryParse(args.Arguments[0], out newScalar))
             {
                 Log.Log("Usage : wasapi:scalar [0.0-2.0]");
                 return;
@@ -171,7 +171,7 @@ namespace player.Core.Audio
                     DefaultDevice = i;
                     return;
                 }
-                
+
             }
         }
 

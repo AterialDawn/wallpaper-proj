@@ -1,13 +1,8 @@
-﻿using player.Core.Render.UI.Controls;
-using player.Core.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenTK;
 using player.Core.Input;
-using OpenTK.Graphics.OpenGL;
-using OpenTK;
+using player.Core.Render.UI.Controls;
+using player.Core.Service;
+using System.Collections.Generic;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Render.UI
@@ -28,7 +23,7 @@ namespace player.Core.Render.UI
         private InputManager input;
 
         private List<ControlBase> RegisteredControls = new List<ControlBase>();
-        
+
         private int controlIndex = 0;
 
         public void Cleanup() { }

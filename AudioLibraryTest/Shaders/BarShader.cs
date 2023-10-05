@@ -1,11 +1,5 @@
 ﻿using OpenTK;
-using player.Utility;
 using player.Utility.Shader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace player.Shaders
 {
@@ -65,7 +59,7 @@ namespace player.Shaders
             SetUniform(blendValUniform, blendingAmount);
             SetUniform(primaryInterpolationUniform, (int)PrimaryInterpolation);
             SetUniform(secondaryInterpolationUniform, (int)SecondaryInterpolation);
-            
+
             SetUniform(texResolutionsUniform[0], primaryRes);
             SetUniform(texResolutionsUniform[1], secondaryRes);
         }

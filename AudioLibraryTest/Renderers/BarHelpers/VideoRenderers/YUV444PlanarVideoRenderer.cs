@@ -1,13 +1,7 @@
-﻿using player.Core.FFmpeg;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
-using player.Utility;
+﻿using OpenTK.Graphics.OpenGL;
+using player.Core.FFmpeg;
 using player.Shaders;
-using Log = player.Core.Logging.Logger;
+using player.Utility;
 
 namespace player.Renderers.BarHelpers.VideoRenderers
 {
@@ -35,7 +29,7 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                 TextureUtils.LoadPtrIntoTexture(frame.Width, frame.Height, vTex[i], OpenTK.Graphics.OpenGL4.PixelInternalFormat.R8, OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
             }
 
-            decoder.ReleaseFrame();
+            decoder.ReleaseFrame(frame);
         }
 
         public override void Cleanup()
@@ -57,7 +51,7 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                 TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, uTex[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
                 TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, vTex[i], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
 
-                Decoder.ReleaseFrame();
+                Decoder.ReleaseFrame(frame);
             }
             currentWriteIndex = FRAME_BUFFER_SIZE - 1; //change write head to last element
         }
@@ -84,11 +78,9 @@ namespace player.Renderers.BarHelpers.VideoRenderers
 
             while (framesToDecode-- > 0)
             {
-                Decoder.WaitUntilFramesDecoded();
+                var frame = Decoder.GetFrame<FFMpegYUV420FrameContainer>();
                 if (framesToDecode == 0)
                 {
-                    var frame = Decoder.GetFrame<FFMpegYUV420FrameContainer>();
-
                     TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, yTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.YFramePointer, frame.YFrameSize);
                     TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, uTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.UFramePointer, frame.UFrameSize);
                     TextureUtils.UpdateTextureFromPtr(frame.Width, frame.Height, vTex[currentWriteIndex], OpenTK.Graphics.OpenGL4.PixelFormat.Red, frame.VFramePointer, frame.VFrameSize);
@@ -98,10 +90,10 @@ namespace player.Renderers.BarHelpers.VideoRenderers
                     currentWriteIndex++;
                     if (currentWriteIndex >= FRAME_BUFFER_SIZE) currentWriteIndex = 0;
                 }
-                Decoder.ReleaseFrame();
+                Decoder.ReleaseFrame(frame);
             }
 
-            
+
         }
     }
 }

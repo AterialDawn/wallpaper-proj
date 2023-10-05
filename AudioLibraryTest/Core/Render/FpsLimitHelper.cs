@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Render
 {
@@ -19,7 +15,7 @@ namespace player.Core.Render
         public double IdleFps { get; set; }
         public double MinimumFps { get; set; }
         public double MaximumFps { get; set; }
-        public bool Enabled { get { return _enabled; } set { _enabled = value;  if (!Enabled) EstimatedCPUUsage = 1f; } }
+        public bool Enabled { get { return _enabled; } set { _enabled = value; if (!Enabled) EstimatedCPUUsage = 1f; } }
         private bool _enabled = true;
         public bool AllowOverrides { get; private set; }
         object timelock = new object();
@@ -44,7 +40,7 @@ namespace player.Core.Render
 
         public void RenderNow()
         {
-            lock(timelock) Monitor.PulseAll(timelock);
+            lock (timelock) Monitor.PulseAll(timelock);
         }
 
         /// <summary>

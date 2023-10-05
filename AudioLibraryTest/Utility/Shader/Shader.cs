@@ -1,9 +1,8 @@
-﻿using System;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System.Collections.Generic;
 using player.Core.Render;
 using player.Core.Service;
+using System;
 
 namespace player.Utility.Shader
 {

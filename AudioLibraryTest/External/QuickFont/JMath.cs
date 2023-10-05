@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 
 
 namespace QuickFont
@@ -8,7 +6,7 @@ namespace QuickFont
 
     public class JMath
     {
-        
+
         public const float PI = (float)Math.PI;
 
         public static float Cos(float ang)
@@ -22,9 +20,10 @@ namespace QuickFont
 
 
         //fast version of gluproject which only works only for scale / translate transformations in gluOrthog - use FastProject2 for even better speed
-        public static void FastProject(float px, float py, double[] modelView, double[] projection, int[] view, out float scrx, out float scry){
-            float w = (float) (2 / projection[0]);
-            float h = (float) (-2 / projection[5]);
+        public static void FastProject(float px, float py, double[] modelView, double[] projection, int[] view, out float scrx, out float scry)
+        {
+            float w = (float)(2 / projection[0]);
+            float h = (float)(-2 / projection[5]);
 
             scrx = (float)((px * modelView[0] + modelView[12]) * view[2] / w + view[0]);
             scry = (float)((1 - (py * modelView[5] + modelView[13]) / h) * view[3] + view[1]);
@@ -41,17 +40,18 @@ namespace QuickFont
 
         private static float[] fastProjectConsts = new float[4];
 
-        public static void FastProjectSetConsts(double[] modelView, double[] projection, int[] view){
-            float w = (float) (2 / projection[0]);
-            float h = (float) (-2 / projection[5]);
+        public static void FastProjectSetConsts(double[] modelView, double[] projection, int[] view)
+        {
+            float w = (float)(2 / projection[0]);
+            float h = (float)(-2 / projection[5]);
 
 
             fastProjectConsts[0] = (float)(modelView[0] * view[2] / w);
             fastProjectConsts[1] = (float)(modelView[12] * view[2] / w + view[0]);
 
             fastProjectConsts[2] = (float)(-modelView[5] * view[3] / h);
-            fastProjectConsts[3] = (float)(  (1 - modelView[13] /h) * view[3] + view[1]);
-         
+            fastProjectConsts[3] = (float)((1 - modelView[13] / h) * view[3] + view[1]);
+
         }
 
 
@@ -67,7 +67,8 @@ namespace QuickFont
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static int pot(int x){
+        public static int pot(int x)
+        {
             int shifts = 0;
             uint val = (uint)x;
 
@@ -75,7 +76,7 @@ namespace QuickFont
             {
                 return 0;
             }
-            
+
             while (val > 0)
             {
                 val = val >> 1;
@@ -129,12 +130,12 @@ namespace QuickFont
         }
 
 
-            
+
 
 
 
     }
 
 
-  
+
 }

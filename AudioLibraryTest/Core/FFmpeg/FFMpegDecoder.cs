@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FFmpeg.AutoGen;
+using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using FFmpeg.AutoGen;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 using Log = player.Core.Logging.Logger;
-using System.Threading.Tasks;
 
 namespace player.Core.FFmpeg
 {
@@ -25,15 +19,14 @@ namespace player.Core.FFmpeg
         public TimeSpan VideoLength { get; private set; } = TimeSpan.Zero;
 
         private ManualResetEvent framesDecodedEvent = new ManualResetEvent(false);
-        private ManualResetEvent frameWaitingToBeFreed = new ManualResetEvent(true);
-
-        private BaseFFMpegFrameContainer currentFrame = null;
 
         private int width = 0, height = 0;
 
         private AVFormatContext* _pFormatContext;
         private AVCodecContext* _pCodecContext;
-        private AVFrame* _pFrame;
+        private AVFrame*[] _frameList = new AVFrame*[3];
+        private BlockingCollection<FrameContainer> _frameCollection = new BlockingCollection<FrameContainer>();
+        private BlockingCollection<BaseFFMpegFrameContainer> _availableFrames = new BlockingCollection<BaseFFMpegFrameContainer>();
         private AVPacket* _pPacket;
         private int _streamIndex;
         private double timeBase;
@@ -56,13 +49,12 @@ namespace player.Core.FFmpeg
 
         public T GetFrame<T>() where T : BaseFFMpegFrameContainer
         {
-            return currentFrame as T;
+            return _availableFrames.Take() as T;
         }
 
-        public void ReleaseFrame()
+        public void ReleaseFrame(BaseFFMpegFrameContainer frame)
         {
-            frameWaitingToBeFreed.Set();
-            framesDecodedEvent.Reset();
+            _frameCollection.Add(new FrameContainer { _frame = frame.Frame });
         }
 
         /// <summary>
@@ -95,6 +87,10 @@ namespace player.Core.FFmpeg
             AVCodec* pCodec = null;
             _streamIndex = ffmpeg.av_find_best_stream(_pFormatContext, AVMediaType.AVMEDIA_TYPE_VIDEO, -1, -1, &pCodec, 0);
             _pCodecContext = ffmpeg.avcodec_alloc_context3(pCodec);
+            int threads = Environment.ProcessorCount / 2;
+            if (threads > 4) threads = 4; //no more than 4 threads even when more than 4 are available
+            _pCodecContext->thread_count = threads;
+            Log.Log($"Using {threads} threads for decoding");
 
             ffmpeg.avcodec_parameters_to_context(_pCodecContext, pFormatContext->streams[_streamIndex]->codecpar);
             ffmpeg.avcodec_open2(_pCodecContext, pCodec, null);
@@ -107,7 +103,11 @@ namespace player.Core.FFmpeg
             CheckForValidPixelFormats();
             FrameDelay = (double)_pFormatContext->streams[_streamIndex]->avg_frame_rate.den / (double)_pFormatContext->streams[_streamIndex]->avg_frame_rate.num;
 
-            _pFrame = ffmpeg.av_frame_alloc();
+            for (int i = 0; i < _frameList.Length; i++)
+            {
+                _frameList[i] = ffmpeg.av_frame_alloc();
+                _frameCollection.Add(new FrameContainer { _frame = _frameList[i] });
+            }
             _pPacket = ffmpeg.av_packet_alloc();
 
             timeBase = ffmpeg.av_q2d(_pFormatContext->streams[_streamIndex]->time_base);
@@ -121,12 +121,10 @@ namespace player.Core.FFmpeg
 
             while (Decoding)
             {
-                frameWaitingToBeFreed.WaitOne();
                 if (TryDecodeNextFrame(out var frame))
                 {
                     AddFrameToBuffer(frame);
                     framesDecodedEvent.Set();
-                    frameWaitingToBeFreed.Reset();
                 }
                 else
                 {
@@ -137,9 +135,12 @@ namespace player.Core.FFmpeg
                 }
             }
 
-            ffmpeg.av_frame_unref(_pFrame);
-            var frameP = _pFrame;
-            ffmpeg.av_frame_free(&frameP);
+            foreach (var _pFrame in _frameList)
+            {
+                ffmpeg.av_frame_unref(_pFrame);
+                var frameP = _pFrame;
+                ffmpeg.av_frame_free(&frameP);
+            }
 
             ffmpeg.av_packet_unref(_pPacket);
             ffmpeg.av_free(_pPacket);
@@ -163,24 +164,24 @@ namespace player.Core.FFmpeg
             }
         }
 
-        private void AddFrameToBuffer(AVFrame frame)
+        private void AddFrameToBuffer(AVFrame* frame)
         {
-            double timeStamp = frame.pts * timeBase;
+            double timeStamp = (*frame).pts * timeBase;
             switch (PixelFormat)
             {
                 case AVPixelFormat.AV_PIX_FMT_GBR24P:
                     {
-                        currentFrame = new FFMpegGBRPFrameContainer(width, height, timeStamp, frame);
+                        _availableFrames.Add(new FFMpegGBRPFrameContainer(width, height, timeStamp, frame));
                         break;
                     }
                 case AVPixelFormat.AV_PIX_FMT_YUV420P:
                     {
-                        currentFrame = new FFMpegYUV420FrameContainer(width, height, timeStamp, frame);
+                        _availableFrames.Add(new FFMpegYUV420FrameContainer(width, height, timeStamp, frame));
                         break;
                     }
                 case AVPixelFormat.AV_PIX_FMT_YUV444P:
                     {
-                        currentFrame = new FFMpegYUV444FrameContainer(width, height, timeStamp, frame);
+                        _availableFrames.Add(new FFMpegYUV444FrameContainer(width, height, timeStamp, frame));
                         break;
                     }
                 default:
@@ -191,9 +192,10 @@ namespace player.Core.FFmpeg
             }
         }
 
-        private bool TryDecodeNextFrame(out AVFrame frame)
+        private bool TryDecodeNextFrame(out AVFrame* frame)
         {
-            ffmpeg.av_frame_unref(_pFrame);
+            //ffmpeg.av_frame_unref(_pFrame);
+            var _pFrame = _frameCollection.Take()._frame;
             int error;
             do
             {
@@ -204,7 +206,7 @@ namespace player.Core.FFmpeg
                         error = ffmpeg.av_read_frame(_pFormatContext, _pPacket);
                         if (error == ffmpeg.AVERROR_EOF)
                         {
-                            frame = *_pFrame;
+                            frame = _pFrame;
                             return false;
                         }
 
@@ -221,7 +223,7 @@ namespace player.Core.FFmpeg
                 error = ffmpeg.avcodec_receive_frame(_pCodecContext, _pFrame);
             } while (error == ffmpeg.AVERROR(ffmpeg.EAGAIN));
             error.ThrowExceptionIfError();
-            frame = *_pFrame;
+            frame = _pFrame;
             return true;
         }
 
@@ -229,11 +231,15 @@ namespace player.Core.FFmpeg
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-            frameWaitingToBeFreed.Set();
         }
 
         protected virtual void Dispose(bool disposing)
         {
+        }
+
+        unsafe class FrameContainer
+        {
+            public AVFrame* _frame;
         }
     }
 }

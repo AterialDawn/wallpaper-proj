@@ -1,10 +1,5 @@
-﻿using Aterial.Utility;
-using player.Core.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Service

@@ -1,12 +1,7 @@
-﻿using player.Core.Service;
-using player.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
+using player.Core.Service;
 using player.Utility.Shader;
+using System.Collections.Generic;
 
 namespace player.Core.Render
 {

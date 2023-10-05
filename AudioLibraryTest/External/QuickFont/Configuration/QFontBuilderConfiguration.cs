@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace QuickFont
+﻿namespace QuickFont
 {
 
 
@@ -28,7 +24,7 @@ namespace QuickFont
         /// Use SystemDefault when rendering the ttf character set to create the QFont texture
         /// </summary>
         SystemDefault
-    } 
+    }
 
     /// <summary>
     /// What settings to use when building the font
@@ -65,7 +61,7 @@ namespace QuickFont
         /// their texture page
         /// </summary>
         public int GlyphMargin = 2;
-       
+
         /// <summary>
         /// Set of characters to support
         /// </summary>

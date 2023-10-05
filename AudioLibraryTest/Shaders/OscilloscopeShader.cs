@@ -1,10 +1,4 @@
-﻿using player.Utility;
-using player.Utility.Shader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using player.Utility.Shader;
 
 namespace player.Shaders
 {

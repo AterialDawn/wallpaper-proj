@@ -1,24 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
-using player.Utility;
-using player.Core.Render.UI;
-using player.Core.Service;
-using player.Shaders;
-using player.Core.Logging;
-using CircularBuffer;
-using System.Windows.Forms;
-using OpenTK.Input;
-using Log = player.Core.Logging.Logger;
-using OpenTK;
-using QuickFont;
-using player.Core.Render.UI.Controls;
-using player.Core.Render;
-using System.Drawing;
+﻿using CircularBuffer;
 using ImGuiNET;
+using player.Core.Logging;
+using player.Core.Render;
+using System.Collections.Generic;
+using System.Text;
+using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Input
 {
@@ -56,7 +42,7 @@ namespace player.Core.Input
 
             ImGui.BeginWindow("Console");
             ImGui.BeginChild("scrolling", textScrollingHeight, false, WindowFlags.Default);
-            for (int i = messageStack.Size - 1; i > -1 ; i--)
+            for (int i = messageStack.Size - 1; i > -1; i--)
             {
                 ImGui.TextWrapped(messageStack[i]);
             }
@@ -99,7 +85,7 @@ namespace player.Core.Input
                 }
             }
         }
-       
+
 
         private class ConsoleHistoryHelper
         {

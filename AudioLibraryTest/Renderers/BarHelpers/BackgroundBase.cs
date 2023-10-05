@@ -2,12 +2,8 @@
 using player.Core.Render;
 using player.Core.Service;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Renderers.BarHelpers

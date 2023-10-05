@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenTK;
-using System.Runtime.InteropServices;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System.Drawing;
-using Log = player.Core.Logging.Logger;
+using System;
+using System.Runtime.InteropServices;
 
 
 namespace QuickFont
@@ -80,7 +75,7 @@ namespace QuickFont
             GL.ColorPointer(4, ColorPointerType.UnsignedByte, BlittableValueType.StrideOf(Vertices), new IntPtr(16));
 
             // triangles because quads are depreciated in new opengl versions
-            GL.DrawArrays(PrimitiveType.Triangles, 0, VertexCount); 
+            GL.DrawArrays(PrimitiveType.Triangles, 0, VertexCount);
 
             GL.PopClientAttrib();
         }

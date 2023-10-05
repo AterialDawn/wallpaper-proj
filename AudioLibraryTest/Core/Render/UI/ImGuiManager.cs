@@ -8,10 +8,7 @@ using player.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Render.UI
@@ -151,7 +148,7 @@ namespace player.Core.Render.UI
                     ImGui.EndPopup();
                 }
             }
-            
+
             controller.Render(currentFrameOpacity);
 
             if (controller.DidRender || popupDrawn)
@@ -236,7 +233,7 @@ namespace player.Core.Render.UI
             int height;
             TexturedQuadShader shader = new TexturedQuadShader();
             Primitives primitives;
-            
+
 
             public bool DidRender { get; private set; }
 

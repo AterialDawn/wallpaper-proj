@@ -3,12 +3,8 @@ using player.Core.Render.UI;
 using player.Core.Service;
 using player.Utility;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Log = player.Core.Logging.Logger;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
@@ -115,8 +111,8 @@ namespace player.Core.Input
         {
             var mouseArgs = new MouseButtonEventArgs(
                 e.X,
-                e.Y, 
-                e.Button == MouseButtons.Left ? MouseButton.Left : e.Button == MouseButtons.Middle ? MouseButton.Middle : e.Button == MouseButtons.Right ? MouseButton.Right : MouseButton.Button1, 
+                e.Y,
+                e.Button == MouseButtons.Left ? MouseButton.Left : e.Button == MouseButtons.Middle ? MouseButton.Middle : e.Button == MouseButtons.Right ? MouseButton.Right : MouseButton.Button1,
                 true);
 
             setButtonInfo.Invoke(mouseArgs, new object[] { mouseArgs.Button, OpenTK.Input.ButtonState.Pressed });

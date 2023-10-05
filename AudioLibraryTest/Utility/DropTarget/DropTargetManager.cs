@@ -1,12 +1,7 @@
 ﻿using player.Core.Service;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Log = player.Core.Logging.Logger;
 
 namespace player.Utility.DropTarget
 {
@@ -22,18 +17,18 @@ namespace player.Utility.DropTarget
         public DropTargetManager(IntPtr handle)
         {
             Win32.OleInitialize(0); //Required for DropTarget to work
-            
+
             int result = Win32.RegisterDragDrop(new HandleRef(this, handle), new DropTarget(this));
         }
 
         public void Initialize()
         {
-            
+
         }
 
         public void Cleanup()
         {
-            
+
         }
 
         void IDropTarget.OnDragEnter(DragEventArgs e)

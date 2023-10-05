@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using player.Core.Audio;
-using player.Core.Input;
-using player.Renderers;
-using player.Core.Service;
-using Log = player.Core.Logging.Logger;
+﻿using player.Core.Audio;
 using player.Core.Render.UI.Controls;
-using QuickFont;
-using System.Drawing;
-using System.Diagnostics;
+using player.Core.Service;
+using player.Renderers;
 using player.Utility;
+using QuickFont;
+using System.Collections.Generic;
+using System.Drawing;
+using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Render
 {
@@ -25,7 +22,7 @@ namespace player.Core.Render
 
         internal VisRenderer()
         {
-            
+
         }
 
         public void Initialize()

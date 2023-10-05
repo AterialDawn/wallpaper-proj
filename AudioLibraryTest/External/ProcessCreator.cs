@@ -1,7 +1,6 @@
 ﻿//Borrowed from http://stackoverflow.com/a/24339722 by Antosha on 5/16/17 11:55 PM
 //Tweaked
 using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;

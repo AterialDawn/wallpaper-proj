@@ -1,11 +1,5 @@
 ﻿using OpenTK;
 using player.Shaders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
 
 namespace player.Core.Render.UI.Controls
 {

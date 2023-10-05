@@ -1,9 +1,9 @@
-﻿using player.Core.Audio;
-using player.Utility;
-using OpenTK.Graphics.OpenGL;
-using player.Shaders;
-using player.Core.Render;
+﻿using OpenTK.Graphics.OpenGL;
 using player.Core;
+using player.Core.Audio;
+using player.Core.Render;
+using player.Shaders;
+using player.Utility;
 
 namespace player.Renderers
 {
@@ -26,7 +26,7 @@ namespace player.Renderers
         public CitySkylineRenderer()
         {
             shader = new CitySkylineShader();
-            
+
             buffer = new VertexFloatBuffer(VertexFormat.XY, 6);
             buffer.AddVertex(0f, 0f);
             buffer.AddVertex(0f, 1f);
@@ -61,7 +61,7 @@ namespace player.Renderers
 
         public override void Deinitialize()
         {
-            
+
         }
 
         public override void ResolutionUpdated()

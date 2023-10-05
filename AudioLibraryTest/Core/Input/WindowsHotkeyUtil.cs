@@ -1,13 +1,10 @@
-﻿using player.Core.Logging;
+﻿using Linearstar.Windows.RawInput;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Linearstar.Windows.RawInput;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Input
@@ -107,7 +104,7 @@ namespace player.Core.Input
                     var data = RawInputData.FromHandle(msg.LParam);
                     Input?.Invoke(this, new RawInputEventArgs(data));
                 }
-                
+
             }
 
             protected override void SetVisibleCore(bool value)

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
-using System.Drawing.Text;
+﻿using OpenTK.Graphics.OpenGL;
+using System;
 using System.Drawing.Imaging;
-using OpenTK.Graphics.OpenGL;
-using OpenTK;
 
 
 namespace QuickFont
@@ -80,7 +75,7 @@ namespace QuickFont
         private bool deletedTexture = false;
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing) 
+            if (disposing)
             {
                 //dispose managed resources here - if there were any!
             }

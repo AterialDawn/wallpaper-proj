@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Reflection;
+using System.Windows.Forms;
 
 // ------------------------------------------------------------------
 // Wraps System.Windows.Forms.OpenFileDialog to make it present

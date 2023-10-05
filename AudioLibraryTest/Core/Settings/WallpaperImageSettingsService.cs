@@ -1,6 +1,5 @@
 ﻿using FullSerializer;
 using Nito.AsyncEx;
-using OpenTK.Graphics;
 using player.Core.Logging;
 using player.Core.Render;
 using player.Core.Service;
@@ -10,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -1,14 +1,9 @@
-﻿using player.Core.FFmpeg;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
-using Log = player.Core.Logging.Logger;
-using player.Core.Service;
+﻿using OpenTK.Graphics.OpenGL;
+using player.Core.FFmpeg;
 using player.Core.Render;
+using player.Core.Service;
+using System;
+using Log = player.Core.Logging.Logger;
 
 namespace player.Renderers.BarHelpers.VideoRenderers
 {

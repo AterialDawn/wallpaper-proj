@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenTK.Input;
+﻿using OpenTK.Input;
 using player.Core.Render.UI;
 using player.Core.Service;
+using System;
+using System.Collections.Generic;
 using Log = player.Core.Logging.Logger;
 
 namespace player.Core.Input
@@ -414,7 +412,7 @@ namespace player.Core.Input
 
         public override string ToString()
         {
-            return $"{(Ctrl?"Ctrl + " : "")}{(Alt ? "Alt + " : "")}{(Ctrl ? "Shift + " : "")}{Key.ToString()}";
+            return $"{(Ctrl ? "Ctrl + " : "")}{(Alt ? "Alt + " : "")}{(Ctrl ? "Shift + " : "")}{Key.ToString()}";
         }
     }
 }

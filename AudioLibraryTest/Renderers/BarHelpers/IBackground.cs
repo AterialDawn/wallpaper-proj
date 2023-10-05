@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using OpenTK;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using player.Utility;
-using System.Threading.Tasks;
-using OpenTK;
 
 namespace player.Renderers.BarHelpers
 {

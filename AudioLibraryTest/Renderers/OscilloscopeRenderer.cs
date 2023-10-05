@@ -1,10 +1,10 @@
-﻿using player.Core.Audio;
-using player.Utility;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
+using player.Core;
+using player.Core.Audio;
+using player.Core.Render;
 using player.Core.Service;
 using player.Shaders;
-using player.Core.Render;
-using player.Core;
+using player.Utility;
 
 namespace player.Renderers
 {
@@ -79,14 +79,14 @@ namespace player.Renderers
 
             oscBufferLeft.Clear();
             oscBufferRight.Clear();
-            
+
             for (int x = 0; x < SoundDataProcessor.OscilloscopeSamples; x++)
             {
                 RelativeX = (float)x / SoundDataProcessor.OscilloscopeSamples;
                 oscBufferLeft.AddVertex(RelativeX, soundDataProcessor.OscilloscopeValues[0, x], 1f, 0f, 0f, 1f);
             }
             oscBufferLeft.Reload();
-            
+
             for (int x = 0; x < SoundDataProcessor.OscilloscopeSamples; x++)
             {
                 RelativeX = (float)x / SoundDataProcessor.OscilloscopeSamples;

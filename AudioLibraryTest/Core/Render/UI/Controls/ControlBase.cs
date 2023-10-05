@@ -1,13 +1,9 @@
-﻿using player.Core.Input;
+﻿using OpenTK.Graphics.OpenGL;
+using player.Core.Input;
 using player.Core.Service;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using OpenTK.Graphics.OpenGL;
 
 namespace player.Core.Render.UI.Controls
 {
@@ -22,10 +18,10 @@ namespace player.Core.Render.UI.Controls
         public bool MouseEntered { get; set; } = false;
 
         public RectangleF Bounds { get { return new RectangleF(Location.X, Location.Y, Size.Width, Size.Height); } }
-        public Padding Margin { get { return _margin; } set { _margin = value; CalculateTransformedBounds();  OnMarginChanged(); } }
+        public Padding Margin { get { return _margin; } set { _margin = value; CalculateTransformedBounds(); OnMarginChanged(); } }
         public PointF Location { get { return _location; } set { _location = value; CalculateTransformedBounds(); OnLocationChanged(); } }
-        public SizeF Size { get { return _size; }  set { _size = value; CalculateTransformedBounds(); OnSizeChanged(); } }
-        
+        public SizeF Size { get { return _size; } set { _size = value; CalculateTransformedBounds(); OnSizeChanged(); } }
+
         public RectangleF TransformedBounds { get { return _transformedBounds; } }
         protected UIManager uiManagerInst = null;
         public int ID { get; private set; } = -1;
@@ -88,11 +84,11 @@ namespace player.Core.Render.UI.Controls
                 _transformedBounds = new RectangleF(x, y, w, h);
                 return;
             }
-            
+
             float uiX = uiManagerInst.UISize.X, uiY = uiManagerInst.UISize.Y;
             //We only care about anchoring top, and right, since coord system is based from bottom left being 0,0
 
-            if (IsAnchored(AnchorStyles.Bottom)) 
+            if (IsAnchored(AnchorStyles.Bottom))
             {
                 y = uiY - cachedBounds.Height;
             }
@@ -179,7 +175,7 @@ namespace player.Core.Render.UI.Controls
         /// </summary>
         /// <param name="time"></param>
         public abstract void Render(double time);
-        
+
         #endregion
 
         public override int GetHashCode()
@@ -200,5 +196,5 @@ namespace player.Core.Render.UI.Controls
             uiManagerInst.UnregisterControl(this);
         }
     }
-    
+
 }

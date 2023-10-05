@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using player.Utility;
-using Log = player.Core.Logging.Logger;
-using System.IO;
 using player.Core.Render;
 using player.Core.Service;
-using player.Shaders;
-using OpenTK;
 using player.Core.Settings;
-using OpenTK.Graphics;
+using player.Shaders;
+using player.Utility;
+using System;
+using System.Drawing;
 using System.Drawing.Imaging;
-using player.Core;
+using System.IO;
 
 namespace player.Renderers.BarHelpers
 {
@@ -34,11 +28,13 @@ namespace player.Renderers.BarHelpers
 
         static StaticImageBackground()
         {
-            framebufferHooks = new FramebufferRenderTexture.FramebufferCreationHooks { TextureCreationHook = () =>
-             {
-                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.MirroredRepeat);
-                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.MirroredRepeat);
-             }
+            framebufferHooks = new FramebufferRenderTexture.FramebufferCreationHooks
+            {
+                TextureCreationHook = () =>
+{
+    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.MirroredRepeat);
+    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.MirroredRepeat);
+}
             };
         }
 
@@ -119,7 +115,7 @@ namespace player.Renderers.BarHelpers
                         TextureUtils.LoadBitmapIntoTexture(image, textureIndex);
                     }
 
-                    
+
                     GL.Finish();
                     return true;
                 }
@@ -138,7 +134,7 @@ namespace player.Renderers.BarHelpers
 
         public override void BindTexture()
         {
-            GL.BindTexture(TextureTarget.Texture2D, alternativeRenderUsed ? renderTargetHelper.RenderTexture : textureIndex );
+            GL.BindTexture(TextureTarget.Texture2D, alternativeRenderUsed ? renderTargetHelper.RenderTexture : textureIndex);
         }
 
         public override void Destroy()
@@ -278,7 +274,7 @@ namespace player.Renderers.BarHelpers
                             GL.PopMatrix();
                         }
 
-                        gaussianBlur.SetColorOverride(true, new Vector4(0,0,0,1));
+                        gaussianBlur.SetColorOverride(true, new Vector4(0, 0, 0, 1));
                         {
                             float targetSizeInPixels = 9f * (RenderResolution.X / 1920f);
                             float barWidth = (1f / RenderResolution.X) * targetSizeInPixels;
@@ -308,7 +304,7 @@ namespace player.Renderers.BarHelpers
                 case BackgroundMode.SolidBackground:
                     {
                         gaussianBlur.SetBlurState(false);
-                        
+
                         renderTargetHelper.BindAndRenderTo();
 
                         GL.Ortho(0, RenderResolution.X, 0, RenderResolution.Y, -1, 1);
@@ -356,7 +352,7 @@ namespace player.Renderers.BarHelpers
                                 rightRect.Draw();
                                 rightRect.Unload();
                             }
-                            else if(settingsForImage.AnchorPosition == BackgroundAnchorPosition.Right)
+                            else if (settingsForImage.AnchorPosition == BackgroundAnchorPosition.Right)
                             {
                                 var leftRect = Primitives.GenerateXY_UVRect(
                                     new RectangleF(0, 0, RenderResolution.X - imageWidth, RenderResolution.Y),

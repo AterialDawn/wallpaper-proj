@@ -1,6 +1,6 @@
-﻿using System;
+﻿using OpenTK;
+using System;
 using System.Reflection;
-using OpenTK;
 
 namespace player.Utility
 {

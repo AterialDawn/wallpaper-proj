@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using player.Utility;
-using player.Core.Service;
-using System;
+﻿using player.Core.Audio;
 using player.Core.Render.UI.Controls;
-using player.Core.Audio;
+using player.Core.Service;
+using player.Utility;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace player.Core.Render
 {
@@ -30,7 +29,7 @@ namespace player.Core.Render
 
         internal FpsTracker()
         {
-            
+
         }
 
         public void Initialize()

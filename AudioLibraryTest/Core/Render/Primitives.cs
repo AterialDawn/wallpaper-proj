@@ -1,12 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using player.Core.Service;
 using player.Utility;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace player.Core.Render
 {
@@ -19,7 +14,7 @@ namespace player.Core.Render
 
         public void Cleanup()
         {
-            
+
         }
 
         public void Initialize()

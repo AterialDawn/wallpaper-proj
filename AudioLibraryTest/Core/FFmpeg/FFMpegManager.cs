@@ -1,6 +1,6 @@
-﻿using System;
+﻿using FFmpeg.AutoGen;
 using player.Core.Service;
-using FFmpeg.AutoGen;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -10,7 +10,7 @@ namespace player.Core.FFmpeg
     {
         #region Singleton
         private static FFMpegManager _instance = new FFMpegManager();
-        public static FFMpegManager Instance { get { if (_instance == null)_instance = new FFMpegManager(); return _instance; } }
+        public static FFMpegManager Instance { get { if (_instance == null) _instance = new FFMpegManager(); return _instance; } }
 
         public string ServiceName { get { return "FFMpegManager"; } }
 

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using player.Core.Render;
 using player.Utility;
-using System.Threading.Tasks;
-using Log = player.Core.Logging.Logger;
-using player.Core.Service;
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace player.Renderers.BarHelpers
 {

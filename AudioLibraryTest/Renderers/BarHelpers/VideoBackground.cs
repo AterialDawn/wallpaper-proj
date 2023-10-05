@@ -1,15 +1,13 @@
-﻿using System;
-using player.Utility;
-using System.Threading;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
+using player.Core.FFmpeg;
 using player.Core.Render;
+using player.Core.Service;
+using player.Renderers.BarHelpers.VideoRenderers;
 using System.Drawing;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Log = player.Core.Logging.Logger;
-using System.IO;
-using player.Core.Service;
-using player.Core.FFmpeg;
-using player.Renderers.BarHelpers.VideoRenderers;
 
 namespace player.Renderers.BarHelpers
 {
@@ -54,7 +52,7 @@ namespace player.Renderers.BarHelpers
         public override void Update(double elapsedTime)
         {
             frameTime -= elapsedTime;
-            
+
             if (frameTime <= 0)
             {
                 frameTime += decoder.FrameDelay;
@@ -105,7 +103,7 @@ namespace player.Renderers.BarHelpers
             {
                 videoRenderer = new YUV420PlanarVideoRenderer(decoder, yuv420pFrame);
             }
-            
+
 
             videoRenderer.PreloadFrames();
         }

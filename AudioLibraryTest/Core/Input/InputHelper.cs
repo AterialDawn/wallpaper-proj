@@ -1,9 +1,4 @@
 ﻿using OpenTK.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace player.Core.Input
@@ -119,7 +114,7 @@ namespace player.Core.Input
                         return "9";
                     }
                 case Key.Period: return ".";
-                
+
                 case Key.Space: return " ";
                 case Key.Tab: return "\t";
                 case Key.Semicolon:

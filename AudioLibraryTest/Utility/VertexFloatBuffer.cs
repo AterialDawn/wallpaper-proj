@@ -1,6 +1,6 @@
 ﻿#define DisableVertexSafety
-using System;
 using OpenTK.Graphics.OpenGL;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace player.Utility
@@ -317,7 +317,7 @@ namespace player.Utility
                     GL.ColorPointer(4, ColorPointerType.Float, Stride, 32);
                     break;
             }
-                GL.DrawArrays(DrawMode, 0, vertex_data.Length / AttributeCount);
+            GL.DrawArrays(DrawMode, 0, vertex_data.Length / AttributeCount);
 
             GL.PopClientAttrib();
         }

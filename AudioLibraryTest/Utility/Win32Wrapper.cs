@@ -1,8 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -579,7 +575,7 @@ namespace player
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr FindWindowEx(IntPtr parentHandle, IntPtr childAfter, string className, string windowTitle);
-       
+
 
         /// <summary>
         /// Changes an attribute of the specified window. The function also sets the 32-bit (long) value at the specified offset into the extra window memory.
