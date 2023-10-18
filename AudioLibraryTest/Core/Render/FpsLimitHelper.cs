@@ -55,7 +55,7 @@ namespace player.Core.Render
             clockDrift = 0;
             if (nextUpdate < 0.0)
             {
-                nextUpdate = 0;
+                clockDrift = nextUpdate;
             }
             else
             {
