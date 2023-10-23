@@ -19,8 +19,6 @@ using player.Utility.DropTarget;
 using player.Utility.Shader;
 using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using Log = player.Core.Logging.Logger;
@@ -33,6 +31,8 @@ namespace player.Core
         internal static WallpaperMode FormWallpaperMode = WallpaperMode.None;
         internal static bool RTTEnabled = true;
         internal static bool WasapiMode = true;
+        internal static event EventHandler OnBeforeThreadedRender;
+        internal static event EventHandler OnAfterThreadedRender;
         internal static Vector2 RenderResolution { get; set; } = new Vector2();
         private uint MainFramebuffer;
         private uint MainRenderTexture;
@@ -148,6 +148,11 @@ namespace player.Core
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             MainThreadDelegator.ExecuteDelegates(InvocationTarget.BeforeRender);
+            try
+            {
+                OnBeforeThreadedRender?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception exc) { Log.Log($"OnBeforeThreadedRendering : {exc}"); }
 
             clockLabel.Text = $"{DateTime.Now.ToString("hh:mm:ss tt")}";
             visRenderer.Render(time);
@@ -167,6 +172,11 @@ namespace player.Core
             }
 
             MainThreadDelegator.ExecuteDelegates(InvocationTarget.AfterRender);
+            try
+            {
+                OnAfterThreadedRender?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception exc2) { Log.Log($"OnAfterThreadedRender : {exc2}"); }
         }
 
         void ThreadedInit()
@@ -269,6 +279,7 @@ namespace player.Core
             {
                 primitives = ServiceManager.RegisterService(new Primitives());
                 ServiceManager.RegisterService(new SettingsService());
+                ServiceManager.RegisterService(new WallpaperImageSettingsService());
                 ServiceManager.RegisterService(new ConsoleManager());
                 ServiceManager.RegisterService(new ShaderManager());
                 ServiceManager.RegisterService(new FFMpegManager());
@@ -287,7 +298,6 @@ namespace player.Core
                 uiManager = ServiceManager.RegisterService(new UIManager());
                 imGuiManager = ServiceManager.RegisterService(new ImGuiManager());
                 fbManager = ServiceManager.RegisterService(new FramebufferManager());
-                ServiceManager.RegisterService(new WallpaperImageSettingsService());
 
                 ServiceManager.RegisterService(dropTarget);
             }
