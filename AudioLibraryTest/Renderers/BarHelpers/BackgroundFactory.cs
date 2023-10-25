@@ -41,9 +41,22 @@ namespace player.Renderers.BarHelpers
         {
             if (registeredFiles.Contains(path))
             {
+                var indexOf = registeredFiles.IndexOf(path);
                 registeredFiles.Remove(path);
+                if (indexOf <= currentIndex) currentIndex--; //if the deleted image was already presented (in history), decrement the currentIndex by 1 to make up for 1 less item
+                ServiceManager.GetService<MessageCenterService>().ShowMessage($"Removed {path} from {indexOf}");
                 Log.Log($"Removed {path} from rotation");
             }
+        }
+
+        public void AddFile(string path)
+        {
+            int maxScan = UtilityMethods.Clamp(registeredFiles.Count - 1 - currentIndex, 0, 100);
+            int idx = rng.Next(0, maxScan);
+            registeredFiles.Insert(currentIndex + idx, path);
+            ServiceManager.GetService<MessageCenterService>().ShowMessage($"Added {path} at {idx}");
+            Log.Log($"Added {path} to rotation at pos {idx}");
+
         }
 
         private void LoadPathsFromSettings()
@@ -74,20 +87,35 @@ namespace player.Renderers.BarHelpers
                 {
                     if (IsValidExtension(Path.GetExtension(e.FullPath).ToLower()) && !registeredFiles.Contains(e.FullPath)) //sometimes programs (FIREFOX) creates a file multiple times, check that it hasn't already been added to the list first before continuing
                     {
-                        int maxScan = UtilityMethods.Clamp(registeredFiles.Count - 1 - currentIndex, 0, 100);
-                        int idx = rng.Next(0, maxScan);
-                        registeredFiles.Insert(currentIndex + idx, e.FullPath);
-                        ServiceManager.GetService<MessageCenterService>().ShowMessage($"Added {e.Name} at {idx}");
-                        Log.Log($"Watcher at {curDirCache} detected file at {e.FullPath} {e.ChangeType}");
+                        Log.Log($"Watcher at {curDirCache} detected file creation at {e.FullPath}");
+                        AddFile(e.FullPath);
+                    }
+                };
+                watcher.Deleted += (s, e) =>
+                {
+                    if (IsValidExtension(Path.GetExtension(e.FullPath).ToLower()) && registeredFiles.Contains(e.FullPath))
+                    {
+                        Log.Log($"Watcher at {curDirCache} detected file deleted {e.FullPath}");
+                        RemoveFile(e.FullPath);
+                    }
+                };
+                watcher.Renamed += (s, e) =>
+                {
+                    bool oldValid = IsValidExtension(Path.GetExtension(e.OldFullPath).ToLower());
+                    bool newValid = IsValidExtension(Path.GetExtension(e.FullPath).ToLower());
+                    if (oldValid || newValid) Log.Log($"Watcher at {curDirCache} detected file rename from {e.OldFullPath} to {e.FullPath}");
+
+                    if (oldValid && registeredFiles.Contains(e.OldFullPath))
+                    {
+                        RemoveFile(e.OldFullPath);
+                    }
+                    if (newValid && !registeredFiles.Contains(e.FullPath))
+                    {
+                        AddFile(e.FullPath);
                     }
                 };
                 watcher.EnableRaisingEvents = true;
             }
-        }
-
-        private void Watcher_Created(object sender, FileSystemEventArgs e)
-        {
-
         }
 
         public void SetRandom(bool random)
@@ -126,9 +154,6 @@ namespace player.Renderers.BarHelpers
                 else SingleBackgroundMode = false;
 
             }
-            FileSystemWatcher watcher = new FileSystemWatcher(path);
-            watcher.Created += Watcher_Created;
-            watcher.EnableRaisingEvents = true;
             return true;
         }
 
