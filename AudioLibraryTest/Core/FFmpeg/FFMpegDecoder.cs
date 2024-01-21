@@ -146,8 +146,8 @@ namespace player.Core.FFmpeg
                 else
                 {
                     _frameCollection.Add(new FrameContainer { _frame = frame }); //restore frame to buffer
-                    ffmpeg.avcodec_flush_buffers(_pCodecContext);
                     ffmpeg.avformat_seek_file(pFormatContext, _streamIndex, 0, 0, 0, 0);
+                    ffmpeg.avcodec_flush_buffers(_pCodecContext);
                     Log.Log("Looping Video");
                     //reset decoder if we should loop, else break out and signal completion
                 }
@@ -228,10 +228,10 @@ namespace player.Core.FFmpeg
                             return false;
                         }
 
-                        error.ThrowExceptionIfError();
+                        error.ThrowExceptionIfError(this);
                     } while (_pPacket->stream_index != _streamIndex);
 
-                    ffmpeg.avcodec_send_packet(_pCodecContext, _pPacket).ThrowExceptionIfError();
+                    ffmpeg.avcodec_send_packet(_pCodecContext, _pPacket).ThrowExceptionIfError(this);
                 }
                 finally
                 {
@@ -240,7 +240,7 @@ namespace player.Core.FFmpeg
 
                 error = ffmpeg.avcodec_receive_frame(_pCodecContext, _pFrame);
             } while (error == ffmpeg.AVERROR(ffmpeg.EAGAIN));
-            error.ThrowExceptionIfError();
+            error.ThrowExceptionIfError(this);
             frame = _pFrame;
             return true;
         }

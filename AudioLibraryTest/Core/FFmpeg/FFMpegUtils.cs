@@ -6,9 +6,9 @@ namespace player.Core.FFmpeg
 {
     static class FFMpegUtils
     {
-        public static int ThrowExceptionIfError(this int error)
+        public static int ThrowExceptionIfError(this int error, FFMpegDecoder context)
         {
-            if (error < 0) throw new ApplicationException(av_strerror(error));
+            if (error < 0) throw new ApplicationException($"{av_strerror(error)}\nFilePath : {context.FilePath}");
             return error;
         }
 
