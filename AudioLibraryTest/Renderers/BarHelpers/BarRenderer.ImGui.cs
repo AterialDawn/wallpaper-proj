@@ -1,5 +1,6 @@
 ﻿using ImGuiNET;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Input;
 using player.Core;
 using player.Core.Input;
 using player.Core.Render.UI;
@@ -34,6 +35,7 @@ namespace player.Renderers
             Graphics desktopDC;
             IntPtr colorPickerTexture;
             Vector2 pickerSize = new Vector2(16, 16);
+            InputManager inputs;
             int selectedTabIdx = 0;
             int bgStyleIndex;
             private SettingsAccessor<List<string>> quickloadImagesSetting;
@@ -51,6 +53,7 @@ namespace player.Renderers
                 ServiceManager.GetService<ImGuiManager>().OnDisplayingPopupMenu += ImGuiHandler_OnDisplayingPopupMenu;
                 ServiceManager.GetService<ImGuiManager>().OnRenderingGui += ImGuiHandler_OnRenderingGui;
                 ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiHandler_MouseMoveEventRaw;
+                inputs = ServiceManager.GetService<InputManager>();
                 settings = ServiceManager.GetService<SettingsService>();
                 settings.SetSettingDefault("Wallpaper.MoveToPaths", new string[0]);
                 quickloadImagesSetting = settings.GetAccessor("bar.quickloadimages", new List<string>());
@@ -190,21 +193,41 @@ namespace player.Renderers
                     if (ImGui.SliderInt("##Left", ref left, 0, imageWidth / 2, $"{left}"))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft = left;
+                        if (inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight))
+                        {
+                            right = left;
+                            wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight = left;
+                        }
                     }
                     ImGui.SameLine();
                     if (ImGui.SliderInt("##Right", ref right, 0, imageWidth / 2, $"{right}"))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight = right;
+                        if (inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight))
+                        {
+                            left = right;
+                            wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft = right;
+                        }
                     }
                     ImGui.SameLine();
                     if (ImGui.SliderInt("##Top", ref top, 0, imageHeight / 2, $"{top}"))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop = top;
+                        if (inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight))
+                        {
+                            bot = top;
+                            wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom = top;
+                        }
                     }
                     ImGui.SameLine();
                     if (ImGui.SliderInt("##Bottom", ref bot, 0, imageHeight / 2, $"{bot}"))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom = bot;
+                        if (inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight))
+                        {
+                            top = bot;
+                            wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop = bot;
+                        }
                     }
 
                     if (ImGui.Button("-##Left", pmButtonSize))
@@ -251,21 +274,41 @@ namespace player.Renderers
                     if (ImGui.SliderInt("##RLeft", ref rLeft, 0, 5, $"{rLeft}"))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft = rLeft;
+                        if (inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight))
+                        {
+                            rRight = rLeft;
+                            wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft = rLeft;
+                        }
                     }
                     ImGui.SameLine();
                     if (ImGui.SliderInt("##RRight", ref rRight, 0, 5, $"{rRight}"))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight = rRight;
+                        if (inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight))
+                        {
+                            rLeft = rRight;
+                            wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight = rLeft;
+                        }
                     }
                     ImGui.SameLine();
                     if (ImGui.SliderInt("##RTop", ref rTop, 0, 5, $"{rTop}"))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop = rTop;
+                        if (inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight))
+                        {
+                            rBot = rTop;
+                            wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot = rTop;
+                        }
                     }
                     ImGui.SameLine();
                     if (ImGui.SliderInt("##RBottom", ref rBot, 0, 5, $"{rBot}"))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot = rBot;
+                        if (inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight))
+                        {
+                            rTop = rBot;
+                            wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop = rBot;
+                        }
                     }
 
                     ImGui.PopItemWidth();

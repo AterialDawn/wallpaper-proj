@@ -159,6 +159,15 @@ namespace player.Core.Input
                 }
             }
         }
+
+        public bool AreAnyKeysPressed(params Key[] keys)
+        {
+            foreach (var key in keys)
+            {
+                if (keyStatusDict.TryGetValue(key, out var result)) return result;
+            }
+            return false;
+        }
         #endregion
 
         #region Private Methods

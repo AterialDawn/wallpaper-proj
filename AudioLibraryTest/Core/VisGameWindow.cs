@@ -23,6 +23,11 @@ using System.Threading;
 using System.Windows.Forms;
 using Log = player.Core.Logging.Logger;
 
+#if DEBUG
+using System.Linq;
+using System.Runtime.InteropServices;
+#endif
+
 namespace player.Core
 {
     public partial class VisGameWindow : GameWindow
