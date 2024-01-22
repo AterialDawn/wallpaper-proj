@@ -11,6 +11,8 @@ namespace player.Core.Settings
 {
     class WallpaperImageSettingsService : IService
     {
+        readonly TimeSpan UpdateSettingsAfter = TimeSpan.FromSeconds(5);
+
         public bool WereSettingsUpdatedThisFrame { get { return lastFrameSettingsChanged == TimeManager.FrameNumber; } }
 
         public string ServiceName => "WallpaperImageSettings";
@@ -18,7 +20,7 @@ namespace player.Core.Settings
         LiteDatabase db;
         ILiteCollection<ImageSettings> collection;
         long lastFrameSettingsChanged = 0;
-        Dictionary<string, ImageSettings> potentiallyDirtySettings = new Dictionary<string, ImageSettings>();
+        Dictionary<string, ImageSettingsContainer> potentiallyDirtySettings = new Dictionary<string, ImageSettingsContainer>();
 
         public void Initialize()
         {
@@ -43,15 +45,31 @@ namespace player.Core.Settings
 
         private void VisGameWindow_OnAfterThreadedRender(object sender, EventArgs e)
         {
-            if (WereSettingsUpdatedThisFrame && potentiallyDirtySettings.Count > 0) //if any settings were updated, commit the change to the db after the frame is complete
+            var toDelete = new List<string>();
+            if (potentiallyDirtySettings.Count > 0) //if any settings were updated, commit the change to the db after the timeout expires
             {
-                foreach (var kvp in potentiallyDirtySettings) collection.Update(kvp.Value);
+                foreach (var kvp in potentiallyDirtySettings)
+                {
+                    if ((DateTime.Now - kvp.Value.TimeWasDirty) > UpdateSettingsAfter)
+                    {
+                        collection.Update(kvp.Value.Settings);
+                        toDelete.Add(kvp.Key);
+                        Logger.Log($"Committing changes to {kvp.Value.Settings.FilePath}");
+                    }
+                }
             }
-            potentiallyDirtySettings.Clear();
+            foreach (var delete in toDelete)
+            {
+                potentiallyDirtySettings.Remove(delete);
+            }
         }
 
         public void Cleanup()
         {
+            foreach (var kvp in potentiallyDirtySettings)
+            {
+                collection.Update(kvp.Value.Settings);
+            }
             db.Dispose();
         }
 
@@ -65,9 +83,18 @@ namespace player.Core.Settings
         public ImageSettings GetImageSettingsForPath(string path, bool createIfNotExists = false)
         {
             string normalizedPath = NormalizePath(path);
-            if (createIfNotExists && potentiallyDirtySettings.ContainsKey(normalizedPath)) //return the same object obtained this frame already
+            if (potentiallyDirtySettings.ContainsKey(normalizedPath)) //return the same object obtained this frame already
             {
-                return potentiallyDirtySettings[normalizedPath];
+                if (createIfNotExists)
+                {
+                    var container = potentiallyDirtySettings[normalizedPath];
+                    container.TimeWasDirty = DateTime.Now;
+                    return container.Settings;
+                }
+                else
+                {
+                    return potentiallyDirtySettings[normalizedPath].Settings;
+                }
             }
             var imageSetting = collection.FindOne(i => i.FilePath == normalizedPath);
 
@@ -80,7 +107,7 @@ namespace player.Core.Settings
             if (createIfNotExists)
             {
                 lastFrameSettingsChanged = TimeManager.FrameNumber;
-                potentiallyDirtySettings.Add(normalizedPath, imageSetting);
+                potentiallyDirtySettings.Add(normalizedPath, new ImageSettingsContainer { TimeWasDirty = DateTime.Now, Settings = imageSetting });
             }
             return imageSetting;
         }
@@ -88,6 +115,10 @@ namespace player.Core.Settings
         public void ClearSettingsForPath(string path)
         {
             var normalizedPath = NormalizePath(path);
+            if (potentiallyDirtySettings.ContainsKey(normalizedPath))
+            {
+                potentiallyDirtySettings.Remove(normalizedPath);
+            }
             var imageSetting = collection.FindOne(i => i.FilePath == normalizedPath);
             if (imageSetting != null)
             {
@@ -109,6 +140,12 @@ namespace player.Core.Settings
                 deserialize: (bson) => new Vector4((float)bson.AsArray[0].AsDouble, (float)bson.AsArray[1].AsDouble, (float)bson.AsArray[2].AsDouble, (float)bson.AsArray[3].AsDouble)
                 );
         }
+    }
+
+    class ImageSettingsContainer
+    {
+        public ImageSettings Settings { get; set; }
+        public DateTime TimeWasDirty { get; set; } = DateTime.Now;
     }
 
     class ImageSettings
