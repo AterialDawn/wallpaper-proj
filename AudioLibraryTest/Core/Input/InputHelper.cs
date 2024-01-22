@@ -233,6 +233,10 @@ namespace player.Core.Input
                 case Keys.RWin: return Key.WinRight;
                 case Keys.Menu: return Key.Menu;
 
+                //Abominations
+                case Keys.ShiftKey: return Key.ShiftLeft;
+                case Keys.ControlKey: return Key.ControlLeft;
+
                 default: return Key.Unknown;
             }
         }
