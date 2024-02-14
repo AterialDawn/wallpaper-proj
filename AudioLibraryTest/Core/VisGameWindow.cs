@@ -229,7 +229,16 @@ namespace player.Core
                 LoadShader();
                 uiManager.Initialize(Width, Height);
 
-                ServiceManager.InitializeAllServices();
+                try
+                {
+                    ServiceManager.InitializeAllServices();
+                }
+                catch (ServiceInitializationException e)
+                {
+                    MessageBox.Show($"Could not initialize required services\n\n{e.InnerException.Message}\n\nThe process will now crash.", "Critical Initialization Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    throw; //let our fatal exception handler log to file
+                }
 
                 if (WasapiMode)
                 {
