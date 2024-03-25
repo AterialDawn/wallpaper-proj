@@ -97,7 +97,7 @@ namespace player.Core.FFmpeg
             int threads = Environment.ProcessorCount / 2;
             if (threads > 4) threads = 4; //no more than 4 threads even when more than 4 are available
             _pCodecContext->thread_count = threads;
-            Log.Log($"Using {threads} threads for decoding");
+            _pCodecContext->thread_type = ffmpeg.FF_THREAD_SLICE;
 
             ffmpeg.avcodec_parameters_to_context(_pCodecContext, pFormatContext->streams[_streamIndex]->codecpar);
             ffmpeg.avcodec_open2(_pCodecContext, pCodec, null);
