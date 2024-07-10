@@ -155,7 +155,7 @@ namespace player.Core.Settings
         public BackgroundMode Mode { get; set; } = BackgroundMode.BorderedDefault;
         public Vector4 BackgroundColor { get; set; } = Vector4.One;
         public BackgroundAnchorPosition AnchorPosition { get; set; } = BackgroundAnchorPosition.Center;
-        public SolidBackgroundStyle BackgroundStyle { get; set; } = SolidBackgroundStyle.SolidColor;
+        public SolidBackgroundStyle BackgroundStyle { get; set; } = SolidBackgroundStyle.StretchEdge;
 
         //image is cropped via GDI+ with these variables
         public int TrimPixelsLeft { get; set; } = 0;
