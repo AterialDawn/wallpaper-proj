@@ -102,7 +102,10 @@ namespace player.Core.Render
         {
             if (!AllowOverrides) return new DummyContext();
             ConcreteOverrideContext overrideContext = new ConcreteOverrideContext(this, fpsOverride, overrideName, customFps);
-            fpsLimitOverrides.Add(overrideContext);
+            lock (overrideLock)
+            {
+                fpsLimitOverrides.Add(overrideContext);
+            }
             return overrideContext;
         }
 

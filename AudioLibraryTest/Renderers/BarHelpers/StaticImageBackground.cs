@@ -221,7 +221,7 @@ namespace player.Renderers.BarHelpers
                     {
                         gaussianBlur.SetBlurState(true);
 
-                        float bgImageScalar = Math.Max(1f, 1f / aspect * (backgroundColor.W == 1 ? 0.75f : 1));
+                        float bgImageScalar = Math.Max(1f, 1f / aspect * 0.75f);
 
                         float horizontalMove = aspect;
                         var bgTargetHelper = new FramebufferRenderTexture((int)RenderResolution.X, (int)RenderResolution.Y, framebufferHooks);
