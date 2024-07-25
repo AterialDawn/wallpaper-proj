@@ -18,7 +18,7 @@ namespace player.Core.FFmpeg
         public AVColorRange ColorRange { get; private set; } = AVColorRange.AVCOL_RANGE_UNSPECIFIED;
         public TimeSpan VideoLength { get; private set; } = TimeSpan.Zero;
 
-        private ManualResetEvent framesDecodedEvent = new ManualResetEvent(false);
+        private ManualResetEventSlim framesDecodedEvent = new ManualResetEventSlim(false);
 
         private int width = 0, height = 0;
 
@@ -44,7 +44,7 @@ namespace player.Core.FFmpeg
 
         public bool WaitUntilFramesDecoded(int waitDelay = -1)
         {
-            return framesDecodedEvent.WaitOne(waitDelay);
+            return framesDecodedEvent.Wait(waitDelay);
         }
 
         public T GetFrame<T>() where T : BaseFFMpegFrameContainer
@@ -140,7 +140,14 @@ namespace player.Core.FFmpeg
                 }
                 if (decodeResult)
                 {
-                    AddFrameToBuffer(frame);
+                    try
+                    {
+                        AddFrameToBuffer(frame);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        break;
+                    }
                     framesDecodedEvent.Set();
                 }
                 else
