@@ -44,6 +44,7 @@ namespace player.Renderers
 
             string[] renderModeItems = new string[] { "Default", "Solid Background" };
             string[] anchorPosItems = new string[] { "Centered", "Left", "Right" };
+            string[] imageFlipItems = new string[] { "None", "Flip X", "Flip Y", "Flip X Y" };
             string[] bgStyleItems = new string[] { "Solid Color", "Source Region (Mirror)", "Source Region (Stretch)", "Stretch Edges" };
 
             public ImGuiHandler(BarRenderer parent)
@@ -136,6 +137,7 @@ namespace player.Renderers
             {
                 int renderModeIdx = 0;
                 int anchorPosIdx = 0;
+                int flipIdx = 0;
                 Vector4 color = Vector4.One;
                 int left = 0, right = 0, top = 0, bot = 0;
                 int rLeft = 0, rRight = 0, rTop = 0, rBot = 0;
@@ -143,6 +145,12 @@ namespace player.Renderers
                 {
                     renderModeIdx = (int)curSettings.Mode;
                     anchorPosIdx = (int)curSettings.AnchorPosition;
+                    switch (curSettings.FlipMode)
+                    {
+                        case FlipMode.FlipX: flipIdx = 1; break;
+                        case FlipMode.FlipY: flipIdx = 2; break;
+                        case FlipMode.FlipXY: flipIdx = 3; break;
+                    }
                     color = curSettings.BackgroundColor;
 
                     left = curSettings.TrimPixelsLeft;
@@ -173,6 +181,18 @@ namespace player.Renderers
 
                 if (selectedTabIdx == 0) //Color&Pos
                 {
+                    if (ImGui.Combo("Image Flip", ref flipIdx, imageFlipItems))
+                    {
+                        var newFlipMode = FlipMode.None;
+                        switch (flipIdx)
+                        {
+                            case 1: newFlipMode = FlipMode.FlipX; break;
+                            case 2: newFlipMode = FlipMode.FlipY; break;
+                            case 3: newFlipMode = FlipMode.FlipXY; break;
+                        }
+                        wpSettings.GetImageSettingsForPath(curPath, true).FlipMode = newFlipMode;
+                    }
+
                     if (ImGui.ColorPicker4("Background Color", ref color, ColorEditFlags.RGB | ColorEditFlags.NoOptions | ColorEditFlags.NoPicker | ColorEditFlags.NoSmallPreview | ColorEditFlags.NoTooltip | ColorEditFlags.AlphaBar))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = color;

@@ -174,12 +174,22 @@ namespace player.Core.Settings
         public int StretchXPos { get; set; } = 0;
         public int StretchWidth { get; set; } = 10;
         public bool EditingDisabled { get; set; } = false;
+        public FlipMode FlipMode { get; set; } = FlipMode.None;
     }
 
     enum BackgroundMode
     {
         BorderedDefault = 0,
         SolidBackground = 1
+    }
+
+    [Flags]
+    enum FlipMode
+    {
+        None    = 0,
+        FlipX   = 1,
+        FlipY   = 1 << 1,
+        FlipXY   = FlipX | FlipY
     }
 
     enum BackgroundAnchorPosition

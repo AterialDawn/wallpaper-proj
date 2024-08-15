@@ -87,6 +87,19 @@ namespace player.Renderers.BarHelpers
                                 {
                                     g.FillRectangle(brush, 0, 0, targetWidth, RenderResolution.Y);
                                 }
+
+                                if (settingsForImage.FlipMode.HasFlag(FlipMode.FlipX))
+                                {
+                                    g.TranslateTransform((float)targetWidth / 2f, (float)RenderResolution.Y / 2f);
+                                    g.ScaleTransform(-1, 1);
+                                    g.TranslateTransform(-(float)targetWidth / 2f, -(float)RenderResolution.Y / 2f);
+                                }
+                                if (settingsForImage.FlipMode.HasFlag(FlipMode.FlipY))
+                                {
+                                    g.TranslateTransform((float)targetWidth / 2f, (float)RenderResolution.Y / 2f);
+                                    g.ScaleTransform(1, -1);
+                                    g.TranslateTransform(-(float)targetWidth / 2f, -(float)RenderResolution.Y / 2f);
+                                }
                             }
 
                             using (var wrapMode = new ImageAttributes())
