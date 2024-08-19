@@ -25,7 +25,7 @@ namespace player.Renderers
             const float HOLD_ROTATION_TIME = 5f;
             BarRenderer parent;
             SettingsService settings;
-            bool imageInfoWindowVisible = false;
+            bool imageInfoWindowVisible = true;
             Vector2 buttonSize = new Vector2(135, 19);
             Vector2 pmButtonSize = new Vector2(33.5f, 20);
             Vector2 stretchButtonSize = new Vector2(67f, 20);
