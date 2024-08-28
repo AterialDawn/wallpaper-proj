@@ -98,7 +98,7 @@ namespace player.Renderers
                                     ImGui.TextWrapped("Editing is locked. Press the unlock button to re-enable editing");
                                     if (ImGui.Button("Unlock"))
                                     {
-                                        curSettings.EditingDisabled = false;
+                                        wpSettings.GetImageSettingsForPath(curPath, true).EditingDisabled = false;
                                     }
                                 }
                                 else

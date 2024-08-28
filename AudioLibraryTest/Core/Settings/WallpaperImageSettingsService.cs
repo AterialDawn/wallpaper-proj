@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using player.Core.Input;
 using player.Core.Logging;
 using player.Core.Service;
 using System;
@@ -41,6 +42,15 @@ namespace player.Core.Settings
             collection = db.GetCollection<ImageSettings>("imageSettings");
             collection.EnsureIndex(i => i.FilePath);
             VisGameWindow.OnAfterThreadedRender += VisGameWindow_OnAfterThreadedRender;
+            ConsoleManager conMan = ServiceManager.GetService<ConsoleManager>();
+            conMan.RegisterCommandHandler("db:compactSettings", onCompactSettings);
+        }
+
+        private void onCompactSettings(object sender, ConsoleLineReadEventArgs args)
+        {
+            Logger.Log("Rebuilding image settings DB");
+            var result = db.Rebuild();
+            Logger.Log($"Rebuilt! Result : {result}");
         }
 
         private void VisGameWindow_OnAfterThreadedRender(object sender, EventArgs e)
