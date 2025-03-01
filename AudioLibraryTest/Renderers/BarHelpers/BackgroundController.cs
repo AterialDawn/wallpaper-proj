@@ -335,7 +335,14 @@ namespace player.Renderers.BarHelpers
         {
             if (currentBackground.Animated && animatedBackgroundOverride == null)
             {
-                animatedBackgroundOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Animated Background", FpsLimitOverride.Maximum); //Maybe add an option for IBackground to return an fps value eventually.
+                if (currentBackground.OverrideFps.HasValue)
+                {
+                    animatedBackgroundOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Animated Background", FpsLimitOverride.Custom, currentBackground.OverrideFps.Value);
+                }
+                else
+                {
+                    animatedBackgroundOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Animated Background", FpsLimitOverride.Maximum);
+                }
             }
             else if (!currentBackground.Animated && animatedBackgroundOverride != null)
             {
