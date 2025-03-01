@@ -333,15 +333,27 @@ namespace player.Renderers.BarHelpers
 
         private void CheckAnimatedBackgroundStatus()
         {
-            if (currentBackground.Animated && animatedBackgroundOverride == null)
+            if (currentBackground.Animated)
             {
-                if (currentBackground.OverrideFps.HasValue)
+                if (animatedBackgroundOverride != null)
                 {
-                    animatedBackgroundOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Animated Background", FpsLimitOverride.Custom, currentBackground.OverrideFps.Value);
+                    if (currentBackground.OverrideFps.HasValue && animatedBackgroundOverride.CustomFps != currentBackground.OverrideFps.Value)
+                    {
+                        animatedBackgroundOverride.Dispose();
+                        animatedBackgroundOverride = null;
+                    }
                 }
-                else
+                
+                if(animatedBackgroundOverride == null)
                 {
-                    animatedBackgroundOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Animated Background", FpsLimitOverride.Maximum);
+                    if (currentBackground.OverrideFps.HasValue)
+                    {
+                        animatedBackgroundOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Animated Background", FpsLimitOverride.Custom, currentBackground.OverrideFps.Value);
+                    }
+                    else
+                    {
+                        animatedBackgroundOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Animated Background", FpsLimitOverride.Maximum);
+                    }
                 }
             }
             else if (!currentBackground.Animated && animatedBackgroundOverride != null)

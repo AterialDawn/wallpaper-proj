@@ -43,7 +43,7 @@ namespace player.Renderers.BarHelpers
             else
             {
                 OverrideBackgroundDuration = decoder.VideoLength;
-                OverrideFps = 1000d / decoder.FrameDelay;
+                OverrideFps = 1d / decoder.FrameDelay;
                 LoadInitialFrames();
             }
             return true;
