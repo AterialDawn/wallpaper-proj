@@ -47,6 +47,7 @@ namespace player.Core.Render
         {
             shaderStack.Push(activeShader);
             shader.Activate();
+            activeShader = shader;
         }
 
         public void PopActiveShader()
