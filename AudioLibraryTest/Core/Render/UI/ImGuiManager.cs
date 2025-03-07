@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using player.Core.Input;
 using player.Core.Service;
+using player.Core.Settings;
 using player.Shaders;
 using player.Utility;
 using System;
@@ -20,13 +21,17 @@ namespace player.Core.Render.UI
         ImGuiController controller;
         VisGameWindow vgs;
         List<char> pressedChars = new List<char>();
-        //bool anyItemInMenuOpened = false; //maybe will use later maybe
         double timeLastMouseMoved;
         float currentFrameOpacity = 0;
+        float mouseLastY = 50;
         ConsoleManager console;
+        bool debugSubMenuOpen = false;
+        Settings settings;
 
         public event EventHandler OnRenderingGui;
         public event EventHandler OnDisplayingPopupMenu;
+        public event EventHandler OnDrawingDebugSubmenu;
+        public event EventHandler<ImGuiRenderingEventArgs> OnDrawingTitlebar;
 
         FpsLimitOverrideContext overrideContext = null;
 
@@ -60,6 +65,7 @@ namespace player.Core.Render.UI
             io.KeyMap[GuiKey.Z] = (int)Key.Z;
 
             ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiController_MouseMoveEventRaw;
+            settings = new Settings(ServiceManager.GetService<SettingsService>());
             console = ServiceManager.GetService<ConsoleManager>();
         }
 
@@ -71,6 +77,7 @@ namespace player.Core.Render.UI
         private void ImGuiController_MouseMoveEventRaw(object sender, MouseMoveEventArgs e)
         {
             timeLastMouseMoved = TimeManager.TimeD;
+            mouseLastY = e.Y;
         }
 
         public void CharPress(char c)
@@ -98,7 +105,14 @@ namespace player.Core.Render.UI
 
         public void NewFrame()
         {
-            currentFrameOpacity = console.Visible ? 1f : (float)UtilityMethods.Clamp(1.0 - ((TimeManager.TimeD - (timeLastMouseMoved + 5f)) / 2.5), 0, 1); //smooth opacity to 0 after 5 seconds of inactivity over a 2.5 second fade duration
+            if (settings.AutoHideGui.Value)
+            {
+                currentFrameOpacity = console.Visible ? 1f : (float)UtilityMethods.Clamp(1.0 - ((TimeManager.TimeD - (timeLastMouseMoved + 5f)) / 2.5), 0, 1); //smooth opacity to 0 after 5 seconds of inactivity over a 2.5 second fade duration
+            }
+            else
+            {
+                currentFrameOpacity = 1;
+            }
             if (currentFrameOpacity > 0)
             {
                 controller.NewFrame(vgs.Width, vgs.Height);
@@ -106,6 +120,35 @@ namespace player.Core.Render.UI
         }
         public void Render()
         {
+            if (mouseLastY < 50 || debugSubMenuOpen)
+            {
+                debugSubMenuOpen = false;
+                if (ImGui.BeginMainMenuBar())
+                {
+                    if (ImGui.BeginMenu("Debug"))
+                    {
+                        debugSubMenuOpen = true;
+                        ImGui.Checkbox("AutoHide GUI", ref settings.AutoHideGui.Value);
+                        OnDrawingDebugSubmenu?.Invoke(this, EventArgs.Empty);
+                        ImGui.EndMenu();
+                    }
+
+                    if (OnDrawingTitlebar != null)
+                    {
+                        foreach (var del in OnDrawingTitlebar.GetInvocationList())
+                        {
+                            var args = new ImGuiRenderingEventArgs();
+                            del.DynamicInvoke(this, args);
+                            if (args.SomethingWasDrawn)
+                            {
+                                debugSubMenuOpen = true;
+                            }
+                        }
+                    }
+
+                    ImGui.EndMainMenuBar();
+                }
+            }
             bool popupDrawn = false;
             if (currentFrameOpacity > 0)
             {
@@ -165,6 +208,16 @@ namespace player.Core.Render.UI
                     overrideContext.Dispose();
                     overrideContext = null;
                 }
+            }
+        }
+
+        class Settings
+        {
+            public SettingsAccessor<bool> AutoHideGui { get; private set; }
+
+            public Settings(SettingsService svc)
+            {
+                AutoHideGui = svc.GetAccessor("IMGUI.AutoHideGui", true);
             }
         }
 

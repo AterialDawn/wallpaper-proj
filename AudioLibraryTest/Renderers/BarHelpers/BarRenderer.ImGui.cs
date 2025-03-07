@@ -25,7 +25,6 @@ namespace player.Renderers
             const float HOLD_ROTATION_TIME = 5f;
             BarRenderer parent;
             SettingsService settings;
-            bool imageInfoWindowVisible = true;
             Vector2 buttonSize = new Vector2(135, 19);
             Vector2 pmButtonSize = new Vector2(33.5f, 20);
             Vector2 stretchButtonSize = new Vector2(67f, 20);
@@ -38,7 +37,8 @@ namespace player.Renderers
             InputManager inputs;
             int selectedTabIdx = 0;
             int bgStyleIndex;
-            private SettingsAccessor<List<string>> quickloadImagesSetting;
+            SettingsAccessor<List<string>> quickloadImagesSetting;
+            SettingsAccessor<bool> imageInfoWindowVisible;
 
             float timeToHoldRotation = 0;
 
@@ -58,6 +58,7 @@ namespace player.Renderers
                 settings = ServiceManager.GetService<SettingsService>();
                 settings.SetSettingDefault("Wallpaper.MoveToPaths", new string[0]);
                 quickloadImagesSetting = settings.GetAccessor("bar.quickloadimages", new List<string>());
+                imageInfoWindowVisible = settings.GetAccessor("Wallpaper.ShowEditor", true);
 
                 wpSettings = ServiceManager.GetService<WallpaperImageSettingsService>();
                 desktopDC = Graphics.FromImage(desktopBmp);
@@ -67,16 +68,16 @@ namespace player.Renderers
                 TextureUtils.LoadBitmapIntoTexture(new Bitmap(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets/colPick.png")), (int)colorPickerTexture);
             }
 
-            private void ImGuiHandler_MouseMoveEventRaw(object sender, OpenTK.Input.MouseMoveEventArgs e)
+            private void ImGuiHandler_MouseMoveEventRaw(object sender, MouseMoveEventArgs e)
             {
                 lastMousePos = new Point(e.X + WallpaperUtils.WallpaperBoundsCorrected.Left, e.Y + WallpaperUtils.WallpaperBoundsCorrected.Top);
             }
 
             private void ImGuiHandler_OnRenderingGui(object sender, EventArgs e)
             {
-                if (imageInfoWindowVisible)
+                if (imageInfoWindowVisible.Value)
                 {
-                    if (ImGui.BeginWindow("Image Settings", ref imageInfoWindowVisible, WindowFlags.Default))
+                    if (ImGui.BeginWindow("Image Settings", ref imageInfoWindowVisible.Value, WindowFlags.Default))
                     {
                         if (parent.backgroundController.LoadingNextWallpaper)
                         {
@@ -571,13 +572,13 @@ namespace player.Renderers
                     parent.ToggleKeepRotation();
                 }
 
-                ImGui.Checkbox("Image Settings", ref imageInfoWindowVisible);
+                ImGui.Checkbox("Image Settings", ref imageInfoWindowVisible.Value);
 
                 ImGui.Separator();
 
                 if (ImGui.BeginMenu("Quickload Images"))
                 {
-                    var lst = quickloadImagesSetting.Get();
+                    var lst = quickloadImagesSetting.Value;
                     var currentWp = parent.backgroundController.CurrentBackground;
                     if (ImGui.Button("Add Current to Quickload"))
                     {

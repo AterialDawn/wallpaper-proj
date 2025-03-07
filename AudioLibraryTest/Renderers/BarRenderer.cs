@@ -28,8 +28,6 @@ namespace player.Renderers
         private double lowActivityTime = 0;
         private float width = 1f / SoundDataProcessor.BarCount;
         private float verticalOffset = 1f / 360f;
-        private bool renderLines = true;
-        private bool renderBars = true;
         private BarShader shader;
         private Primitives primitives;
         private DropTargetManager dropManager;
@@ -71,9 +69,7 @@ namespace player.Renderers
 
             interpolateSetting = settings.GetAccessor("bar.interpolate", InterpolationMode.Automatic);
             renderBarsSetting = settings.GetAccessor("bar.renderbar", false);
-            renderBars = renderBarsSetting.Get();
             renderLinesSetting = settings.GetAccessor("bar.renderlines", false);
-            renderLines = renderLinesSetting.Get();
             shader = new BarShader();
             InitVBO();
             loadingLabel = new OLabel("Loading Label", "Loading Backgrounds...", QuickFont.QFontAlignment.Centre);
@@ -100,7 +96,7 @@ namespace player.Renderers
             toggleRotationMenuItem.Click += ToggleRotationMenuItem_Click;
             loadWallpaper.Click += LoadWallpaper_Click;
 
-            if (renderBars || renderLines)
+            if (renderBarsSetting.Value || renderLinesSetting.Value)
             {
                 fpsOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("BarRenderer", FpsLimitOverride.Minimum);
             }
@@ -110,8 +106,6 @@ namespace player.Renderers
 
         private void Settings_OnSettingsReloaded(object sender, EventArgs e)
         {
-            renderBars = renderBarsSetting.Get();
-            renderLines = renderLinesSetting.Get();
             backgroundController.BackgroundFactory.Initialize();
             backgroundController.NewBackground();
         }
@@ -141,7 +135,7 @@ namespace player.Renderers
 
         private void CheckFpsOverride()
         {
-            if (!renderLines && !renderBars)
+            if (!renderLinesSetting.Value && !renderBarsSetting.Value)
             {
                 if (fpsOverride != null)
                 {
@@ -165,17 +159,15 @@ namespace player.Renderers
             {
                 case OpenTK.Input.Key.L:
                     {
-                        renderLines = !renderLines;
-                        renderLinesSetting.Set(renderLines);
-                        DisplayFadeoutMessage(renderLines ? "Rendering Lines" : "Not Rendering Lines");
+                        renderLinesSetting.Value = !renderLinesSetting.Value;
+                        DisplayFadeoutMessage(renderLinesSetting.Value ? "Rendering Lines" : "Not Rendering Lines");
                         CheckFpsOverride();
                         break;
                     }
                 case OpenTK.Input.Key.B:
                     {
-                        renderBars = !renderBars;
-                        renderBarsSetting.Set(renderBars);
-                        DisplayFadeoutMessage(renderBars ? "Rendering Bars" : "Not Rendering Bars");
+                        renderBarsSetting.Value = !renderBarsSetting.Value;
+                        DisplayFadeoutMessage(renderBarsSetting.Value ? "Rendering Bars" : "Not Rendering Bars");
                         CheckFpsOverride();
                         break;
                     }
@@ -376,53 +368,51 @@ namespace player.Renderers
 
         private void RotateInterpolations()
         {
-            InterpolationMode currentInterpolation = interpolateSetting.Get();
-            switch (currentInterpolation)
+            switch (interpolateSetting.Value)
             {
                 case InterpolationMode.Automatic:
                     {
-                        currentInterpolation = InterpolationMode.Bicubic;
+                        interpolateSetting.Value = InterpolationMode.Bicubic;
                         shader.SetPrimaryInterpolationType(BarShader.InterpolationType.BiCubic);
                         shader.SetSecondaryInterpolationType(BarShader.InterpolationType.BiCubic);
                         break;
                     }
                 case InterpolationMode.Bicubic:
                     {
-                        currentInterpolation = InterpolationMode.Bilinear;
+                        interpolateSetting.Value = InterpolationMode.Bilinear;
                         shader.SetPrimaryInterpolationType(BarShader.InterpolationType.BiLinear);
                         shader.SetSecondaryInterpolationType(BarShader.InterpolationType.BiLinear);
                         break;
                     }
                 case InterpolationMode.Bilinear:
                     {
-                        currentInterpolation = InterpolationMode.BSpline;
+                        interpolateSetting.Value = InterpolationMode.BSpline;
                         shader.SetPrimaryInterpolationType(BarShader.InterpolationType.BSpline);
                         shader.SetSecondaryInterpolationType(BarShader.InterpolationType.BSpline);
                         break;
                     }
                 case InterpolationMode.BSpline:
                     {
-                        currentInterpolation = InterpolationMode.Catmull;
+                        interpolateSetting.Value = InterpolationMode.Catmull;
                         shader.SetPrimaryInterpolationType(BarShader.InterpolationType.CatmullRom);
                         shader.SetSecondaryInterpolationType(BarShader.InterpolationType.CatmullRom);
                         break;
                     }
                 case InterpolationMode.Catmull:
                     {
-                        currentInterpolation = InterpolationMode.None;
+                        interpolateSetting.Value = InterpolationMode.None;
                         shader.SetPrimaryInterpolationType(BarShader.InterpolationType.None);
                         shader.SetSecondaryInterpolationType(BarShader.InterpolationType.None);
                         break;
                     }
                 case InterpolationMode.None:
                     {
-                        currentInterpolation = InterpolationMode.Automatic;
+                        interpolateSetting.Value = InterpolationMode.Automatic;
                         break;
                     }
             }
 
-            DisplayFadeoutMessage($"Interpolation set to {currentInterpolation}");
-            interpolateSetting.Set(currentInterpolation);
+            DisplayFadeoutMessage($"Interpolation set to {interpolateSetting.Value}");
         }
 
         private void DisplayFadeoutMessage(string message)
@@ -478,7 +468,7 @@ namespace player.Renderers
             shader.Activate();
             backgroundController.Update(time);
             shader.Activate();
-            if (interpolateSetting.Get() != InterpolationMode.None) UpdateShaderUniforms(); //update interpolation uniforms only if interpolation is enabled
+            if (interpolateSetting.Value != InterpolationMode.None) UpdateShaderUniforms(); //update interpolation uniforms only if interpolation is enabled
 
             shader.SetTexturing(true);
 
@@ -487,7 +477,7 @@ namespace player.Renderers
             //Render background
             primitives.QuadBuffer.Draw();
 
-            if (renderBars)
+            if (renderBarsSetting.Value)
             {
                 switch (drawMode)
                 {
@@ -496,7 +486,7 @@ namespace player.Renderers
                 }
             }
             shader.Activate();
-            if (renderLines && lowActivityTime < LOWACTIVITYCUTOFF)
+            if (renderLinesSetting.Value && lowActivityTime < LOWACTIVITYCUTOFF)
             {
                 switch (drawMode)
                 {
@@ -511,7 +501,7 @@ namespace player.Renderers
             shader.SetPrimarySize(backgroundController.PrimaryTextureResolution);
             shader.SetSecondarySize(backgroundController.SecondaryTextureResolution);
 
-            if (interpolateSetting.Get() == InterpolationMode.Automatic) AutomaticInterpolation();
+            if (interpolateSetting.Value == InterpolationMode.Automatic) AutomaticInterpolation();
 
         }
 
@@ -551,7 +541,7 @@ namespace player.Renderers
         private void UpdateBackgroundSaturation(double time)
         {
             float Saturation = 0.7f + (SoundDataProcessor.AveragedVolume * .15f);
-            if (!renderBars)
+            if (!renderBarsSetting.Value)
             {
                 Saturation = 1f;
             }

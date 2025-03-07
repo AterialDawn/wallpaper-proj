@@ -13,6 +13,7 @@ namespace player.Core.Settings
         public static string SettingsFileName = "settings";
         private Dictionary<string, object> settingsDict;
         private Dictionary<string, List<SettingUpdatedDelegate>> settingListenerDelegates = new Dictionary<string, List<SettingUpdatedDelegate>>();
+        private List<BaseSettingsAccessor> accessors = new List<BaseSettingsAccessor>();
 
         private string settingsDirectory;
         private string settingsFile;
@@ -64,7 +65,9 @@ namespace player.Core.Settings
 
         public SettingsAccessor<T> GetAccessor<T>(string key, T defaultValue)
         {
-            return new SettingsAccessor<T>(this, key, defaultValue);
+            var newAccessor = new SettingsAccessor<T>(this, key, defaultValue);
+            accessors.Add(newAccessor);
+            return newAccessor;
         }
 
         public string GetFileRelativeToSettings(string file)
@@ -159,6 +162,10 @@ namespace player.Core.Settings
 
         public void Save()
         {
+            foreach (var accessor in accessors)
+            {
+                accessor.Save();
+            }
             string serializedDict;
             try
             {

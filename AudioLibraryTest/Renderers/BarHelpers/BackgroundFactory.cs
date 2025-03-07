@@ -63,7 +63,7 @@ namespace player.Renderers.BarHelpers
         {
             registeredPathsKey = ServiceManager.GetService<SettingsService>().GetAccessor<List<string>>(SettingsKeys.BarRenderer_SourceFolders, null);
 
-            var tempList = registeredPathsKey.Get();
+            var tempList = registeredPathsKey.Value;
             if (tempList != null && tempList.Count > 0)
             {
                 sourcePaths = tempList; //by reference, so updating this should save it in settings

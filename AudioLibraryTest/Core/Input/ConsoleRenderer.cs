@@ -2,6 +2,8 @@
 using ImGuiNET;
 using player.Core.Logging;
 using player.Core.Render;
+using player.Core.Service;
+using player.Core.Settings;
 using System.Collections.Generic;
 using System.Text;
 using Log = player.Core.Logging.Logger;
@@ -10,15 +12,15 @@ namespace player.Core.Input
 {
     class ConsoleRenderer
     {
-        public bool Visible { get { return enabled; } }
+        public bool Visible { get { return enabled.Value; } }
 
-        private bool enabled = false;
         bool justActivated = false;
         private CircularBuffer<string> messageStack = new CircularBuffer<string>(500); //MORE MESSAGES
         private ConsoleManager consoleManager;
         private ConsoleHistoryHelper historyHelper = new ConsoleHistoryHelper();
         private FpsLimitOverrideContext fpsOverride = null;
         System.Numerics.Vector2 textScrollingHeight;
+        SettingsAccessor<bool> enabled;
 
         internal ConsoleRenderer(ConsoleManager conManager)
         {
@@ -27,6 +29,8 @@ namespace player.Core.Input
             Log.MessageLogged += Logger_MessageLogged;
 
             textScrollingHeight = new System.Numerics.Vector2(0, -(ImGui.GetStyle().ItemSpacing.Y + ImGui.GetFrameHeightWithSpacing() + 15f));
+
+            enabled = ServiceManager.GetService<SettingsService>().GetAccessor("Console.Visible", false);
         }
 
         private void Logger_MessageLogged(object sender, MessageLoggedEventArgs e)
@@ -38,7 +42,7 @@ namespace player.Core.Input
 
         public void Render(double time)
         {
-            if (!enabled) return;
+            if (!enabled.Value) return;
 
             ImGui.BeginWindow("Console");
             ImGui.BeginChild("scrolling", textScrollingHeight, false, WindowFlags.Default);
@@ -70,8 +74,8 @@ namespace player.Core.Input
 
         public void ToggleDisplay()
         {
-            enabled = !enabled;
-            if (enabled)
+            enabled.Value = !enabled.Value;
+            if (enabled.Value)
             {
                 justActivated = true;
                 fpsOverride = VisGameWindow.ThisForm.FpsLimiter.OverrideFps("Console", FpsLimitOverride.Maximum);

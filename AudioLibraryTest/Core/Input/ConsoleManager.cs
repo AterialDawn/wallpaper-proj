@@ -1,6 +1,8 @@
-﻿using OpenTK;
+﻿using ImGuiNET;
+using OpenTK;
 using OpenTK.Input;
 using player.Core.Render;
+using player.Core.Render.UI;
 using player.Core.Render.UI.Controls;
 using player.Core.Service;
 using player.Utility;
@@ -67,11 +69,19 @@ namespace player.Core.Input
 
             //Register ` as our toggle console hotkey
             ServiceManager.GetService<InputManager>().RegisterKeyHandler(Key.Tilde, f3KeyPress, false);
+            ServiceManager.GetService<ImGuiManager>().OnDrawingDebugSubmenu += ConsoleManager_OnDrawingDebugSubmenu;
 
             grabbingInputText = new OLabel(nameof(grabbingInputText), "Grabbing Input", QuickFont.QFontAlignment.Centre);
             grabbingInputText.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             grabbingInputText.Location = new System.Drawing.PointF(VisGameWindow.ThisForm.Width / 2f, 0);
             grabbingInputText.Enabled = false;
+        }
+
+        private void ConsoleManager_OnDrawingDebugSubmenu(object sender, EventArgs e)
+        {
+            bool consoleOpen = consoleRenderer.Visible;
+            ImGui.Checkbox("Console", ref consoleOpen);
+            if (consoleOpen != consoleRenderer.Visible) consoleRenderer.ToggleDisplay();
         }
 
         private void WindowsHotkeyUtil_OnMouseRawInput(object sender, RawInputEventArgs e)

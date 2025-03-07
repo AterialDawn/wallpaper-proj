@@ -26,7 +26,7 @@ namespace player.Core.Render.UI.Controls
 
         public void ShowMessage(string message)
         {
-            messageQueue.PushFront(new MessageCenterMessage(message, fadeTime.Get(), messageLife.Get()));
+            messageQueue.PushFront(new MessageCenterMessage(message, fadeTime.Value, messageLife.Value));
         }
 
         public override void Render(double time)

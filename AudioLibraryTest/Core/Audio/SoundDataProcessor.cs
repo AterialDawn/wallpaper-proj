@@ -21,7 +21,7 @@ namespace player.Core.Audio
     {
         public const int OscilloscopeSamples = 2400;
         public const int BarCount = 1000;
-        public static float SmoothingFactor { get { return smoothingFactorSetting.Get(); } set { smoothingFactorSetting.Set(UtilityMethods.Clamp(value, 0, 1)); } }
+        public static float SmoothingFactor { get { return smoothingFactorSetting.Value; } set { smoothingFactorSetting.Set(UtilityMethods.Clamp(value, 0, 1)); } }
         static SettingsAccessor<float> smoothingFactorSetting;
         public int SampleFrequency = 48000;
 
