@@ -15,6 +15,8 @@ namespace player.Utility
         public static readonly uint SPIF_UPDATEINIFILE = 0x01;
         public static readonly uint SPIF_SENDWININICHANGE = 0x02;
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern void GetSystemTimePreciseAsFileTime(out long fileTime);
         [DllImport("user32.dll")]
         public static extern bool WaitMessage();
 

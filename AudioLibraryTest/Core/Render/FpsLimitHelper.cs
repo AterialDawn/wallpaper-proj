@@ -70,6 +70,29 @@ namespace player.Core.Render
                 clockDrift = nextUpdate - actualSleep;
             }
             stopwatch.Restart();
+
+            /*
+            if (!Enabled) return;
+            double fpsLimit = GetCurrentFPSLimit(out var unlimited);
+            if (unlimited) return;
+
+            lastTime += (long)((1000d / fpsLimit) * 10_000d);
+
+            long now;
+            Win32.GetSystemTimePreciseAsFileTime(out now);
+
+            double sleepDuration = (lastTime - now) * 0.00001f;
+
+            if (now >= lastTime)
+            {
+                lastTime = now;
+                return;
+            }
+            else
+            {
+                lock (timelock) Monitor.Wait(timelock, (int)sleepDuration);
+            }
+            */
         }
 
         void UpdateCpuEstimate()

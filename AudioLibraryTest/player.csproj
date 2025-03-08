@@ -300,7 +300,10 @@
     <Compile Include="Utility\ExtensionMethods.cs" />
     <Compile Include="Utility\Methods.cs" />
     <Compile Include="Utility\TrayIconManager.cs" />
+    <Compile Include="Utility\UI\IMGRenderable.cs" />
+    <Compile Include="Utility\UI\IMGWindow.cs" />
     <Compile Include="Utility\UI\MessageCenterMessage.cs" />
+    <Compile Include="Utility\UI\PlotgraphHelper.cs" />
     <Compile Include="Utility\VertexFloatBuffer.cs" />
     <Compile Include="Utility\VertexFormat.cs" />
     <Compile Include="Utility\WallpaperMode.cs" />

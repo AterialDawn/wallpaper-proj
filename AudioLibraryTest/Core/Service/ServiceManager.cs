@@ -6,6 +6,7 @@ namespace player.Core.Service
 {
     static class ServiceManager
     {
+        public static event EventHandler OnServicesInitialized;
         static Dictionary<string, IService> serviceList = new Dictionary<string, IService>();
 
         static ServiceManager()
@@ -48,6 +49,8 @@ namespace player.Core.Service
                     throw new ServiceInitializationException($"Unable to initialize service {service.Value.ServiceName}", e); //if a service fails to initialize, it should be a catastrophic failure.
                 }
             }
+
+            OnServicesInitialized?.Invoke(null, EventArgs.Empty);
         }
 
         public static void CleanupAllServices()

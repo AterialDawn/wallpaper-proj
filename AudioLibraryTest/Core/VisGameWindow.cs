@@ -131,12 +131,13 @@ namespace player.Core
                 inputManager.ProcessInputs();
                 imGuiManager.OnInputsProcessed();
 
-                ThreadedRendering(renderWatch.Elapsed.TotalSeconds);
-
+                var lastTime = renderWatch.Elapsed.TotalSeconds;
                 renderWatch.Restart();
+                ThreadedRendering(lastTime);
 
+                var swapStart = renderWatch.ElapsedMilliseconds;
                 SwapBuffers();
-                FpsLimiter.Sleep(renderWatch.Elapsed.TotalMilliseconds); //pass in how much time we spent swapping this frame (fps limiter subtracts this from actual work done
+                FpsLimiter.Sleep(renderWatch.ElapsedMilliseconds - swapStart); //pass in how much time we spent swapping this frame (fps limiter subtracts this from actual work done
             }
         }
 
