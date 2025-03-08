@@ -30,7 +30,9 @@ namespace player.Utility
             IntPtr hnd = (IntPtr)handle;
             if (hnd == null) throw new ApplicationException("WindowHandle was null!");
             return hnd;
-
         }
+
+        public static double PreciseFileTimeToMillis(this long val) => val * 0.0001;
+        public static long MillisToPreciseFileTime(this double val) => (long)(val * 10_000);
     }
 }

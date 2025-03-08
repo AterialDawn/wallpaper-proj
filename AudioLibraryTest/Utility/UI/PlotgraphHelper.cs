@@ -13,6 +13,7 @@ namespace player.Utility.UI
 {
     class PlotgraphHelper : IMGRenderable
     {
+        public bool AutoScale { get; set; } = true;
         public float ScaleMin { get { return scaleMin; } set { scaleMin = value; } }
         public float ScaleMax { get { return scaleMax; } set { scaleMax = value; } }
         public float Width { get { return size.X; } set { size.X = value; } }
@@ -43,6 +44,11 @@ namespace player.Utility.UI
         {
             values[ftt++] = newVal;
             if (ftt >= values.Length) ftt = 0;
+            if (AutoScale)
+            {
+                if (newVal > scaleMax) scaleMax = newVal;
+                if (newVal < scaleMin) scaleMin = newVal;
+            }
         }
     }
 }

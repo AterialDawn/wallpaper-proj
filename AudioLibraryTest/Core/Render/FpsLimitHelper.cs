@@ -55,7 +55,8 @@ namespace player.Core.Render
             clockDrift = 0;
             if (nextUpdate < 0.0)
             {
-                clockDrift = nextUpdate;
+                clockDrift = Math.Max(nextUpdate, -msToSleep * 4); //cap to fastfire 4 catchup frames (arbitrary lmao)
+                sleepDurations.Enqueue(new SleepDurationsContainer { WorkingTime = elapsedMillis - timeSpentSwapping, SleepingTime = 0 });
             }
             else
             {
@@ -66,33 +67,10 @@ namespace player.Core.Render
                 lock (timelock) { Monitor.Wait(timelock, (int)nextUpdate); }
                 double actualSleep = swSleepLength.Elapsed.TotalMilliseconds;
                 sleepDurations.Enqueue(new SleepDurationsContainer { WorkingTime = elapsedMillis - timeSpentSwapping, SleepingTime = actualSleep + timeSpentSwapping });
-                UpdateCpuEstimate();
                 clockDrift = nextUpdate - actualSleep;
             }
+            UpdateCpuEstimate();
             stopwatch.Restart();
-
-            /*
-            if (!Enabled) return;
-            double fpsLimit = GetCurrentFPSLimit(out var unlimited);
-            if (unlimited) return;
-
-            lastTime += (long)((1000d / fpsLimit) * 10_000d);
-
-            long now;
-            Win32.GetSystemTimePreciseAsFileTime(out now);
-
-            double sleepDuration = (lastTime - now) * 0.00001f;
-
-            if (now >= lastTime)
-            {
-                lastTime = now;
-                return;
-            }
-            else
-            {
-                lock (timelock) Monitor.Wait(timelock, (int)sleepDuration);
-            }
-            */
         }
 
         void UpdateCpuEstimate()
