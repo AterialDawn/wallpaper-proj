@@ -19,11 +19,11 @@ namespace player.Utility.UI
 
         private void IMGWindow_OnRenderingGui(object sender, EventArgs e)
         {
-            if (BeginWindow(windowName))
+            if (Begin(windowName))
             {
                 OnDraw();
 
-                EndWindow();
+                End();
             }
         }
 

@@ -77,7 +77,7 @@ namespace player.Renderers
             {
                 if (imageInfoWindowVisible.Value)
                 {
-                    if (ImGui.BeginWindow("Image Settings", ref imageInfoWindowVisible.Value, WindowFlags.Default))
+                    if (ImGui.Begin("Image Settings", ref imageInfoWindowVisible.Value, ImGuiWindowFlags.None))
                     {
                         if (parent.backgroundController.LoadingNextWallpaper)
                         {
@@ -113,7 +113,7 @@ namespace player.Renderers
                             }
                         }
                     }
-                    ImGui.EndWindow();
+                    ImGui.End();
                 }
 
                 if (timeToHoldRotation > 0)
@@ -168,12 +168,12 @@ namespace player.Renderers
                 }
                 int imageWidth = bg.SourceImageSize.Width;
                 int imageHeight = bg.SourceImageSize.Height;
-                if (ImGui.Combo("Render Mode", ref renderModeIdx, renderModeItems))
+                if (ImGui.Combo("Render Mode", ref renderModeIdx, renderModeItems, renderModeItems.Length))
                 {
                     wpSettings.GetImageSettingsForPath(curPath, true).Mode = (BackgroundMode)renderModeIdx;
                 }
 
-                if (ImGui.Combo("Anchor Position", ref anchorPosIdx, anchorPosItems))
+                if (ImGui.Combo("Anchor Position", ref anchorPosIdx, anchorPosItems, anchorPosItems.Length))
                 {
                     wpSettings.GetImageSettingsForPath(curPath, true).AnchorPosition = (BackgroundAnchorPosition)anchorPosIdx;
                 }
@@ -182,7 +182,7 @@ namespace player.Renderers
 
                 if (selectedTabIdx == 0) //Color&Pos
                 {
-                    if (ImGui.Combo("Image Flip", ref flipIdx, imageFlipItems))
+                    if (ImGui.Combo("Image Flip", ref flipIdx, imageFlipItems, imageFlipItems.Length))
                     {
                         var newFlipMode = FlipMode.None;
                         switch (flipIdx)
@@ -194,13 +194,13 @@ namespace player.Renderers
                         wpSettings.GetImageSettingsForPath(curPath, true).FlipMode = newFlipMode;
                     }
 
-                    if (ImGui.ColorPicker4("Background Color", ref color, ColorEditFlags.RGB | ColorEditFlags.NoOptions | ColorEditFlags.NoPicker | ColorEditFlags.NoSmallPreview | ColorEditFlags.NoTooltip | ColorEditFlags.AlphaBar))
+                    if (ImGui.ColorPicker4("Background Color", ref color, ImGuiColorEditFlags.DisplayRGB | ImGuiColorEditFlags.NoOptions | ImGuiColorEditFlags.NoPicker | ImGuiColorEditFlags.NoSmallPreview | ImGuiColorEditFlags.NoTooltip | ImGuiColorEditFlags.AlphaBar))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).BackgroundColor = color;
                     }
 
-                    ImGui.ImageButton(colorPickerTexture, pickerSize, Vector2.Zero, Vector2.One, 0, Vector4.Zero, Vector4.One);
-                    if (ImGui.IsLastItemActive())
+                    ImGui.ImageButton("colorPickerBtn", colorPickerTexture, pickerSize, Vector2.Zero, Vector2.One);
+                    if (ImGui.IsItemActive())
                     {
                         desktopDC.CopyFromScreen(lastMousePos.X, lastMousePos.Y, 0, 0, new Size(1, 1), CopyPixelOperation.SourceCopy);
 
@@ -383,7 +383,7 @@ namespace player.Renderers
                     }
                     else
                     {
-                        if (ImGui.Combo("Background Style", ref bgStyleIndex, bgStyleItems))
+                        if (ImGui.Combo("Background Style", ref bgStyleIndex, bgStyleItems, bgStyleItems.Length))
                         {
                             //update background style mode
                             wpSettings.GetImageSettingsForPath(curPath, true).BackgroundStyle = (SolidBackgroundStyle)bgStyleIndex;

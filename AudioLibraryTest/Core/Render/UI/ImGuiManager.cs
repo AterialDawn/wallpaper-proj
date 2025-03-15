@@ -27,6 +27,7 @@ namespace player.Core.Render.UI
         ConsoleManager console;
         bool debugSubMenuOpen = false;
         Settings settings;
+        ImGuiIOPtr io;
 
         public event EventHandler OnRenderingGui;
         public event EventHandler OnDisplayingPopupMenu;
@@ -42,27 +43,7 @@ namespace player.Core.Render.UI
 
             vgs = VisGameWindow.ThisForm;
 
-            var io = ImGui.GetIO();
-
-            io.KeyMap[GuiKey.Tab] = (int)Key.Tab;
-            io.KeyMap[GuiKey.LeftArrow] = (int)Key.Left;
-            io.KeyMap[GuiKey.RightArrow] = (int)Key.Right;
-            io.KeyMap[GuiKey.UpArrow] = (int)Key.Up;
-            io.KeyMap[GuiKey.DownArrow] = (int)Key.Down;
-            io.KeyMap[GuiKey.PageUp] = (int)Key.PageUp;
-            io.KeyMap[GuiKey.PageDown] = (int)Key.PageDown;
-            io.KeyMap[GuiKey.Home] = (int)Key.Home;
-            io.KeyMap[GuiKey.End] = (int)Key.End;
-            io.KeyMap[GuiKey.Delete] = (int)Key.Delete;
-            io.KeyMap[GuiKey.Backspace] = (int)Key.BackSpace;
-            io.KeyMap[GuiKey.Enter] = (int)Key.Enter;
-            io.KeyMap[GuiKey.Escape] = (int)Key.Escape;
-            io.KeyMap[GuiKey.A] = (int)Key.A;
-            io.KeyMap[GuiKey.C] = (int)Key.C;
-            io.KeyMap[GuiKey.V] = (int)Key.V;
-            io.KeyMap[GuiKey.X] = (int)Key.X;
-            io.KeyMap[GuiKey.Y] = (int)Key.Y;
-            io.KeyMap[GuiKey.Z] = (int)Key.Z;
+            io = ImGui.GetIO();
 
             ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiController_MouseMoveEventRaw;
             settings = new Settings(ServiceManager.GetService<SettingsService>());
@@ -99,7 +80,7 @@ namespace player.Core.Render.UI
 
             foreach (var c in charList)
             {
-                ImGui.AddInputCharacter(c);
+                io.AddInputCharacter(c);
             }
         }
 
@@ -163,7 +144,10 @@ namespace player.Core.Render.UI
 
 
 
-                if (!ImGui.IsAnyWindowHovered() && ImGui.IsMouseClicked(1))
+                var hovered = ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow);
+                var right = ImGui.IsMouseClicked(ImGuiMouseButton.Right);
+                Log.Log($"{hovered} | {right}");
+                if (!hovered && right)
                 {
                     ImGui.OpenPopup("mainPopup");
                 }
@@ -221,6 +205,8 @@ namespace player.Core.Render.UI
             }
         }
 
+        bool[] lastMouseButtons = new bool[3];
+
         public bool ShouldSwallowInputEvent(InputManager.InputEventContainer evc)
         {
             var io = ImGui.GetIO();
@@ -228,11 +214,7 @@ namespace player.Core.Render.UI
             if (evc.IsKeyEventArg)
             {
                 var ka = evc.KeyboardKeyEventArg;
-                io.KeysDown[(int)ka.Key] = ka.Pressed;
-
-                io.AltPressed = ka.Alt;
-                io.CtrlPressed = ka.Ctrl;
-                io.ShiftPressed = ka.Shift;
+                io.AddKeyEvent(InputHelper.OpenTKKeyToImGuiKey(ka.Key), evc.KeyPressed);
 
                 return io.WantCaptureKeyboard;
             }
@@ -240,19 +222,36 @@ namespace player.Core.Render.UI
             {
                 var ma = evc.MouseEventArg;
 
-                io.MousePosition = new Vector2(ma.X, ma.Y);
+                io.AddMousePosEvent(ma.X, ma.Y);
 
                 return io.WantCaptureMouse;
             }
             else if (evc.IsMouseSnapshot)
             {
                 var mb = evc.MouseSnapshot;
+                io.AddMousePosEvent(mb.Args.X, mb.Args.Y);
 
-                io.MouseDown[0] = mb.MouseState.LeftButton == ButtonState.Pressed;
-                io.MouseDown[2] = mb.MouseState.MiddleButton == ButtonState.Pressed;
-                io.MouseDown[1] = mb.MouseState.RightButton == ButtonState.Pressed;
+                //ffs its lrm instead of lmr
+                var mb0D = mb.MouseState.LeftButton == ButtonState.Pressed;
+                var mb2D = mb.MouseState.MiddleButton == ButtonState.Pressed;
+                var mb1D = mb.MouseState.RightButton == ButtonState.Pressed;
+                if (lastMouseButtons[0] != mb0D)
+                {
+                    lastMouseButtons[0] = mb0D;
+                    io.AddMouseButtonEvent(0, mb0D);
+                }
+                if (lastMouseButtons[1] != mb1D)
+                {
+                    lastMouseButtons[1] = mb1D;
+                    io.AddMouseButtonEvent(1, mb1D);
+                }
+                if (lastMouseButtons[2] != mb2D)
+                {
+                    lastMouseButtons[2] = mb2D;
+                    io.AddMouseButtonEvent(2, mb2D);
+                }
 
-                io.MousePosition = new Vector2(mb.Args.X, mb.Args.Y);
+
 
                 return io.WantCaptureMouse;
             }
@@ -260,7 +259,7 @@ namespace player.Core.Render.UI
             {
                 var ma = evc.MouseMoveEventArg;
 
-                io.MousePosition = new Vector2(ma.X, ma.Y);
+                io.AddMousePosEvent(ma.X, ma.Y);
 
                 return io.WantCaptureMouse;
             }
@@ -270,7 +269,7 @@ namespace player.Core.Render.UI
 
                 io.MouseWheel = mw.DeltaPrecise;
 
-                io.MousePosition = new Vector2(mw.X, mw.Y);
+                io.AddMouseWheelEvent(0, mw.DeltaPrecise);
 
                 return io.WantCaptureMouse;
             }
@@ -286,6 +285,7 @@ namespace player.Core.Render.UI
             int height;
             TexturedQuadShader shader = new TexturedQuadShader();
             Primitives primitives;
+            ImGuiIOPtr io;
 
 
             public bool DidRender { get; private set; }
@@ -295,20 +295,20 @@ namespace player.Core.Render.UI
             /// </summary>
             public ImGuiController()
             {
+                ImGui.CreateContext();
                 primitives = ServiceManager.GetService<Primitives>();
+                io = ImGui.GetIO();
             }
 
             public void NewFrame(int width, int height)
             {
                 this.width = width; this.height = height;
-                IO io = ImGui.GetIO();
-                io.DisplaySize = new System.Numerics.Vector2(width, height);
-                io.DisplayFramebufferScale = new System.Numerics.Vector2(1);
+                io.DisplaySize = new Vector2(width, height);
+                io.DisplayFramebufferScale = new Vector2(1);
 
 
                 io.DeltaTime = (float)sw.Elapsed.TotalSeconds;
                 sw.Restart();
-                //SDL.SDL_ShowCursor(io.MouseDrawCursor ? 0 : 1);
 
                 ImGui.NewFrame();
             }
@@ -316,16 +316,14 @@ namespace player.Core.Render.UI
             public unsafe void Render(float opacity)
             {
                 ImGui.Render();
-                if (ImGuiNative.igGetIO()->RenderDrawListsFn == IntPtr.Zero)
-                    RenderDrawData(ImGuiNative.igGetDrawData(), width, height, opacity);
+                RenderDrawData(ImGui.GetDrawData(), width, height, opacity);
             }
 
             public unsafe void Create()
             {
-                IO io = ImGui.GetIO();
-
                 // Build texture atlas
-                FontTextureData texData = io.FontAtlas.GetTexDataAsRGBA32();
+                IntPtr pixels;
+                io.Fonts.GetTexDataAsRGBA32(out pixels, out var width, out var height);
 
                 // Create OpenGL texture
                 g_FontTexture = GL.GenTexture();
@@ -336,23 +334,23 @@ namespace player.Core.Render.UI
                     TextureTarget.Texture2D,
                     0,
                     PixelInternalFormat.Rgba,
-                    texData.Width,
-                    texData.Height,
+                    width,
+                    height,
                     0,
                     PixelFormat.Rgba,
                     PixelType.UnsignedByte,
-                    new IntPtr(texData.Pixels));
+                    pixels);
 
                 // Store the texture identifier in the ImFontAtlas substructure.
-                io.FontAtlas.SetTexID(g_FontTexture);
+                io.Fonts.SetTexID(new IntPtr(g_FontTexture));
 
                 // Cleanup (don't clear the input data if you want to append new fonts later)
                 //io.Fonts->ClearInputData();
-                io.FontAtlas.ClearTexData();
+                io.Fonts.ClearTexData();
                 GL.BindTexture(TextureTarget.Texture2D, 0);
             }
 
-            public unsafe void RenderDrawData(DrawData* drawData, int displayW, int displayH, float opacity)
+            public unsafe void RenderDrawData(ImDrawDataPtr drawDataPtr, int displayW, int displayH, float opacity)
             {
                 // We are using the OpenGL fixed pipeline to make the example code simpler to read!
                 // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers.
@@ -361,7 +359,7 @@ namespace player.Core.Render.UI
                 //GL.ClearColor(clear_color.X, clear_color.Y, clear_color.Z, clear_color.W);
                 //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-                if (drawData->CmdListsCount == 0 || opacity <= 0)
+                if (drawDataPtr.CmdListsCount == 0 || opacity <= 0)
                 {
                     DidRender = false;
                     return; //nothing to do :>
@@ -403,20 +401,23 @@ namespace player.Core.Render.UI
                 GL.LoadIdentity();
 
                 // Render command lists
+                const int VertexOffset = 0;
+                const int TexOffset = 8;
+                const int ColorOffset = 16;
 
-                for (int n = 0; n < drawData->CmdListsCount; n++)
+                for (int n = 0; n < drawDataPtr.CmdListsCount; n++)
                 {
-                    NativeDrawList* cmd_list = drawData->CmdLists[n];
-                    byte* vtx_buffer = (byte*)cmd_list->VtxBuffer.Data;
-                    ushort* idx_buffer = (ushort*)cmd_list->IdxBuffer.Data;
+                    var cmd_list = drawDataPtr.CmdLists[n];
+                    byte* vtx_buffer = (byte*)cmd_list.VtxBuffer.Data;
+                    ushort* idx_buffer = (ushort*)cmd_list.IdxBuffer.Data;
+                    
+                    GL.VertexPointer(2, VertexPointerType.Float, sizeof(ImDrawVert), new IntPtr(vtx_buffer + VertexOffset));
+                    GL.TexCoordPointer(2, TexCoordPointerType.Float, sizeof(ImDrawVert), new IntPtr(vtx_buffer + TexOffset));
+                    GL.ColorPointer(4, ColorPointerType.UnsignedByte, sizeof(ImDrawVert), new IntPtr(vtx_buffer + ColorOffset));
 
-                    GL.VertexPointer(2, VertexPointerType.Float, sizeof(DrawVert), new IntPtr(vtx_buffer + DrawVert.PosOffset));
-                    GL.TexCoordPointer(2, TexCoordPointerType.Float, sizeof(DrawVert), new IntPtr(vtx_buffer + DrawVert.UVOffset));
-                    GL.ColorPointer(4, ColorPointerType.UnsignedByte, sizeof(DrawVert), new IntPtr(vtx_buffer + DrawVert.ColOffset));
-
-                    for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+                    for (int cmd_i = 0; cmd_i < cmd_list.CmdBuffer.Size; cmd_i++)
                     {
-                        DrawCmd* pcmd = &(((DrawCmd*)cmd_list->CmdBuffer.Data)[cmd_i]);
+                        var pcmd = cmd_list.CmdBuffer[cmd_i].NativePtr;
                         if (pcmd->UserCallback != IntPtr.Zero)
                         {
                             throw new NotImplementedException();

@@ -28,9 +28,12 @@ namespace player.Core.Input
 
             Log.MessageLogged += Logger_MessageLogged;
 
-            textScrollingHeight = new System.Numerics.Vector2(0, -(ImGui.GetStyle().ItemSpacing.Y + ImGui.GetFrameHeightWithSpacing() + 15f));
-
             enabled = ServiceManager.GetService<SettingsService>().GetAccessor("Console.Visible", false);
+        }
+
+        public void Init()
+        {
+            textScrollingHeight = new System.Numerics.Vector2(0, -(ImGui.GetStyle().ItemSpacing.Y + ImGui.GetFrameHeightWithSpacing() + 15f));
         }
 
         private void Logger_MessageLogged(object sender, MessageLoggedEventArgs e)
@@ -44,18 +47,18 @@ namespace player.Core.Input
         {
             if (!enabled.Value) return;
 
-            ImGui.BeginWindow("Console");
-            ImGui.BeginChild("scrolling", textScrollingHeight, false, WindowFlags.Default);
+            ImGui.Begin("Console");
+            ImGui.BeginChild("scrolling", textScrollingHeight, ImGuiChildFlags.None);
             for (int i = messageStack.Size - 1; i > -1; i--)
             {
                 ImGui.TextWrapped(messageStack[i]);
             }
-            ImGui.SetScrollHere(1.0f);
+            ImGui.SetScrollHereY(1.0f);
             ImGui.EndChild();
             ImGui.Separator();
             ImGui.PushItemWidth(ImGui.GetWindowWidth() - 20f);
             bool refocus = false;
-            if (ImGui.InputText("", textBuf, (uint)textBuf.Length, InputTextFlags.EnterReturnsTrue, null))
+            if (ImGui.InputText("##", textBuf, (uint)textBuf.Length, ImGuiInputTextFlags.EnterReturnsTrue, null))
             {
                 var str = Encoding.ASCII.GetString(textBuf).TrimEnd((char)0);
                 textBuf = new byte[256];
@@ -69,7 +72,7 @@ namespace player.Core.Input
                 justActivated = false;
                 ImGui.SetKeyboardFocusHere(-1);
             }
-            ImGui.EndWindow();
+            ImGui.End();
         }
 
         public void ToggleDisplay()

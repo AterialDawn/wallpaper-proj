@@ -75,6 +75,8 @@ namespace player.Core.Input
             grabbingInputText.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             grabbingInputText.Location = new System.Drawing.PointF(VisGameWindow.ThisForm.Width / 2f, 0);
             grabbingInputText.Enabled = false;
+
+            consoleRenderer.Init();
         }
 
         private void ConsoleManager_OnDrawingDebugSubmenu(object sender, EventArgs e)

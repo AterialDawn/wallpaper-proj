@@ -13,19 +13,19 @@ namespace player.Core.Render.UI
         public static bool TabButtons(ref int selectedTabIndex, params string[] tabNames)
         {
             var style = ImGui.GetStyle();
-            var buttonInactiveColor = style.GetColor(ColorTarget.Button);
-            var buttonActiveColor = style.GetColor(ColorTarget.ButtonActive);
+            var buttonInactiveColor = style.Colors[(int)ImGuiCol.Button];
+            var buttonActiveColor = style.Colors[(int)ImGuiCol.ButtonActive];
             bool selectedTabChanged = false;
             for (int i = 0; i < tabNames.Length; i++)
             {
                 string tab = tabNames[i];
                 if (selectedTabIndex == i)
                 {
-                    style.SetColor(ColorTarget.Button, buttonActiveColor);
+                    style.Colors[(int)ImGuiCol.Button] = buttonActiveColor;
                 }
                 else
                 {
-                    style.SetColor(ColorTarget.Button, buttonInactiveColor);
+                    style.Colors[(int)ImGuiCol.Button] = buttonInactiveColor;
                 }
                 if (i > 0) ImGui.SameLine();
                 if (ImGui.Button($"{tab}##Tabs"))
@@ -35,7 +35,7 @@ namespace player.Core.Render.UI
                 }
             }
 
-            style.SetColor(ColorTarget.Button, buttonInactiveColor);
+            style.Colors[(int)ImGuiCol.Button] = buttonInactiveColor;
 
             return selectedTabChanged;
         }

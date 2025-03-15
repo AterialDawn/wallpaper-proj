@@ -293,6 +293,7 @@ namespace player.Core
             using (new ProfilingHelper("Service Registration"))
             {
                 primitives = ServiceManager.RegisterService(new Primitives());
+                imGuiManager = ServiceManager.RegisterService(new ImGuiManager());
                 ServiceManager.RegisterService(new SettingsService());
                 ServiceManager.RegisterService(new WallpaperImageSettingsService());
                 ServiceManager.RegisterService(new ConsoleManager());
@@ -311,7 +312,6 @@ namespace player.Core
                 ServiceManager.RegisterService(new PlayerCommands());
                 inputManager = ServiceManager.RegisterService(new InputManager());
                 uiManager = ServiceManager.RegisterService(new UIManager());
-                imGuiManager = ServiceManager.RegisterService(new ImGuiManager());
                 fbManager = ServiceManager.RegisterService(new FramebufferManager());
 
                 ServiceManager.RegisterService(dropTarget);

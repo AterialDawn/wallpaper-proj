@@ -36,7 +36,7 @@ namespace player.Utility.UI
 
         public void Draw()
         {
-            ImGui.PlotLines(graphName, values, 0, "", scaleMin, scaleMax, size, 4);
+            ImGui.PlotLines(graphName, ref values[0], values.Length, 0, "", scaleMin, scaleMax, size, 4);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
