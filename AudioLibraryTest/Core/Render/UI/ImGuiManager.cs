@@ -146,7 +146,6 @@ namespace player.Core.Render.UI
 
                 var hovered = ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow);
                 var right = ImGui.IsMouseClicked(ImGuiMouseButton.Right);
-                Log.Log($"{hovered} | {right}");
                 if (!hovered && right)
                 {
                     ImGui.OpenPopup("mainPopup");
