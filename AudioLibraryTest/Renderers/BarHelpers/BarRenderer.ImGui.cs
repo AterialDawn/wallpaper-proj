@@ -260,44 +260,47 @@ namespace player.Renderers
                         }
                     }
 
+                    int buttonAmount = inputs.AreAnyKeysPressed(Key.ControlLeft, Key.ControlRight) ? 5 : 1; //ctrl is 5
+                    buttonAmount *= inputs.AreAnyKeysPressed(Key.ShiftLeft, Key.ShiftRight) ? 10 : 1; //shift is *10
+
                     if (ImGui.Button("-##Left", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft--;
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft -= buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("+##Left", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft++;
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsLeft += buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("-##Right", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight--;
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight -= buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("+##Right", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight++;
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsRight += buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("-##Top", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop--;
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop -= buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("+##Top", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop++;
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsTop += buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("-##Bot", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom--;
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom -= buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("+##Bot", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
+                        wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom += buttonAmount;
                     }
 
                     if (sib == null)
@@ -350,42 +353,42 @@ namespace player.Renderers
 
                     if (ImGui.Button("-##RLeft", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft--;
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft -= buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("+##RLeft", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft++;
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimLeft += buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("-##RRight", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight--;
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight -= buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("+##RRight", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight++;
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimRight += buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("-##RTop", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop--;
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop -= buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("+##RTop", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop++;
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimTop += buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("-##RBot", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot--;
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot -= buttonAmount;
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("+##RBot", pmButtonSize))
                     {
-                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot++;
+                        wpSettings.GetImageSettingsForPath(curPath, true).RenderTrimBot += buttonAmount;
                     }
 
                 }

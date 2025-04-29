@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using player.Core;
 using player.Core.Render;
 using player.Core.Service;
 using player.Core.Settings;
@@ -35,6 +36,7 @@ namespace player.Renderers.BarHelpers
         FramebufferRenderTexture renderTargetHelper;
         FramebufferRenderTexture bgTargetHelper;
         Primitives primitives;
+        WallpaperImageSettingsService wpSettings;
         private string lastBgPath = null;
         private bool bgDrawn = false;
         private bool dirty = false;
@@ -45,6 +47,7 @@ namespace player.Renderers.BarHelpers
             primitives = ServiceManager.GetService<Primitives>();
             gaussianBlur = new GaussianBlurShader();
             RenderResolutionChanged();
+            wpSettings = ServiceManager.GetService<WallpaperImageSettingsService>();
         }
 
         public void RenderResolutionChanged()
@@ -61,7 +64,8 @@ namespace player.Renderers.BarHelpers
 
         public void Render()
         {
-            if (!dirty && !Background.Animated && lastBgPath == Background.SourcePath)
+            bool wereSettingsUpdatedRecently = (TimeManager.FrameNumber - wpSettings.LastFrameSettingsWereChanged) < 2; //settings gui renders after the background already rendered, so we check if settings were updated within a few frames. if they were, background is dirty.
+            if (!dirty && !wereSettingsUpdatedRecently && !Background.Animated && lastBgPath == Background.SourcePath)
             {
                 //static wallpaper, not just updated
                 if (bgDrawn)
@@ -73,7 +77,7 @@ namespace player.Renderers.BarHelpers
             }
             lastBgPath = Background.SourcePath;
             bgDrawn = true;
-            var settingsForImage = ServiceManager.GetService<WallpaperImageSettingsService>().GetImageSettingsForPath(Background.SourcePath);
+            var settingsForImage = wpSettings.GetImageSettingsForPath(Background.SourcePath);
             var currentMode = BackgroundMode.BorderedDefault;
             var backgroundColor = System.Numerics.Vector4.One;
             var align = BackgroundAnchorPosition.Center;

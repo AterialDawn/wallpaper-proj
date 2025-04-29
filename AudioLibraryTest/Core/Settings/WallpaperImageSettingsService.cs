@@ -14,13 +14,13 @@ namespace player.Core.Settings
     {
         readonly TimeSpan UpdateSettingsAfter = TimeSpan.FromSeconds(5);
 
-        public bool WereSettingsUpdatedThisFrame { get { return lastFrameSettingsChanged == TimeManager.FrameNumber; } }
+        public bool WereSettingsUpdatedThisFrame { get { return LastFrameSettingsWereChanged == TimeManager.FrameNumber; } }
+        public long LastFrameSettingsWereChanged { get; private set; }
 
         public string ServiceName => "WallpaperImageSettings";
         string settingsFilePath = "";
         LiteDatabase db;
         ILiteCollection<ImageSettings> collection;
-        long lastFrameSettingsChanged = 0;
         Dictionary<string, ImageSettingsContainer> potentiallyDirtySettings = new Dictionary<string, ImageSettingsContainer>();
 
         public void Initialize()
@@ -99,6 +99,7 @@ namespace player.Core.Settings
                 {
                     var container = potentiallyDirtySettings[normalizedPath];
                     container.TimeWasDirty = DateTime.Now;
+                    LastFrameSettingsWereChanged = TimeManager.FrameNumber;
                     return container.Settings;
                 }
                 else
@@ -116,7 +117,7 @@ namespace player.Core.Settings
             }
             if (createIfNotExists)
             {
-                lastFrameSettingsChanged = TimeManager.FrameNumber;
+                LastFrameSettingsWereChanged = TimeManager.FrameNumber;
                 potentiallyDirtySettings.Add(normalizedPath, new ImageSettingsContainer { TimeWasDirty = DateTime.Now, Settings = imageSetting });
             }
             return imageSetting;
@@ -135,6 +136,8 @@ namespace player.Core.Settings
                 collection.Delete(imageSetting.Id);
                 Logger.Log($"Deleted image settings for {Path.GetFileName(normalizedPath)}");
             }
+
+            LastFrameSettingsWereChanged = TimeManager.FrameNumber;
         }
 
         private string NormalizePath(string path)
