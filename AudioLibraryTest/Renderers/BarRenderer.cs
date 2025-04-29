@@ -241,7 +241,7 @@ namespace player.Renderers
 
         void NewWallpaper(bool previous, bool disableTransition = false)
         {
-            if (backgroundController.IsTransitioning())
+            if (backgroundController.IsTransitioning)
             {
                 backgroundController.EndTransition();
                 DisplayFadeoutMessage("Ending Transition");

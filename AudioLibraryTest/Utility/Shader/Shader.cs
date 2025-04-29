@@ -20,7 +20,7 @@ namespace player.Utility.Shader
         {
             shaderManager = ServiceManager.GetService<ShaderManager>();
             compiledShader = shaderManager.GetShader(this);
-            GL.UseProgram(Program);
+            shaderManager.SetActiveShader(this);
             Initialize(); //eh.
         }
 
@@ -87,8 +87,10 @@ namespace player.Utility.Shader
 
         public void Activate()
         {
-            shaderManager.SetActiveShader(this);
-            OnActivate();
+            var activeShader = shaderManager.GetActiveShader();
+            if(activeShader == null || activeShader.Program != Program) shaderManager.SetActiveShader(this); //activate if the program itself is not the same
+
+            if(activeShader != this) OnActivate(); //only load shader state if the shader is not the exact same instance, since different instances can have different values
         }
 
         public void Deactivate()

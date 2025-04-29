@@ -28,6 +28,8 @@ namespace player.Renderers.BarHelpers
         public bool LoadingNextWallpaper { get { return loadingBackground; } }
 
         public IBackground CurrentBackground { get { return currentBackground; } }
+        public Vector2 RenderResolution { get { return windowRes; } }
+        public bool IsTransitioning { get { return currentBlendTime > 0; } }
 
         private BarShader shader;
         private Vector2 windowRes = Vector2.Zero;
@@ -40,6 +42,7 @@ namespace player.Renderers.BarHelpers
         private double currentBlendTime = 0;
         private double backgroundTimeTotal = 0;
         private double backgroundTimeLeft = 0;
+        private double currentAspectRatio = 0;
         private SettingsAccessor<double> backgroundDurationAccessor;
         bool skipBlending = false;
 
@@ -48,12 +51,16 @@ namespace player.Renderers.BarHelpers
         private IBackground overrideBackground = null;
         private FpsLimitOverrideContext fpsOverride = null;
         private FpsLimitOverrideContext animatedBackgroundOverride = null;
+        private BackgroundRenderer currentBackgroundRenderer;
+        private BackgroundRenderer nextBackgroundRenderer;
 
         PieChartControl pieChart;
+        ShaderManager shaderManager;
 
         public BackgroundController(BarShader shader)
         {
             this.shader = shader;
+            shaderManager = ServiceManager.GetService<ShaderManager>();
             texMatrices[0] = Matrix4.Identity;
             texMatrices[1] = Matrix4.Identity;
             backgroundDurationAccessor = ServiceManager.GetService<SettingsService>().GetAccessor<double>(SettingsKeys.BarRenderer_BackgroundDuration, 45f);
@@ -63,6 +70,9 @@ namespace player.Renderers.BarHelpers
             pieChart = new PieChartControl("BGProgress");
             pieChart.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             pieChart.Size = new System.Drawing.SizeF(30, 30);
+
+            currentBackgroundRenderer = new BackgroundRenderer(this);
+            nextBackgroundRenderer = new BackgroundRenderer(this);
         }
 
         public string GetCurrentWallpaperPath()
@@ -107,6 +117,9 @@ namespace player.Renderers.BarHelpers
             if (!initialLoadDone) return; //do nothing if not ready
             if (!KeepCurrentBackground && !BackgroundFactory.SingleBackgroundMode) backgroundTimeLeft -= elapsedTime;
 
+            const float RendererAspectLeeway = 0.03f; //arbitrary :)
+
+
             bool blended = false;
             if (swapBackgrounds)
             {
@@ -133,6 +146,7 @@ namespace player.Renderers.BarHelpers
                     currentBackground.Destroy();
                     currentBackground = nextBackground;
                     nextBackground = null;
+                    currentBackgroundRenderer.Background = currentBackground;
                     backgroundTimeLeft = BackgroundDuration;
                     if (currentBackground.OverrideBackgroundDuration != null)
                     {
@@ -156,17 +170,27 @@ namespace player.Renderers.BarHelpers
                     pieChart.SetFillPercentage(1f - BlendTimeRemainingPercentage);
                     blended = true;
 
-                    shader.Activate();
                     shader.SetBlendingAmount(blendFactor);
 
                     GL.PushAttrib(AttribMask.TextureBit);
                     nextBackground.Update(elapsedTime);
+                    shader.Activate();
                     GL.PopAttrib();
 
-                    shader.Activate();
-
-                    GL.ActiveTexture(TextureUnit.Texture1);
-                    nextBackground.BindTexture();
+                    var nextBgAspect = nextBackground.Resolution.Width / nextBackground.Resolution.Height;
+                    if (Math.Abs(currentAspectRatio / nextBgAspect) > RendererAspectLeeway)
+                    {
+                        nextBackgroundRenderer.Render();
+                        shader.Activate();
+                        SecondaryTextureResolution = nextBackground.RenderResolution;
+                        GL.ActiveTexture(TextureUnit.Texture1);
+                        GL.BindTexture(TextureTarget.Texture2D, nextBackgroundRenderer.Texture);
+                    }
+                    else
+                    {
+                        GL.ActiveTexture(TextureUnit.Texture1);
+                        nextBackground.BindTexture();
+                    }
                     GL.ActiveTexture(TextureUnit.Texture0);
 
                     if (updateBackgroundMatrix)
@@ -189,7 +213,21 @@ namespace player.Renderers.BarHelpers
                 currentBackground.Update(elapsedTime);
                 shader.Activate();
                 GL.PopAttrib();
-                currentBackground.BindTexture();
+
+                var currentBgAspect = currentBackground.Resolution.Width / currentBackground.Resolution.Height;
+                if (Math.Abs(currentAspectRatio / currentBgAspect) > RendererAspectLeeway)
+                {
+                    currentBackgroundRenderer.Render();
+                    shader.Activate();
+                    PrimaryTextureResolution = currentBackground.RenderResolution;
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, currentBackgroundRenderer.Texture);
+                }
+                else
+                {
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    currentBackground.BindTexture();
+                }
                 if (!blended && !loadingBackground) pieChart.SetFillPercentage((float)(backgroundTimeLeft / backgroundTimeTotal));
             }
         }
@@ -217,6 +255,7 @@ namespace player.Renderers.BarHelpers
         public void UpdateWindowResolution(Vector2 newRes)
         {
             windowRes = newRes;
+            currentAspectRatio = newRes.X / newRes.Y;
 
             shader.Activate();
             if (currentBackground != null)
@@ -229,11 +268,14 @@ namespace player.Renderers.BarHelpers
                 ScaleBackgroundMatrix(nextBackground, ref texMatrices[1]);
                 shader.SetSecondaryMatrix(texMatrices[1]);
             }
+
+            currentBackgroundRenderer.RenderResolutionChanged();
+            nextBackgroundRenderer.RenderResolutionChanged();
         }
 
         public bool NewBackground(bool disableTransition = false)
         {
-            if (!CanChangeBackground())
+            if (loadingBackground)
             {
                 return false;
             }
@@ -244,7 +286,7 @@ namespace player.Renderers.BarHelpers
 
         public bool PreviousBackground(bool disableTransition = false)
         {
-            if (!CanChangeBackground())
+            if (loadingBackground)
             {
                 return false;
             }
@@ -257,16 +299,6 @@ namespace player.Renderers.BarHelpers
         public void EndTransition()
         {
             currentBlendTime = 0;
-        }
-
-        public bool IsTransitioning()
-        {
-            return currentBlendTime > 0;
-        }
-
-        private bool CanChangeBackground()
-        {
-            return !loadingBackground; //if loading background, dont allow change
         }
 
         public void Destroy()
@@ -320,8 +352,10 @@ namespace player.Renderers.BarHelpers
 
                 backgroundTimeTotal = backgroundTimeLeft;
                 ScaleBackgroundMatrix(currentBackground, ref texMatrices[0]);
+                shader.Activate();
                 shader.SetPrimaryMatrix(texMatrices[0]);
                 PrimaryTextureResolution = new Vector2(currentBackground.Resolution.Width, currentBackground.Resolution.Height);
+                currentBackgroundRenderer.Background = currentBackground;
                 CheckAnimatedBackgroundStatus();
                 initialLoadDone = true;
                 MainThreadDelegator.InvokeOn(InvocationTarget.BeforeRender, () =>
@@ -365,7 +399,9 @@ namespace player.Renderers.BarHelpers
 
         private void ScaleBackgroundMatrix(IBackground background, ref Matrix4 matrix)
         {
-            switch (ScalingMode)
+            matrix = Matrix4.Identity;
+            return;
+            /*switch (ScalingMode)
             {
                 case BackgroundScalingMode.Fit:
                     {
@@ -412,7 +448,7 @@ namespace player.Renderers.BarHelpers
 
                         break;
                     }
-            }
+            }*/
         }
 
         private void GetNextBackground()
@@ -468,6 +504,7 @@ namespace player.Renderers.BarHelpers
                 updateBackgroundMatrix = true;
                 swapBackgrounds = true;
                 skipBlending = false;
+                nextBackgroundRenderer.Background = nextBackground;
             }
         }
     }

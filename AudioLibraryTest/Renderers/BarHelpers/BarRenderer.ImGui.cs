@@ -83,33 +83,26 @@ namespace player.Renderers
                         {
                             ImGui.Text("Busy loading a wallpaper...");
                         }
-                        else if (parent.backgroundController.IsTransitioning())
+                        else if (parent.backgroundController.IsTransitioning)
                         {
                             ImGui.Text("Transitioning wallpapers...");
                             ImGui.ProgressBar(parent.backgroundController.BlendTimeRemainingPercentage, Vector2.Zero, "Blend Duration");
                         }
                         else
                         {
-                            if (parent.backgroundController.CurrentBackground is StaticImageBackground bg)
+                            var curPath = parent.backgroundController.GetCurrentWallpaperPath();
+                            var curSettings = wpSettings.GetImageSettingsForPath(curPath);
+                            if (curSettings != null && curSettings.EditingDisabled)
                             {
-                                var curPath = parent.backgroundController.GetCurrentWallpaperPath();
-                                var curSettings = wpSettings.GetImageSettingsForPath(curPath);
-                                if (curSettings != null && curSettings.EditingDisabled)
+                                ImGui.TextWrapped("Editing is locked. Press the unlock button to re-enable editing");
+                                if (ImGui.Button("Unlock"))
                                 {
-                                    ImGui.TextWrapped("Editing is locked. Press the unlock button to re-enable editing");
-                                    if (ImGui.Button("Unlock"))
-                                    {
-                                        wpSettings.GetImageSettingsForPath(curPath, true).EditingDisabled = false;
-                                    }
-                                }
-                                else
-                                {
-                                    DrawStaticImageSettings(bg, curSettings, curPath);
+                                    wpSettings.GetImageSettingsForPath(curPath, true).EditingDisabled = false;
                                 }
                             }
                             else
                             {
-                                ImGui.Text("Settings not yet supported for this background type");
+                                RenderBackgroundModeSettings(parent.backgroundController.CurrentBackground, curSettings, curPath);
                             }
                         }
                     }
@@ -134,7 +127,7 @@ namespace player.Renderers
                 }
             }
 
-            void DrawStaticImageSettings(StaticImageBackground bg, ImageSettings curSettings, string curPath)
+            void RenderBackgroundModeSettings(IBackground bg, ImageSettings curSettings, string curPath)
             {
                 int renderModeIdx = 0;
                 int anchorPosIdx = 0;
@@ -166,8 +159,15 @@ namespace player.Renderers
 
                     bgStyleIndex = (int)curSettings.BackgroundStyle;
                 }
-                int imageWidth = bg.SourceImageSize.Width;
-                int imageHeight = bg.SourceImageSize.Height;
+                int imageWidth = (int)bg.Resolution.Width;
+                int imageHeight = (int)bg.Resolution.Height;
+                StaticImageBackground sib = bg as StaticImageBackground;
+                if (sib != null)
+                {
+                    imageWidth = sib.SourceImageSize.Width;
+                    imageHeight = sib.SourceImageSize.Width;
+                }
+
                 if (ImGui.Combo("Render Mode", ref renderModeIdx, renderModeItems, renderModeItems.Length))
                 {
                     wpSettings.GetImageSettingsForPath(curPath, true).Mode = (BackgroundMode)renderModeIdx;
@@ -209,7 +209,16 @@ namespace player.Renderers
                     }
 
                     ImGui.SameLine();
-                    ImGui.Text("Source Crop (Left / Right / Top / Bot)");
+
+                    if (sib == null)
+                    {
+                        ImGui.Text("Source Crop (Disabled for this type)");
+                        ImGui.BeginDisabled();
+                    }
+                    else
+                    {
+                        ImGui.Text("Source Crop (Left / Right / Top / Bot)");
+                    }
                     ImGui.PushItemWidth(75);
                     if (ImGui.SliderInt("##Left", ref left, 0, imageWidth / 2, $"{left}"))
                     {
@@ -289,6 +298,11 @@ namespace player.Renderers
                     if (ImGui.Button("+##Bot", pmButtonSize))
                     {
                         wpSettings.GetImageSettingsForPath(curPath, true).TrimPixelsBottom++;
+                    }
+
+                    if (sib == null)
+                    {
+                        ImGui.EndDisabled();
                     }
 
                     ImGui.Text("Render Crop");

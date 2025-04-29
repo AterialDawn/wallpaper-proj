@@ -1,6 +1,4 @@
-﻿//#define SHOW_COPYRIGHT
-
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
@@ -22,11 +20,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
 using Log = player.Core.Logging.Logger;
-
-#if DEBUG
 using System.Linq;
 using System.Runtime.InteropServices;
-#endif
 
 namespace player.Core
 {
@@ -273,16 +268,14 @@ namespace player.Core
                     ServiceManager.GetService<SettingsService>().SetSetting("Core.ClockEnabled", clockLabel.Enabled);
                 };
 
-#if DEBUG
                 if (Program.CLIParser.ActiveOptions.Where(opt => opt.Item1 == "GLDebug").Any())
                 {
-                    //add opengl debug logging on debug builds if -GLDebug is specified
+                    //add opengl debug logging if -GLDebug is specified
                     _debugHandle = GCHandle.Alloc(_debugProcCallback);
                     GL.DebugMessageCallback(_debugProcCallback, IntPtr.Zero);
                     GL.Enable(EnableCap.DebugOutput);
                     GL.Enable(EnableCap.DebugOutputSynchronous);
                 }
-#endif
             }
         }
 
@@ -457,15 +450,14 @@ namespace player.Core
             Log.Log($"Player v{Program.VersionNumber} Shutting down!");
         }
 
-#if DEBUG
         static DebugProc _debugProcCallback = DebugCallback;
         static GCHandle _debugHandle;
         private static void DebugCallback(DebugSource source, DebugType type, int id,
     DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
         {
+            if (type == DebugType.DebugTypeOther) return;
             string messageString = Marshal.PtrToStringAnsi(message, length);
             Log.Log($"[{DateTime.Now.Ticks}] {severity} {type} | {messageString}");
         }
-#endif
     }
 }

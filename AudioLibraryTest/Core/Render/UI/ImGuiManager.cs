@@ -448,7 +448,7 @@ namespace player.Core.Render.UI
                 GL.PopAttrib();
                 GL.Disable(EnableCap.ScissorTest);
                 GL.BindTexture(TextureTarget.Texture2D, last_texture);
-
+                GL.MatrixMode(MatrixMode.Modelview);
             }
         }
     }

@@ -317,7 +317,7 @@ namespace player.Utility
                     GL.ColorPointer(4, ColorPointerType.Float, Stride, 32);
                     break;
             }
-            GL.DrawArrays(DrawMode, 0, vertex_data.Length / AttributeCount);
+            GL.DrawArrays(DrawMode, 0, vertex_position / AttributeCount);
 
             GL.PopClientAttrib();
         }

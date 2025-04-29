@@ -9,7 +9,7 @@ namespace player.Core.Render
     {
         public string ServiceName => "Framebuffer Manager";
 
-        private Stack<uint> fbStack = new Stack<uint>();
+        private Dictionary<int, Stack<uint>> fbStackDict = new Dictionary<int, Stack<uint>>();
 
         public void Cleanup()
         {
@@ -25,6 +25,12 @@ namespace player.Core.Render
             {
                 case FramebufferTarget.Framebuffer:
                     {
+                        var threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+                        if (!fbStackDict.TryGetValue(threadId, out var fbStack))
+                        {
+                            fbStack = new Stack<uint>();
+                            fbStackDict[threadId] = fbStack;
+                        }
                         fbStack.Push(frameBuffer);
                         GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBuffer);
                         break;
@@ -39,6 +45,7 @@ namespace player.Core.Render
             {
                 case FramebufferTarget.Framebuffer:
                     {
+                        var fbStack = fbStackDict[System.Threading.Thread.CurrentThread.ManagedThreadId];
                         var result = fbStack.Pop();
                         uint toBind = 0;
                         if (fbStack.Count > 0)

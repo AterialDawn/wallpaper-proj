@@ -27,21 +27,23 @@ namespace player.Renderers.BarHelpers
         public AnimatedImageBackground(string sourcePath)
         {
             SourcePath = sourcePath;
-
-            GL.GenTextures(textureIndices.Length, textureIndices);
-            indexBuffer = new RotatingBuffer<int>(textureIndices.Length);
-            indexBuffer.Set(textureIndices);
         }
 
         public override bool Preload()
         {
             try
             {
+                GL.GenTextures(textureIndices.Length, textureIndices);
+                indexBuffer = new RotatingBuffer<int>(textureIndices.Length);
+                indexBuffer.Set(textureIndices);
+
                 gifBmp = (Bitmap)Bitmap.FromFile(SourcePath);
 
                 Resolution = new SizeF(gifBmp.Width, gifBmp.Height);
 
                 InitializeGifData();
+
+                Dirty = true;
                 return true;
             }
             catch (Exception e)
@@ -53,6 +55,7 @@ namespace player.Renderers.BarHelpers
 
         public override void Update(double elapsedTime)
         {
+            Dirty = false;
             if (singleFrame) return;
             timeLeftForFrame -= elapsedTime;
             if (timeLeftForFrame < 0)
@@ -137,6 +140,7 @@ namespace player.Renderers.BarHelpers
             GL.Finish();
 
             indexBuffer.RotateElements();
+            Dirty = true;
         }
     }
 }

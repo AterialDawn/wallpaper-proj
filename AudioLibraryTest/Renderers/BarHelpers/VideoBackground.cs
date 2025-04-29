@@ -45,12 +45,14 @@ namespace player.Renderers.BarHelpers
                 OverrideBackgroundDuration = decoder.VideoLength;
                 OverrideFps = 1d / decoder.FrameDelay;
                 LoadInitialFrames();
+                Dirty = true;
             }
             return true;
         }
 
         public override void Update(double elapsedTime)
         {
+            Dirty = false;
             frameTime -= elapsedTime;
 
             if (frameTime <= 0)
@@ -65,6 +67,7 @@ namespace player.Renderers.BarHelpers
 
                 videoRenderer.SkipFrames(framesToSkip);
                 videoRenderer.RenderNextFrame();
+                Dirty = true;
                 fbManager.PopFramebuffer(FramebufferTarget.Framebuffer);
                 GL.PopAttrib();
             }

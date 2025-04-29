@@ -11,6 +11,10 @@ namespace player.Renderers.BarHelpers
     abstract class BackgroundBase : IBackground
     {
         public abstract bool Animated { get; }
+        /// <summary>
+        /// If animated, indicates this texture was just updated/changed
+        /// </summary>
+        public bool Dirty { get; protected set; } = false;
 
         public SizeF Resolution { get; protected set; }
 
@@ -32,8 +36,8 @@ namespace player.Renderers.BarHelpers
         protected void ReportPreloadError(string message, Exception e = null)
         {
             string exceptionText = (e != null ? e.ToString() : "No exception!");
-            Log.Log("Exception attempting to load image {0}! E : {1}", SourcePath, exceptionText);
-            ServiceManager.GetService<MessageCenterService>().ShowMessage($"Error loading : {Path.GetFileName(SourcePath)}");
+            Log.Log($"Exception attempting to load image {SourcePath}! {message} | E : {exceptionText}");
+            ServiceManager.GetService<MessageCenterService>().ShowMessage(message);
         }
 
         protected void ShowMessageCenterMessage(string message)

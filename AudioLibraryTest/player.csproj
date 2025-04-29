@@ -56,6 +56,7 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -253,6 +254,7 @@
     <Compile Include="Renderers\BarHelpers\BackgroundBase.cs" />
     <Compile Include="Renderers\BarHelpers\BackgroundController.cs" />
     <Compile Include="Renderers\BarHelpers\BackgroundFactory.cs" />
+    <Compile Include="Renderers\BarHelpers\BackgroundRenderer.cs" />
     <Compile Include="Renderers\BarHelpers\BackgroundScalingMode.cs" />
     <Compile Include="Renderers\BarHelpers\BarRenderer.ImGui.cs" />
     <Compile Include="Renderers\BarHelpers\IBackground.cs" />
