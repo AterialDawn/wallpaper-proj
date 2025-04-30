@@ -79,7 +79,7 @@ namespace player.Renderers
                 {
                     if (ImGui.Begin("Image Settings", ref imageInfoWindowVisible.Value, ImGuiWindowFlags.None))
                     {
-                        if (parent.backgroundController.LoadingNextWallpaper)
+                        if (parent.backgroundController.LoadingNextWallpaper || parent.backgroundController.CurrentBackground == null)
                         {
                             ImGui.Text("Busy loading a wallpaper...");
                         }
@@ -90,7 +90,7 @@ namespace player.Renderers
                         }
                         else
                         {
-                            var curPath = parent.backgroundController.GetCurrentWallpaperPath();
+                            var curPath = parent.backgroundController.CurrentBackground.SourcePath;
                             var curSettings = wpSettings.GetImageSettingsForPath(curPath);
                             if (curSettings != null && curSettings.EditingDisabled)
                             {
