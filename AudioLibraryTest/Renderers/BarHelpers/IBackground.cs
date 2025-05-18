@@ -52,9 +52,9 @@ namespace player.Renderers.BarHelpers
         void Update(double elapsedTime);
 
         /// <summary>
-        /// This should only consist of calling GL.BindTexture with the current texture to use
+        /// Gets the texture index that this image is stored in
         /// </summary>
-        void BindTexture();
+        int GetTextureIndex();
 
         /// <summary>
         /// Destroy all allocated resources, as the background is no longer used

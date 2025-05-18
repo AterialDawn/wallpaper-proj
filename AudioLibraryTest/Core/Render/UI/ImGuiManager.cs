@@ -32,7 +32,8 @@ namespace player.Core.Render.UI
         public event EventHandler OnRenderingGui;
         public event EventHandler OnDisplayingPopupMenu;
         public event EventHandler OnDrawingDebugSubmenu;
-        public event EventHandler<ImGuiRenderingEventArgs> OnDrawingTitlebar;
+
+        Dictionary<string, List<Action<ImGuiRenderingEventArgs>>> titlebarMenus = new Dictionary<string, List<Action<ImGuiRenderingEventArgs>>>();
 
         FpsLimitOverrideContext overrideContext = null;
 
@@ -48,11 +49,25 @@ namespace player.Core.Render.UI
             ServiceManager.GetService<InputManager>().MouseMoveEventRaw += ImGuiController_MouseMoveEventRaw;
             settings = new Settings(ServiceManager.GetService<SettingsService>());
             console = ServiceManager.GetService<ConsoleManager>();
+
+            ImGui.LoadIniSettingsFromMemory(settings.IniData.Value);
         }
 
         public void Cleanup()
         {
+            var iniStr = ImGui.SaveIniSettingsToMemory();
+            settings.IniData.Set(iniStr);
+        }
 
+        public void AddOptionToTitlebarMenu(string titlebarMenu, Action<ImGuiRenderingEventArgs> onDrawnHandler)
+        {
+            if (!titlebarMenus.TryGetValue(titlebarMenu, out var list))
+            {
+                list = new List<Action<ImGuiRenderingEventArgs>>();
+                titlebarMenus[titlebarMenu] = list;
+            }
+
+            list.Add(onDrawnHandler);
         }
 
         private void ImGuiController_MouseMoveEventRaw(object sender, MouseMoveEventArgs e)
@@ -98,41 +113,54 @@ namespace player.Core.Render.UI
             {
                 controller.NewFrame(vgs.Width, vgs.Height);
             }
+
+            if (io.WantSaveIniSettings)
+            {
+                var str = ImGui.SaveIniSettingsToMemory();
+                settings.IniData.Set(str);
+                io.WantSaveIniSettings = false;
+            }
         }
         public void Render()
         {
-            if (mouseLastY < 50 || debugSubMenuOpen)
-            {
-                debugSubMenuOpen = false;
-                if (ImGui.BeginMainMenuBar())
-                {
-                    if (ImGui.BeginMenu("Debug"))
-                    {
-                        debugSubMenuOpen = true;
-                        ImGui.Checkbox("AutoHide GUI", ref settings.AutoHideGui.Value);
-                        OnDrawingDebugSubmenu?.Invoke(this, EventArgs.Empty);
-                        ImGui.EndMenu();
-                    }
-
-                    if (OnDrawingTitlebar != null)
-                    {
-                        foreach (var del in OnDrawingTitlebar.GetInvocationList())
-                        {
-                            var args = new ImGuiRenderingEventArgs();
-                            del.DynamicInvoke(this, args);
-                            if (args.SomethingWasDrawn)
-                            {
-                                debugSubMenuOpen = true;
-                            }
-                        }
-                    }
-
-                    ImGui.EndMainMenuBar();
-                }
-            }
             bool popupDrawn = false;
             if (currentFrameOpacity > 0)
             {
+                if (mouseLastY < 50 || debugSubMenuOpen)
+                {
+                    debugSubMenuOpen = false;
+                    if (ImGui.BeginMainMenuBar())
+                    {
+                        foreach (var menu in titlebarMenus)
+                        {
+                            if (ImGui.BeginMenu(menu.Key))
+                            {
+                                foreach (var entry in menu.Value)
+                                {
+                                    var args = new ImGuiRenderingEventArgs();
+
+                                    entry(args);
+
+                                    if (args.SomethingWasDrawn)
+                                    {
+                                        debugSubMenuOpen = true;
+                                    }
+                                }
+                                ImGui.EndMenu();
+                            }
+                        }
+
+                        if (ImGui.BeginMenu("Debug"))
+                        {
+                            debugSubMenuOpen = true;
+                            ImGui.Checkbox("AutoHide GUI", ref settings.AutoHideGui.Value);
+                            OnDrawingDebugSubmenu?.Invoke(this, EventArgs.Empty);
+                            ImGui.EndMenu();
+                        }
+                        ImGui.EndMainMenuBar();
+                    }
+                }
+
                 try
                 {
                     OnRenderingGui?.Invoke(this, EventArgs.Empty);
@@ -170,7 +198,6 @@ namespace player.Core.Render.UI
                             invoList[invoList.Length - 1].DynamicInvoke(this, EventArgs.Empty);
                         }
                     }
-
                     ImGui.EndPopup();
                 }
             }
@@ -197,14 +224,22 @@ namespace player.Core.Render.UI
         class Settings
         {
             public SettingsAccessor<bool> AutoHideGui { get; private set; }
+            public SettingsAccessor<string> IniData { get; private set; }
 
             public Settings(SettingsService svc)
             {
                 AutoHideGui = svc.GetAccessor("IMGUI.AutoHideGui", true);
+                IniData = svc.GetAccessor("IMGUI.Ini", string.Empty);
             }
         }
 
+        public static class KnownTitlebars
+        {
+            public static readonly string Options = "Options";
+        }
+
         bool[] lastMouseButtons = new bool[3];
+        bool[] lastModifiers = new bool[3];
 
         public bool ShouldSwallowInputEvent(InputManager.InputEventContainer evc)
         {
@@ -214,6 +249,22 @@ namespace player.Core.Render.UI
             {
                 var ka = evc.KeyboardKeyEventArg;
                 io.AddKeyEvent(InputHelper.OpenTKKeyToImGuiKey(ka.Key), evc.KeyPressed);
+
+                if (ka.Shift != lastModifiers[0])
+                {
+                    io.AddKeyEvent(ImGuiKey.ModShift, ka.Shift);
+                    lastModifiers[0] = ka.Shift;
+                }
+                if (ka.Ctrl != lastModifiers[1])
+                {
+                    io.AddKeyEvent(ImGuiKey.ModCtrl, ka.Ctrl);
+                    lastModifiers[1] = ka.Ctrl;
+                }
+                if (ka.Alt != lastModifiers[2])
+                {
+                    io.AddKeyEvent(ImGuiKey.ModAlt, ka.Alt);
+                    lastModifiers[2] = ka.Alt;
+                }
 
                 return io.WantCaptureKeyboard;
             }

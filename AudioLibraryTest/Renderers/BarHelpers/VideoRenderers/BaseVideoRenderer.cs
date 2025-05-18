@@ -10,12 +10,12 @@ namespace player.Renderers.BarHelpers.VideoRenderers
     abstract class BaseVideoRenderer
     {
         protected const int FRAME_BUFFER_SIZE = 5;
-        public uint RenderedVideoTexture { get { return MainRenderTexture; } }
+        public int RenderedVideoTexture { get { return MainRenderTexture; } }
 
         protected FFMpegDecoder Decoder;
 
         protected uint MainFramebuffer;
-        protected uint MainRenderTexture;
+        protected int MainRenderTexture;
         protected uint MainDepthRenderBuffer;
         protected FramebufferManager fbManager;
 

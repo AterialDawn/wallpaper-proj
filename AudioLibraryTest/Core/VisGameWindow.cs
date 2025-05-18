@@ -22,6 +22,8 @@ using System.Windows.Forms;
 using Log = player.Core.Logging.Logger;
 using System.Linq;
 using System.Runtime.InteropServices;
+using player.Renderers.BarHelpers;
+using player.Core.Render.UI.ImageWindow;
 
 namespace player.Core
 {
@@ -299,6 +301,7 @@ namespace player.Core
                     ServiceManager.RegisterService(new WasapiSoundManager());
                 }
                 fpsTracker = ServiceManager.RegisterService(new FpsTracker());
+                ServiceManager.RegisterService(new BackgroundFactory());
                 visRenderer = ServiceManager.RegisterService(new VisRenderer());
                 soundDataProcessor = ServiceManager.RegisterService(new SoundDataProcessor());
                 ServiceManager.RegisterService(new WindowCommands());
@@ -306,6 +309,7 @@ namespace player.Core
                 inputManager = ServiceManager.RegisterService(new InputManager());
                 uiManager = ServiceManager.RegisterService(new UIManager());
                 fbManager = ServiceManager.RegisterService(new FramebufferManager());
+                ServiceManager.RegisterService(new ImageWindowService());
 
                 ServiceManager.RegisterService(dropTarget);
             }

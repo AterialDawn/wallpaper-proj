@@ -10,7 +10,7 @@ using Log = player.Core.Logging.Logger;
 
 namespace player.Renderers.BarHelpers
 {
-    class BackgroundFactory
+    class BackgroundFactory : IService
     {
         List<string> registeredFiles = new List<string>();
         List<string> sourcePaths = new List<string>();
@@ -23,6 +23,8 @@ namespace player.Renderers.BarHelpers
 
         public bool IsRandom { get; private set; } = true;
         public bool SingleBackgroundMode { get; private set; } = false;
+
+        public string ServiceName => "BackgroundFactory";
 
         private SettingsAccessor<List<string>> registeredPathsKey;
 
@@ -302,6 +304,11 @@ namespace player.Renderers.BarHelpers
             }
 
             if (currentIndex == -1) ShuffleFiles();
+        }
+
+        public void Cleanup()
+        {
+            throw new NotImplementedException();
         }
     }
 }

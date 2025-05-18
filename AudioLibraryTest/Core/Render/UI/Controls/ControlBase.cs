@@ -191,7 +191,7 @@ namespace player.Core.Render.UI.Controls
             return otherCtrl.ID == ID;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             uiManagerInst.UnregisterControl(this);
         }

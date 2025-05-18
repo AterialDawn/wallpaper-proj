@@ -73,10 +73,7 @@ namespace player.Renderers.BarHelpers
             }
         }
 
-        public override void BindTexture()
-        {
-            GL.BindTexture(TextureTarget.Texture2D, videoRenderer.RenderedVideoTexture);
-        }
+        public override int GetTextureIndex() => videoRenderer.RenderedVideoTexture;
 
         public override void Destroy()
         {

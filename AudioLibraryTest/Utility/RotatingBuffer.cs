@@ -5,9 +5,10 @@ namespace player.Utility
 {
     class RotatingBuffer<T>
     {
+        public int Index { get; set; }
+
         private T[] elementArray;
         List<T> returnList = new List<T>();
-        private int startIndex = 0;
         private int count = 0;
 
         public int Count { get { return count; } }
@@ -28,12 +29,12 @@ namespace player.Utility
 
         public void Reset()
         {
-            startIndex = 0;
+            Index = 0;
         }
 
         public void RotateElements()
         {
-            startIndex = (startIndex + 1) % count;
+            Index = (Index + 1) % count;
         }
 
         public T[] ToArray()
@@ -41,7 +42,7 @@ namespace player.Utility
             returnList.Clear();
             for (int i = 0; i < count; i++)
             {
-                int index = (i + startIndex) % count;
+                int index = (i + Index) % count;
                 returnList.Add(elementArray[index]);
             }
             return returnList.ToArray();
@@ -49,17 +50,17 @@ namespace player.Utility
 
         public T GetCurrent()
         {
-            return elementArray[startIndex];
+            return elementArray[Index];
         }
 
         public T GetNext()
         {
-            int index = (startIndex + 1) % count;
+            int index = (Index + 1) % count;
             return elementArray[index];
         }
         public T GetLast()
         {
-            int index = startIndex - 1;
+            int index = Index - 1;
             if (index < 0) index = count - 1;
             return elementArray[index];
         }
@@ -68,7 +69,7 @@ namespace player.Utility
         {
             for (int i = 0; i < count; i++)
             {
-                int index = (i + startIndex) % count;
+                int index = (i + Index) % count;
                 yield return elementArray[index];
             }
         }

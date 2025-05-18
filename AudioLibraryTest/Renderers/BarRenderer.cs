@@ -102,6 +102,8 @@ namespace player.Renderers
             }
 
             imGuiHandler = new ImGuiHandler(this);
+
+            backgroundController.Initialize();
         }
 
         private void Settings_OnSettingsReloaded(object sender, EventArgs e)

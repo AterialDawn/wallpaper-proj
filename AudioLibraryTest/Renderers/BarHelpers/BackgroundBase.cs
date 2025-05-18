@@ -25,7 +25,7 @@ namespace player.Renderers.BarHelpers
 
         public double? OverrideFps { get; protected set; } = null;
 
-        public abstract void BindTexture();
+        public abstract int GetTextureIndex();
 
         public abstract void Destroy();
 

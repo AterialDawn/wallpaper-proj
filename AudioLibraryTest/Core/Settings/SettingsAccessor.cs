@@ -28,6 +28,7 @@
         public void Set(T value)
         {
             settings.SetSetting(key, value);
+            Value = value;
         }
 
         /// <summary>

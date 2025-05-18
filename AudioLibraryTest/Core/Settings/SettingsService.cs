@@ -36,15 +36,8 @@ namespace player.Core.Settings
             Load();
         }
 
-        public void Initialize()
-        {
-
-        }
-
-        public void Cleanup()
-        {
-            Save();
-        }
+        public void Initialize() { }
+        public void Cleanup() { }
 
         public void ReloadSettingsFile(string settingsFileName)
         {

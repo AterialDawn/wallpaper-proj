@@ -13,11 +13,13 @@ namespace player.Renderers.BarHelpers
     {
         public override bool Animated { get { return true; } }
 
+        public bool LoadAllFramesToMemory { get; set; } = false;
+
         private RotatingBuffer<int> indexBuffer;
         int frameCount = 0;
         int frameIndex = 0;
         double timeLeftForFrame = 0;
-        int[] textureIndices = new int[2];
+        int[] textureIndices;
         double[] frameDurations;
         private Bitmap gifBmp;
         private bool singleFrame = false;
@@ -33,15 +35,27 @@ namespace player.Renderers.BarHelpers
         {
             try
             {
-                GL.GenTextures(textureIndices.Length, textureIndices);
-                indexBuffer = new RotatingBuffer<int>(textureIndices.Length);
-                indexBuffer.Set(textureIndices);
-
                 gifBmp = (Bitmap)Bitmap.FromFile(SourcePath);
 
                 Resolution = new SizeF(gifBmp.Width, gifBmp.Height);
 
                 InitializeGifData();
+
+                if (LoadAllFramesToMemory)
+                {
+                    LoadGifCompletely();
+                }
+                else
+                {
+                    textureIndices = new int[2];
+                    GL.GenTextures(textureIndices.Length, textureIndices);
+                    indexBuffer = new RotatingBuffer<int>(textureIndices.Length);
+                    indexBuffer.Set(textureIndices);
+
+                    //Load first frame of the gif into a texture
+                    InitializeTextures();
+                    timeLeftForFrame = frameDurations[0];
+                }
 
                 Dirty = true;
                 return true;
@@ -64,15 +78,19 @@ namespace player.Renderers.BarHelpers
                 {
                     frameIndex = (frameIndex + 1) % frameCount;
                     timeLeftForFrame += frameDurations[frameIndex];
+                    if (LoadAllFramesToMemory)
+                    {
+                        indexBuffer.RotateElements();
+                    }
                 }
-                ThreadedLoaderContext.Instance.ExecuteOnLoaderThread(LoadFrameIntoTexture);
+                if(!LoadAllFramesToMemory)
+                {
+                    ThreadedLoaderContext.Instance.ExecuteOnLoaderThread(LoadFrameIntoTexture);
+                }
             }
         }
 
-        public override void BindTexture()
-        {
-            GL.BindTexture(TextureTarget.Texture2D, indexBuffer.GetCurrent());
-        }
+        public override int GetTextureIndex() => indexBuffer.GetCurrent();
 
         public override void Destroy()
         {
@@ -96,10 +114,21 @@ namespace player.Renderers.BarHelpers
 
             frameCount = gifBmp.GetFrameCount(FrameDimension.Time);
             singleFrame = frameCount == 1;
+        }
 
-            //Load first frame of the gif into a texture
-            InitializeTextures();
-            timeLeftForFrame = frameDurations[0];
+        private void LoadGifCompletely()
+        {
+            textureIndices = new int[frameDurations.Length];
+            GL.GenTextures(textureIndices.Length, textureIndices);
+            indexBuffer = new RotatingBuffer<int>(textureIndices.Length);
+            indexBuffer.Set(textureIndices);
+
+            //load all gif frames into gpu textures
+            indexBuffer.Index = frameDurations.Length - 1; //set to last element, since LoadFrame uses GetNext. stupid but then i can reuse LoadFrame :)
+            for (frameIndex = 0; frameIndex < frameDurations.Length; frameIndex++)
+            {
+                LoadFrameIntoTexture();
+            }
         }
 
         private void InitializeTextures()
@@ -133,7 +162,14 @@ namespace player.Renderers.BarHelpers
             gifBmp.SelectActiveFrame(FrameDimension.Time, frameIndex);
             BitmapData lockedData = gifBmp.LockBits(new Rectangle(0, 0, gifBmp.Width, gifBmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
-            TextureUtils.UpdateTextureFromPtr(gifBmp.Width, gifBmp.Height, indexBuffer.GetNext(), OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, lockedData.Scan0);
+            if (LoadAllFramesToMemory)
+            {
+                TextureUtils.LoadPtrIntoTexture(gifBmp.Width, gifBmp.Height, indexBuffer.GetNext(), OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, lockedData.Scan0);
+            }
+            else
+            {
+                TextureUtils.UpdateTextureFromPtr(gifBmp.Width, gifBmp.Height, indexBuffer.GetNext(), OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, lockedData.Scan0);
+            }
 
             gifBmp.UnlockBits(lockedData);
 

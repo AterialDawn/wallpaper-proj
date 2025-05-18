@@ -165,6 +165,7 @@
     <Compile Include="Core\Render\FpsLimitHelper.cs" />
     <Compile Include="Core\Render\FramebufferManager.cs" />
     <Compile Include="Core\Render\FramebufferRenderTexture.cs" />
+    <Compile Include="Core\Render\UI\ImageWindow\ImageWindowService.cs" />
     <Compile Include="Core\Render\MessageRenderer.cs" />
     <Compile Include="Core\Render\Primitives.cs" />
     <Compile Include="Core\Render\ShaderManager.cs" />
@@ -174,6 +175,8 @@
     <Compile Include="Core\Render\UI\Controls\OLabel.cs" />
     <Compile Include="Core\Render\MessageCenterService.cs" />
     <Compile Include="Core\Render\UI\Controls\PieChartControl.cs" />
+    <Compile Include="Core\Render\UI\ImageWindow\ImageWindowService.ImageWindow.cs" />
+    <Compile Include="Core\Render\UI\ImageWindow\ImageWindowService.IMGWindowData.cs" />
     <Compile Include="Core\Render\UI\ImGuiEx.cs" />
     <Compile Include="Core\Render\UI\ImGuiManager.cs" />
     <Compile Include="Core\Render\UI\UIManager.cs" />

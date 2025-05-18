@@ -19,7 +19,7 @@ namespace player.Renderers.BarHelpers
         public double BackgroundDuration { get { return backgroundDurationAccessor.Value; } private set { backgroundDurationAccessor.Set(value); } }
         public bool KeepCurrentBackground { get; set; } = false;
         public BackgroundScalingMode ScalingMode { get; set; } = BackgroundScalingMode.Fit;
-        public BackgroundFactory BackgroundFactory { get; private set; } = new BackgroundFactory();
+        public BackgroundFactory BackgroundFactory { get; private set; }
         public event EventHandler InitialBackgroundLoadComplete;
 
         public Vector2 PrimaryTextureResolution { get; private set; } = new Vector2();
@@ -60,12 +60,11 @@ namespace player.Renderers.BarHelpers
         public BackgroundController(BarShader shader)
         {
             this.shader = shader;
+            BackgroundFactory = ServiceManager.GetService<BackgroundFactory>();
             shaderManager = ServiceManager.GetService<ShaderManager>();
             texMatrices[0] = Matrix4.Identity;
             texMatrices[1] = Matrix4.Identity;
             backgroundDurationAccessor = ServiceManager.GetService<SettingsService>().GetAccessor<double>(SettingsKeys.BarRenderer_BackgroundDuration, 45f);
-
-            InitializeTextures();
 
             pieChart = new PieChartControl("BGProgress");
             pieChart.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
@@ -73,6 +72,11 @@ namespace player.Renderers.BarHelpers
 
             currentBackgroundRenderer = new BackgroundRenderer(this);
             nextBackgroundRenderer = new BackgroundRenderer(this);
+        }
+
+        public void Initialize()
+        {
+            InitializeTextures();
         }
 
         public string GetCurrentWallpaperPath()
@@ -189,7 +193,7 @@ namespace player.Renderers.BarHelpers
                     else
                     {
                         GL.ActiveTexture(TextureUnit.Texture1);
-                        nextBackground.BindTexture();
+                        GL.BindTexture(TextureTarget.Texture2D, nextBackground.GetTextureIndex());
                     }
                     GL.ActiveTexture(TextureUnit.Texture0);
 
@@ -226,7 +230,7 @@ namespace player.Renderers.BarHelpers
                 else
                 {
                     GL.ActiveTexture(TextureUnit.Texture0);
-                    currentBackground.BindTexture();
+                    GL.BindTexture(TextureTarget.Texture2D, CurrentBackground.GetTextureIndex());
                 }
                 if (!blended && !loadingBackground) pieChart.SetFillPercentage((float)(backgroundTimeLeft / backgroundTimeTotal));
             }
@@ -313,7 +317,6 @@ namespace player.Renderers.BarHelpers
             {
                 try
                 {
-                    BackgroundFactory.Initialize();
                     currentBackground = BackgroundFactory.GetNextBackground();
                     currentBackground.RenderResolution = windowRes;
                 }

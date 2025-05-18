@@ -156,8 +156,7 @@ namespace player.Renderers.BarHelpers
                         float horizontalMove = aspect;
                         bgTargetHelper.BindAndRenderTo(true);
 
-                        //GL.BindTexture(TextureTarget.Texture2D, textureIndex);
-                        Background.BindTexture();
+                        GL.BindTexture(TextureTarget.Texture2D, Background.GetTextureIndex());
 
                         GL.Scale(2, 2, 1);
                         {
@@ -190,7 +189,7 @@ namespace player.Renderers.BarHelpers
 
                         primitives.CenteredQuad.Draw();
 
-                        Background.BindTexture();
+                        GL.BindTexture(TextureTarget.Texture2D, Background.GetTextureIndex());
 
                         gaussianBlur.SetBlurState(false);
 
@@ -260,7 +259,7 @@ namespace player.Renderers.BarHelpers
                         }
                         else if (settingsForImage.BackgroundStyle == SolidBackgroundStyle.StretchEdge)
                         {
-                            Background.BindTexture();
+                            GL.BindTexture(TextureTarget.Texture2D, Background.GetTextureIndex());
                             gaussianBlur.SetColorOverride(false, Vector4.One);
                             //flip uv coordinates of left rect
                             float uvSampleWidth = settingsForImage.StretchWidth / Controller.RenderResolution.X;
@@ -306,7 +305,7 @@ namespace player.Renderers.BarHelpers
 
                         gaussianBlur.SetColorOverride(false, Vector4.Zero);
 
-                        Background.BindTexture();
+                        GL.BindTexture(TextureTarget.Texture2D, Background.GetTextureIndex());
                         {
 
                             switch (align)

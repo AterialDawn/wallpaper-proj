@@ -72,8 +72,9 @@ namespace player
                 {
                     GameWindow.VSync = OpenTK.VSyncMode.Off;
                     GameWindow.Run(0, 0);
-
                 }
+
+                Core.Service.ServiceManager.GetService<SettingsService>().Save();
             }
             catch (Exception e)
             {

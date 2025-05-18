@@ -49,10 +49,7 @@ namespace player.Renderers.BarHelpers
             if (TimeManager.FrameNumber - wpSettings.LastFrameSettingsWereChanged < 2) uploadToGL();
         }
 
-        public override void BindTexture()
-        {
-            GL.BindTexture(TextureTarget.Texture2D, textureIndex);
-        }
+        public override int GetTextureIndex() => textureIndex;
 
         public override void Destroy()
         {
