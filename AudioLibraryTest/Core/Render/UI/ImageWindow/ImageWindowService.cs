@@ -66,11 +66,9 @@ namespace player.Core.Render.UI.ImageWindow
         {
             foreach (var window in windows)
             {
-                if (io.KeyShift)
-                {
-                    curWindow = window;
-                    ImGui.SetNextWindowSizeConstraints(Vector2.Zero, MaxVect, constrainToAspectRatio);
-                }
+                curWindow = window;
+                ImGui.SetNextWindowSizeConstraints(Vector2.Zero, MaxVect, constrainToAspectRatio);
+
                 var flags = ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoCollapse;
                 if (window.Data == hoveredData)
                 {
@@ -78,7 +76,7 @@ namespace player.Core.Render.UI.ImageWindow
                 }
                 if (ImGui.Begin(window.Name, flags))
                 {
-                    if (!window.Initialized || ImGui.IsWindowHovered())
+                    if (!window.Initialized)
                     {
                         var size = ImGui.GetWindowSize();
                         var pos = ImGui.GetWindowPos();
@@ -192,9 +190,19 @@ namespace player.Core.Render.UI.ImageWindow
 
         private unsafe void constrainToAspectRatio(ImGuiSizeCallbackData* data)
         {
-            float aspectRatio = curWindow.ImageSize.Width / curWindow.ImageSize.Height;
-            var newSize = data->DesiredSize.X / aspectRatio;
-            data->DesiredSize.Y = newSize;
+            //check if we should constrain
+            if (ImGui.IsWindowFocused() && io.KeyShift && io.MouseDown[0])
+            {
+                //current window is focused, user is holding shift and dragging with mouse
+                float aspectRatio = curWindow.ImageSize.Width / curWindow.ImageSize.Height;
+                var newSize = data->DesiredSize.X / aspectRatio;
+                data->DesiredSize.Y = newSize;
+            }
+
+            if (data->DesiredSize.X != data->CurrentSize.Y || data->DesiredSize.Y != data->CurrentSize.Y)
+            {
+                curWindow.Initialized = false; //force internal basecontrol window to resize
+            }
         }
 
         private void VisGameWindow_OnBeforeThreadedRender(object sender, EventArgs e)
