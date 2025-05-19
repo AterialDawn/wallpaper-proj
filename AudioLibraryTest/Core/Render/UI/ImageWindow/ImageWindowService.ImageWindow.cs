@@ -25,6 +25,8 @@ namespace player.Core.Render.UI.ImageWindow
 
             public SizeF ImageSize { get; private set; }
             public bool Initialized { get; set; } = false;
+            //maybe a flag?
+            public bool ImguiSetSize { get; set; } = false;
 
             Primitives primitives;
             ShaderManager shadMgr;

@@ -74,6 +74,12 @@ namespace player.Core.Render.UI.ImageWindow
                 {
                     flags = ImGuiWindowFlags.NoCollapse;
                 }
+
+                if (window.ImguiSetSize)
+                {
+                    window.ImguiSetSize = false;
+                    ImGui.SetNextWindowSize(new Vector2(window.ImageSize.Width, window.ImageSize.Height));
+                }
                 if (ImGui.Begin(window.Name, flags))
                 {
                     if (!window.Initialized)
@@ -221,7 +227,7 @@ namespace player.Core.Render.UI.ImageWindow
 
             foreach (var toAdd in windowsToAdd)
             {
-                windows.Add(new ImageWindow(toAdd));
+                windows.Add(new ImageWindow(toAdd) { ImguiSetSize = true });
             }
 
             windowsToAdd.Clear();
