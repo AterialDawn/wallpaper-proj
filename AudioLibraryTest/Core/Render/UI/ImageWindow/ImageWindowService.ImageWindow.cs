@@ -44,7 +44,7 @@ namespace player.Core.Render.UI.ImageWindow
                 {
                     aib.LoadAllFramesToMemory = true;
                 }
-                _name = $"IMW : {Path.GetFileName(img.SourcePath)}##{GetHashCode()}"; //add ## label to avoid collision in case multiple files with the same name are loaded
+                _name = $"IMW : {Path.GetFileName(img.SourcePath)}##{data.Path.GetHashCode()}"; //add ## label to avoid collision in case multiple files with the same name are loaded
                 img.Preload();
 
                 ImageSize = img.Resolution;
