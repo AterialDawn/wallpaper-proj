@@ -16,7 +16,6 @@ namespace player.Core.Render.UI.ImageWindow
         static readonly Vector2 MaxVect = new Vector2(float.MaxValue, float.MaxValue);
         public string ServiceName => "ImageWindow";
         List<ImageWindow> windows = new List<ImageWindow>();
-        List<IMGWindowData> windowsToAdd = new List<IMGWindowData>();
         FpsLimitOverrideContext ctx = null;
         ImageWindow curWindow = null;
         ImGuiIOPtr io;
@@ -173,9 +172,13 @@ namespace player.Core.Render.UI.ImageWindow
                             var data = new IMGWindowData { Path = selectedPath };
 
                             settings.ImagesToDisplay.Value.Add(data);
-                            windowsToAdd.Add(data);
 
-                            messageCenter.ShowMessage($"Added IMW : {Path.GetFileName(selectedPath)}");
+                            MainThreadDelegator.InvokeOn(InvocationTarget.BeforeRender, () =>
+                            {
+                                windows.Add(new ImageWindow(data) { ImguiSetSize = true });
+
+                                messageCenter.ShowMessage($"Added IMW : {Path.GetFileName(selectedPath)}");
+                            });
                         }
                     }
                 }
@@ -224,13 +227,6 @@ namespace player.Core.Render.UI.ImageWindow
                 ctx.Dispose();
                 ctx = null;
             }
-
-            foreach (var toAdd in windowsToAdd)
-            {
-                windows.Add(new ImageWindow(toAdd) { ImguiSetSize = true });
-            }
-
-            windowsToAdd.Clear();
         }
 
         public void Cleanup()
