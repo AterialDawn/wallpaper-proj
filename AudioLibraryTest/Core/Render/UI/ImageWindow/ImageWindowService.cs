@@ -38,20 +38,23 @@ namespace player.Core.Render.UI.ImageWindow
 
             settings = new Settings(ServiceManager.GetService<SettingsService>());
 
-            var data = settings.ImagesToDisplay.Value;
-            for (int i = data.Count - 1; i >= 0; i--)
+            ThreadedLoaderContext.Instance.ExecuteOnLoaderThread(() =>
             {
-                var curData = data[i];
-                try
+                var data = settings.ImagesToDisplay.Value;
+                for (int i = data.Count - 1; i >= 0; i--)
                 {
-                    var window = new ImageWindow(curData);
-                    windows.Add(window);
+                    var curData = data[i];
+                    try
+                    {
+                        var window = new ImageWindow(curData);
+                        windows.Add(window);
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        data.RemoveAt(i);
+                    }
                 }
-                catch (FileNotFoundException)
-                {
-                    data.RemoveAt(i);
-                }
-            }
+            });
 
             io = ImGui.GetIO();
         }

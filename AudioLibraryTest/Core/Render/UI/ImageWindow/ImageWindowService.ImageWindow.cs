@@ -32,6 +32,8 @@ namespace player.Core.Render.UI.ImageWindow
             ShaderManager shadMgr;
             TexturedQuadShader shad;
 
+            bool ready = false;
+
             public ImageWindow(IMGWindowData data)
             {
                 Data = data;
@@ -57,10 +59,13 @@ namespace player.Core.Render.UI.ImageWindow
 
                 Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
                 Size = ImageSize;
+                ready = true;
             }
 
             public override void Render(double time)
             {
+                if (!ready) return;
+
                 LoadMatrix();
                 img.Update(time);
 
