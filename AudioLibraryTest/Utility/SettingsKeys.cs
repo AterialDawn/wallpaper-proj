@@ -9,5 +9,6 @@
 
         public const string BarRenderer_SourceFolders = "Bar.SourcePaths";
         public const string BarRenderer_BackgroundDuration = "Bar.BackgroundDuration";
+        public const string BarRenderer_KeepCurrentBackground = "Bar.KeepCurrent";
     }
 }

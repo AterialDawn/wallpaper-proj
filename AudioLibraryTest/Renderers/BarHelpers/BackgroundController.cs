@@ -17,7 +17,7 @@ namespace player.Renderers.BarHelpers
         public double BlendDuration { get; set; } = 2.5;
         public float BlendTimeRemainingPercentage { get; set; } = 0f;
         public double BackgroundDuration { get { return backgroundDurationAccessor.Value; } private set { backgroundDurationAccessor.Set(value); } }
-        public bool KeepCurrentBackground { get; set; } = false;
+        public bool KeepCurrentBackground { get { return keepCurrentBackgroundAccessor.Value; } set { keepCurrentBackgroundAccessor.Value = value; } }
         public BackgroundScalingMode ScalingMode { get; set; } = BackgroundScalingMode.Fit;
         public BackgroundFactory BackgroundFactory { get; private set; }
         public event EventHandler InitialBackgroundLoadComplete;
@@ -44,6 +44,7 @@ namespace player.Renderers.BarHelpers
         private double backgroundTimeLeft = 0;
         private double currentAspectRatio = 0;
         private SettingsAccessor<double> backgroundDurationAccessor;
+        private SettingsAccessor<bool> keepCurrentBackgroundAccessor;
         bool skipBlending = false;
 
         private IBackground currentBackground = null;
@@ -64,7 +65,8 @@ namespace player.Renderers.BarHelpers
             shaderManager = ServiceManager.GetService<ShaderManager>();
             texMatrices[0] = Matrix4.Identity;
             texMatrices[1] = Matrix4.Identity;
-            backgroundDurationAccessor = ServiceManager.GetService<SettingsService>().GetAccessor<double>(SettingsKeys.BarRenderer_BackgroundDuration, 45f);
+            backgroundDurationAccessor = ServiceManager.GetService<SettingsService>().GetAccessor(SettingsKeys.BarRenderer_BackgroundDuration, 45.0);
+            keepCurrentBackgroundAccessor = ServiceManager.GetService<SettingsService>().GetAccessor(SettingsKeys.BarRenderer_KeepCurrentBackground, false);
 
             pieChart = new PieChartControl("BGProgress");
             pieChart.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
