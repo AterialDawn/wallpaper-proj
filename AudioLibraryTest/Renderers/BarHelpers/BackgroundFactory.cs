@@ -39,6 +39,8 @@ namespace player.Renderers.BarHelpers
             RescanAllSources();
         }
 
+        public void Cleanup() { }
+
         public void RemoveFile(string path)
         {
             if (registeredFiles.Contains(path))
@@ -304,11 +306,6 @@ namespace player.Renderers.BarHelpers
             }
 
             if (currentIndex == -1) ShuffleFiles();
-        }
-
-        public void Cleanup()
-        {
-            throw new NotImplementedException();
         }
     }
 }
