@@ -141,15 +141,15 @@ namespace player
 
         private static void WallpaperOptionCallback(string Arg)
         {
-            if (Arg != null && Arg.ToLower().Equals("full"))
-            {
-                Log.Log("Wallpaper mode enabled (FullArea)");
-                VisGameWindow.FormWallpaperMode = WallpaperMode.FullArea;
-            }
-            else
+            if (Arg != null && Arg.ToLower().Equals("working"))
             {
                 Log.Log("Wallpaper mode enabled (WorkingArea)");
                 VisGameWindow.FormWallpaperMode = WallpaperMode.WorkingArea;
+            }
+            else
+            {
+                Log.Log("Wallpaper mode enabled (Full)");
+                VisGameWindow.FormWallpaperMode = WallpaperMode.FullArea;
             }
 
         }

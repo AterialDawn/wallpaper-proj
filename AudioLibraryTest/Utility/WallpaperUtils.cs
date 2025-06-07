@@ -89,30 +89,55 @@ namespace player.Utility
             int xOff = 0, yOff = 0;
             foreach (var screen in Screen.AllScreens)
             {
+                //get the negative offset(if any) of the furthest left monitor
                 if (screen.Bounds.X < xOff) xOff = screen.Bounds.X;
                 if (screen.Bounds.Y < yOff) yOff = screen.Bounds.Y;
             }
 
             Point wallpaperModePosition = Screen.PrimaryScreen.Bounds.Location;
             Size wallpaperModeSize = Screen.PrimaryScreen.Bounds.Size;
-            var wallpaperPosOption = Program.CLIParser.ActiveOptions.Where(o => o.Item1.Equals("WallpaperPos")).FirstOrDefault();
-            var wallpaperSizeOption = Program.CLIParser.ActiveOptions.Where(o => o.Item1.Equals("WallpaperSize")).FirstOrDefault();
-            if (wallpaperPosOption != null)
+            var monIndexOpt = Program.CLIParser.ActiveOptions.Where(o => o.Item1 == "WallpaperMonitorIndex").FirstOrDefault();
+            if (monIndexOpt != null)
             {
-                string[] split = wallpaperPosOption.Item2.Split('x');
-                if (split.Length == 2)
+                if (!int.TryParse(monIndexOpt.Item2, out var monitorIndex))
                 {
-                    wallpaperModePosition = new Point(int.Parse(split[0]), int.Parse(split[1]));
+                    throw new InvalidOperationException($"Could not parse {monIndexOpt.Item2} as an integer for monitor index!");
+                }
+
+                if (monitorIndex < 0 || monitorIndex > Screen.AllScreens.Length - 1)
+                {
+                    throw new InvalidOperationException($"Monitor index {monitorIndex} is out of bounds! Must be between 0 and {Screen.AllScreens.Length - 1}!");
+                }
+
+                var screenBounds = Screen.AllScreens[monitorIndex];
+
+                wallpaperModePosition = screenBounds.Bounds.Location;
+                wallpaperModeSize = screenBounds.Bounds.Size;
+            }
+            else
+            {
+                var wallpaperPosOption = Program.CLIParser.ActiveOptions.Where(o => o.Item1.Equals("WallpaperPos")).FirstOrDefault();
+                var wallpaperSizeOption = Program.CLIParser.ActiveOptions.Where(o => o.Item1.Equals("WallpaperSize")).FirstOrDefault();
+                if (wallpaperPosOption != null)
+                {
+                    string[] split = wallpaperPosOption.Item2.Split('x');
+                    if (split.Length == 2)
+                    {
+                        wallpaperModePosition = new Point(int.Parse(split[0]), int.Parse(split[1]));
+                    }
+                }
+                if (wallpaperSizeOption != null)
+                {
+                    string[] split = wallpaperSizeOption.Item2.Split('x');
+                    if (split.Length == 2)
+                    {
+                        wallpaperModeSize = new Size(int.Parse(split[0]), int.Parse(split[1]));
+                    }
                 }
             }
-            if (wallpaperSizeOption != null)
-            {
-                string[] split = wallpaperSizeOption.Item2.Split('x');
-                if (split.Length == 2)
-                {
-                    wallpaperModeSize = new Size(int.Parse(split[0]), int.Parse(split[1]));
-                }
-            }
+            wallpaperModePosition.Offset(-xOff, -yOff); //apply the negative offset to the obtained coordinate
+                                                        //but why did we offset? windows has 2 coordinate systems for this kind of thing. the desktop (regardless if the monitor is at a negative coordinate) is ALWAYS 0,0 top left. mouse coordinates CAN BE negative, if a physical monitor is in a negative coordinate.
+                                                        //by negating the coordinate here, we convert the (potentially) negative windows coordinates, into 0,0 which is desktop coordinate and CAN NOT be negative. we then apply correction to Corrected coordinates, to get the true mouse position for the rest of the input system, which CAN BE negative.
             WallpaperBounds = new Rectangle(wallpaperModePosition, wallpaperModeSize);
             WallpaperBoundsCorrected = new Rectangle(xOff + WallpaperBounds.X, yOff + WallpaperBounds.Y, WallpaperBounds.Width, WallpaperBounds.Height);
             Log.Log($"Wallpaper bounds : {WallpaperBounds}. Corrected : {WallpaperBoundsCorrected}");
